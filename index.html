@@ -414,6 +414,11 @@
             margin: 15px 0;
             border-radius: 4px;
         }
+        
+        .error-input {
+            border-color: var(--danger-color) !important;
+            background-color: #fff5f5;
+        }
     </style>
 </head>
 <body>
@@ -440,8 +445,8 @@
             
             <div class="form-grid">
                 <div class="form-group">
-                    <label class="form-label">Nombre completo</label>
-                    <input type="text" id="nombre" class="form-control" placeholder="Nombre del paciente">
+                    <label class="form-label">Nombre completo <span style="color:red">*</span></label>
+                    <input type="text" id="nombre" class="form-control" placeholder="Nombre del paciente" required>
                 </div>
                 
                 <div class="form-group">
@@ -455,8 +460,8 @@
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Fecha evaluación</label>
-                    <input type="date" id="fecha" class="form-control">
+                    <label class="form-label">Fecha evaluación <span style="color:red">*</span></label>
+                    <input type="date" id="fecha" class="form-control" required>
                 </div>
                 
                 <div class="form-group">
@@ -470,12 +475,13 @@
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Evaluador</label>
-                    <input type="text" id="evaluador" class="form-control" placeholder="Nombre del profesional">
+                    <label class="form-label">Evaluador <span style="color:red">*</span></label>
+                    <input type="text" id="evaluador" class="form-control" placeholder="Nombre del profesional" required>
                 </div>
             </div>
             
             <div class="action-buttons">
+                <div></div>
                 <button class="btn btn-primary" id="siguiente-irat">
                     <i class="fas fa-arrow-right"></i> Siguiente: IRAT-5
                 </button>
@@ -487,8 +493,8 @@
             <h2 class="section-title"><i class="fas fa-clipboard-list"></i> Evaluación IRAT-5 Modificado</h2>
             
             <div class="question-group">
-                <div class="question-text">1. Equilibrio Unipodal</div>
-                <select id="equilibrio" class="form-control">
+                <div class="question-text">1. Equilibrio Unipodal <span style="color:red">*</span></div>
+                <select id="equilibrio" class="form-control" required>
                     <option value="">Seleccione...</option>
                     <option value="0">≥ 30 segundos (0 pts)</option>
                     <option value="1">15-29 segundos (1 pts)</option>
@@ -499,8 +505,8 @@
             </div>
             
             <div class="question-group">
-                <div class="question-text">2. Tipo de Amputación</div>
-                <select id="amputacion" class="form-control">
+                <div class="question-text">2. Tipo de Amputación <span style="color:red">*</span></div>
+                <select id="amputacion" class="form-control" required>
                     <option value="">Seleccione...</option>
                     <option value="0">Sin amputaciones (0 pts)</option>
                     <option value="1">Amputación transmetatarsiana (1 pts)</option>
@@ -518,8 +524,8 @@
             </div>
             
             <div class="question-group">
-                <div class="question-text">3. Función de Brazos</div>
-                <select id="brazos" class="form-control">
+                <div class="question-text">3. Función de Brazos <span style="color:red">*</span></div>
+                <select id="brazos" class="form-control" required>
                     <option value="">Seleccione...</option>
                     <option value="0">Ambos brazos normales o fuerza ≥3 (0 pts)</option>
                     <option value="1">Problemas en un brazo/fuerza <3 (1 pts)</option>
@@ -528,8 +534,8 @@
             </div>
             
             <div class="question-group">
-                <div class="question-text">4. Situación Social</div>
-                <select id="social" class="form-control">
+                <div class="question-text">4. Situación Social <span style="color:red">*</span></div>
+                <select id="social" class="form-control" required>
                     <option value="">Seleccione...</option>
                     <option value="0">Cuidador profesional (0 pts)</option>
                     <option value="1">Cuidador informal (1 pts)</option>
@@ -539,8 +545,8 @@
             </div>
             
             <div class="question-group">
-                <div class="question-text">5. Nivel de Cooperación</div>
-                <select id="cooperacion" class="form-control">
+                <div class="question-text">5. Nivel de Cooperación <span style="color:red">*</span></div>
+                <select id="cooperacion" class="form-control" required>
                     <option value="">Seleccione...</option>
                     <option value="0">Excelente - Sigue todas las instrucciones (0 pts)</option>
                     <option value="1">Buena - Sigue mayoría de instrucciones (1 pts)</option>
@@ -579,7 +585,7 @@
             <div class="tinetti-container">
                 <!-- Opción No Evaluable -->
                 <div class="question-group">
-                    <div class="question-text">¿Es evaluable el Test de Tinetti?</div>
+                    <div class="question-text">¿Es evaluable el Test de Tinetti? <span style="color:red">*</span></div>
                     <div id="opcion-no-evaluable" class="tinetti-option" data-puntaje="0" data-irat="4">
                         <strong>NO EVALUABLE</strong><br>
                         <small>Paciente no puede realizar la prueba (máximo riesgo - 4 puntos IRAT-5)</small>
@@ -977,82 +983,226 @@
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('fecha').value = today;
             
-            // Actualizar Norton al cargar
-            calcularNorton();
-            
-            // Configurar Tinetti
-            configurarTinetti();
+            // Inicializar componentes
+            inicializarAplicacion();
             
             mostrarNotificacion('App IRAT-5 + Tinetti + Norton cargada', 'info');
         });
         
-        // Navegación entre secciones
-        document.querySelectorAll('.nav-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                const sectionId = tab.getAttribute('data-section');
-                
-                // Actualizar tabs activos
-                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                
-                // Mostrar sección correspondiente
-                document.querySelectorAll('.section').forEach(section => {
-                    section.classList.remove('active');
+        // ========== INICIALIZACIÓN ==========
+        function inicializarAplicacion() {
+            // Configurar navegación
+            inicializarNavegacion();
+            
+            // Configurar Tinetti
+            configurarTinetti();
+            
+            // Configurar IRAT-5 en tiempo real
+            inicializarIRAT5();
+            
+            // Configurar Norton
+            inicializarNorton();
+            
+            // Configurar funcionalidades de compartir
+            inicializarCompartir();
+        }
+        
+        // ========== NAVEGACIÓN ==========
+        function inicializarNavegacion() {
+            // Navegación por pestañas
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const sectionId = this.getAttribute('data-section');
+                    mostrarSeccion(sectionId);
                 });
-                document.getElementById(sectionId).classList.add('active');
             });
-        });
+            
+            // Botones específicos de navegación
+            document.getElementById('siguiente-irat').addEventListener('click', function() {
+                if (validarIdentificacion()) {
+                    mostrarSeccion('evaluacion');
+                }
+            });
+            
+            document.getElementById('volver-identificacion').addEventListener('click', function() {
+                mostrarSeccion('identificacion');
+            });
+            
+            document.getElementById('siguiente-tinetti').addEventListener('click', function() {
+                if (validarIRAT5()) {
+                    mostrarSeccion('tinetti');
+                }
+            });
+            
+            document.getElementById('volver-irat').addEventListener('click', function() {
+                mostrarSeccion('evaluacion');
+            });
+            
+            document.getElementById('siguiente-norton').addEventListener('click', function() {
+                if (validarTinetti()) {
+                    mostrarSeccion('norton');
+                }
+            });
+            
+            document.getElementById('volver-tinetti').addEventListener('click', function() {
+                mostrarSeccion('tinetti');
+            });
+            
+            document.getElementById('calcular-resultados').addEventListener('click', function() {
+                if (validarNorton()) {
+                    calcularResultadosCompletos();
+                    mostrarSeccion('resultados');
+                }
+            });
+            
+            document.getElementById('volver-norton').addEventListener('click', function() {
+                mostrarSeccion('norton');
+            });
+            
+            document.getElementById('ir-compartir').addEventListener('click', function() {
+                if (Object.keys(datosCompletos).length > 0) {
+                    mostrarSeccion('compartir');
+                } else {
+                    mostrarNotificacion('Primero debe calcular los resultados', 'error');
+                }
+            });
+            
+            document.getElementById('volver-resultados').addEventListener('click', function() {
+                mostrarSeccion('resultados');
+            });
+        }
         
-        // Botones de navegación
-        document.getElementById('siguiente-irat').addEventListener('click', () => {
-            document.querySelector('[data-section="evaluacion"]').click();
-        });
+        function mostrarSeccion(sectionId) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Mostrar sección seleccionada
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Actualizar pestañas activas
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-section') === sectionId) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Scroll al inicio
+            window.scrollTo(0, 0);
+        }
         
-        document.getElementById('volver-identificacion').addEventListener('click', () => {
-            document.querySelector('[data-section="identificacion"]').click();
-        });
-        
-        document.getElementById('siguiente-tinetti').addEventListener('click', () => {
-            document.querySelector('[data-section="tinetti"]').click();
-        });
-        
-        document.getElementById('volver-irat').addEventListener('click', () => {
-            document.querySelector('[data-section="evaluacion"]').click();
-        });
-        
-        document.getElementById('siguiente-norton').addEventListener('click', () => {
-            // Validar Tinetti antes de continuar
-            if (!validarTinetti()) {
-                mostrarNotificacion('Debe completar la evaluación Tinetti', 'error');
-                return;
+        // ========== VALIDACIONES ==========
+        function validarIdentificacion() {
+            const camposRequeridos = [
+                { id: 'nombre', nombre: 'Nombre del paciente' },
+                { id: 'fecha', nombre: 'Fecha de evaluación' },
+                { id: 'evaluador', nombre: 'Nombre del evaluador' }
+            ];
+            
+            let valido = true;
+            let mensajeError = '';
+            
+            // Remover errores previos
+            camposRequeridos.forEach(campo => {
+                document.getElementById(campo.id).classList.remove('error-input');
+            });
+            
+            // Validar campos
+            for (const campo of camposRequeridos) {
+                const elemento = document.getElementById(campo.id);
+                if (!elemento.value.trim()) {
+                    elemento.classList.add('error-input');
+                    mensajeError += `• ${campo.nombre} es requerido\n`;
+                    valido = false;
+                }
             }
-            document.querySelector('[data-section="norton"]').click();
-        });
+            
+            if (!valido) {
+                mostrarNotificacion(mensajeError, 'error');
+                return false;
+            }
+            
+            return true;
+        }
         
-        document.getElementById('volver-tinetti').addEventListener('click', () => {
-            document.querySelector('[data-section="tinetti"]').click();
-        });
+        function validarIRAT5() {
+            const camposRequeridos = [
+                'equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'
+            ];
+            
+            let valido = true;
+            let camposFaltantes = [];
+            
+            // Remover errores previos
+            camposRequeridos.forEach(id => {
+                document.getElementById(id).classList.remove('error-input');
+            });
+            
+            // Validar campos
+            camposRequeridos.forEach(id => {
+                const select = document.getElementById(id);
+                if (!select.value) {
+                    select.classList.add('error-input');
+                    camposFaltantes.push(select.previousElementSibling.textContent);
+                    valido = false;
+                }
+            });
+            
+            if (!valido) {
+                mostrarNotificacion('Complete todos los campos del IRAT-5', 'error');
+                return false;
+            }
+            
+            return true;
+        }
         
-        document.getElementById('volver-norton').addEventListener('click', () => {
-            document.querySelector('[data-section="norton"]').click();
-        });
+        function validarTinetti() {
+            // Verificar si se seleccionó "No evaluable"
+            if (tinettiNoEvaluable) {
+                return true;
+            }
+            
+            // Verificar que todas las preguntas del Tinetti estén respondidas
+            const gruposNecesarios = [];
+            for (let i = 1; i <= 8; i++) gruposNecesarios.push(`balance${i}`);
+            for (let i = 9; i <= 16; i++) gruposNecesarios.push(`gait${i}`);
+            
+            const todosCompletos = gruposNecesarios.every(grupo => respuestasTinetti[grupo]);
+            
+            if (!todosCompletos) {
+                mostrarNotificacion('Complete todas las preguntas del Test de Tinetti', 'error');
+                return false;
+            }
+            
+            return true;
+        }
         
-        document.getElementById('ir-compartir').addEventListener('click', () => {
-            document.querySelector('[data-section="compartir"]').click();
-        });
+        function validarNorton() {
+            // Norton siempre tiene valores por defecto, así que siempre es válido
+            return true;
+        }
         
-        document.getElementById('volver-resultados').addEventListener('click', () => {
-            document.querySelector('[data-section="resultados"]').click();
-        });
-        
-        // Calcular puntaje IRAT-5 en tiempo real
-        const selectsIRAT = ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'];
-        selectsIRAT.forEach(id => {
-            document.getElementById(id).addEventListener('change', calcularPuntajeIRATPreliminar);
-        });
+        // ========== IRAT-5 ==========
+        function inicializarIRAT5() {
+            const selectsIRAT = ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'];
+            
+            selectsIRAT.forEach(id => {
+                document.getElementById(id).addEventListener('change', function() {
+                    calcularPuntajeIRATPreliminar();
+                    // Remover error si se selecciona algo
+                    this.classList.remove('error-input');
+                });
+            });
+            
+            // Calcular puntaje inicial
+            calcularPuntajeIRATPreliminar();
+        }
         
         function calcularPuntajeIRATPreliminar() {
             let puntaje = 0;
+            const selectsIRAT = ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'];
             
             // Sumar valores de selects IRAT-5
             selectsIRAT.forEach(id => {
@@ -1072,29 +1222,12 @@
             document.getElementById('puntaje-irat').textContent = puntaje;
         }
         
-        // Calcular Norton en tiempo real
-        const selectsNorton = ['norton-fisico', 'norton-mental', 'norton-actividad', 'norton-movilidad', 'norton-incontinencia'];
-        selectsNorton.forEach(id => {
-            document.getElementById(id).addEventListener('change', calcularNorton);
-        });
-        
-        function calcularNorton() {
-            let puntaje = 0;
-            selectsNorton.forEach(id => {
-                const select = document.getElementById(id);
-                puntaje += parseInt(select.value);
-            });
-            
-            puntajeNorton = puntaje;
-            document.getElementById('puntaje-norton').textContent = puntaje;
-        }
-        
-        // Configurar Tinetti
+        // ========== TINETTI ==========
         function configurarTinetti() {
             // Opción "No evaluable"
             document.getElementById('opcion-no-evaluable').addEventListener('click', function() {
                 // Deseleccionar todas las otras opciones
-                document.querySelectorAll('.tinetti-option').forEach(opt => {
+                document.querySelectorAll('.tinetti-option[data-grupo]').forEach(opt => {
                     opt.classList.remove('selected');
                 });
                 
@@ -1106,14 +1239,7 @@
                 document.getElementById('test-tinetti-completo').style.display = 'none';
                 
                 // Mostrar resultado
-                document.getElementById('resultado-tinetti').style.display = 'block';
-                document.getElementById('puntaje-tinetti-total').textContent = 'No evaluable';
-                document.getElementById('interpretacion-tinetti').innerHTML = '<strong>Máximo riesgo de caídas</strong>';
-                document.getElementById('puntos-irat-tinetti').innerHTML = '<strong>4 puntos IRAT-5 (máximo)</strong>';
-                
-                // Resetear respuestas
-                respuestasTinetti = {};
-                puntajeTinetti = 0;
+                mostrarResultadoTinetti();
             });
             
             // Opciones del test completo
@@ -1139,8 +1265,9 @@
                     
                     // Guardar respuesta
                     const puntaje = parseInt(this.getAttribute('data-puntaje'));
+                    const texto = this.querySelector('strong') ? this.querySelector('strong').textContent : this.textContent;
                     respuestasTinetti[grupo] = {
-                        texto: this.textContent.trim(),
+                        texto: texto.trim(),
                         puntaje: puntaje
                     };
                     
@@ -1148,6 +1275,9 @@
                     calcularPuntajeTinetti();
                 });
             });
+            
+            // Inicializar display
+            document.getElementById('test-tinetti-completo').style.display = 'block';
         }
         
         function calcularPuntajeTinetti() {
@@ -1181,8 +1311,10 @@
         }
         
         function mostrarResultadoTinetti() {
+            const resultadoDiv = document.getElementById('resultado-tinetti');
+            
             if (tinettiNoEvaluable) {
-                document.getElementById('resultado-tinetti').style.display = 'block';
+                resultadoDiv.style.display = 'block';
                 document.getElementById('puntaje-tinetti-total').textContent = 'No evaluable';
                 document.getElementById('interpretacion-tinetti').innerHTML = '<strong>Máximo riesgo de caídas</strong>';
                 document.getElementById('puntos-irat-tinetti').innerHTML = '<strong>4 puntos IRAT-5 (máximo)</strong>';
@@ -1197,7 +1329,7 @@
             const todosCompletos = gruposNecesarios.every(grupo => respuestasTinetti[grupo]);
             
             if (!todosCompletos) {
-                document.getElementById('resultado-tinetti').style.display = 'none';
+                resultadoDiv.style.display = 'none';
                 return;
             }
             
@@ -1215,63 +1347,49 @@
                 puntosIRAT = 4;
             }
             
-            document.getElementById('resultado-tinetti').style.display = 'block';
+            resultadoDiv.style.display = 'block';
             document.getElementById('puntaje-tinetti-total').textContent = puntajeTinetti;
             document.getElementById('interpretacion-tinetti').innerHTML = interpretacion;
             document.getElementById('puntos-irat-tinetti').innerHTML = `<strong>${puntosIRAT} puntos IRAT-5</strong>`;
         }
         
-        function validarTinetti() {
-            if (tinettiNoEvaluable) {
-                return true;
-            }
+        // ========== NORTON ==========
+        function inicializarNorton() {
+            const selectsNorton = ['norton-fisico', 'norton-mental', 'norton-actividad', 'norton-movilidad', 'norton-incontinencia'];
             
-            // Verificar que todas las preguntas estén respondidas
-            const gruposNecesarios = [];
-            for (let i = 1; i <= 8; i++) gruposNecesarios.push(`balance${i}`);
-            for (let i = 9; i <= 16; i++) gruposNecesarios.push(`gait${i}`);
-            
-            return gruposNecesarios.every(grupo => respuestasTinetti[grupo]);
-        }
-        
-        // Calcular resultados completos
-        document.getElementById('calcular-resultados').addEventListener('click', calcularResultadosCompletos);
-        
-        function calcularResultadosCompletos() {
-            // Validar campos requeridos
-            const camposRequeridos = [
-                'nombre', 'equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion',
-                'norton-fisico', 'norton-mental', 'norton-actividad', 'norton-movilidad', 'norton-incontinencia'
-            ];
-            
-            let valido = true;
-            let camposFaltantes = [];
-            
-            camposRequeridos.forEach(id => {
-                const campo = document.getElementById(id);
-                if (!campo.value) {
-                    valido = false;
-                    camposFaltantes.push(campo.id);
-                    campo.style.borderColor = 'red';
-                } else {
-                    campo.style.borderColor = '#e0e0e0';
-                }
+            selectsNorton.forEach(id => {
+                document.getElementById(id).addEventListener('change', calcularNorton);
             });
             
-            // Validar Tinetti
-            if (!validarTinetti()) {
-                valido = false;
-                camposFaltantes.push('tinetti');
-                mostrarNotificacion('Complete todas las preguntas del Test de Tinetti', 'error');
-            }
+            // Calcular puntaje inicial
+            calcularNorton();
+        }
+        
+        function calcularNorton() {
+            let puntaje = 0;
+            const selectsNorton = ['norton-fisico', 'norton-mental', 'norton-actividad', 'norton-movilidad', 'norton-incontinencia'];
             
-            if (!valido) {
-                mostrarNotificacion(`Complete todos los campos`, 'error');
+            selectsNorton.forEach(id => {
+                const select = document.getElementById(id);
+                puntaje += parseInt(select.value);
+            });
+            
+            puntajeNorton = puntaje;
+            document.getElementById('puntaje-norton').textContent = puntaje;
+        }
+        
+        // ========== CÁLCULO DE RESULTADOS ==========
+        function calcularResultadosCompletos() {
+            // Validar que todo esté completo
+            if (!validarIdentificacion() || !validarIRAT5() || !validarTinetti()) {
+                mostrarNotificacion('Complete todas las secciones antes de calcular', 'error');
                 return;
             }
             
             // Calcular puntaje IRAT-5 completo (con Tinetti)
             let puntajeIRAT = 0;
+            const selectsIRAT = ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'];
+            
             selectsIRAT.forEach(id => {
                 const select = document.getElementById(id);
                 if (select.value) {
@@ -1328,9 +1446,6 @@
             
             // Mostrar resultados
             mostrarResultados();
-            
-            // Ir a sección de resultados
-            document.querySelector('[data-section="resultados"]').click();
             
             mostrarNotificacion('Resultados calculados exitosamente', 'success');
         }
@@ -1564,459 +1679,93 @@
             return "Ayudas de movilización. Silla de ruedas + colchón alternante.";
         }
         
-        // ========== FUNCIONALIDAD PARA COMPARTIR ==========
-        
-        // 1. Generar PDF MEJORADO (múltiples páginas)
-        document.getElementById('generar-pdf').addEventListener('click', generarPDF);
+        // ========== COMPARTIR ==========
+        function inicializarCompartir() {
+            document.getElementById('generar-pdf').addEventListener('click', generarPDF);
+            document.getElementById('compartir-whatsapp').addEventListener('click', compartirWhatsApp);
+            document.getElementById('copiar-texto').addEventListener('click', copiarTextoCompleto);
+            document.getElementById('nueva-evaluacion').addEventListener('click', nuevaEvaluacion);
+        }
         
         async function generarPDF() {
-            mostrarNotificacion('Generando PDF...', 'info');
-            
             try {
-                // Verificar que hay datos calculados
-                if (!datosCompletos.paciente.nombre) {
+                if (!datosCompletos.paciente || !datosCompletos.paciente.nombre) {
                     mostrarNotificacion('Primero calcule los resultados', 'error');
                     return;
                 }
                 
-                // Crear PDF
+                mostrarNotificacion('Generando PDF...', 'info');
+                
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
-                let yPos = 20;
-                const pageHeight = 280;
                 
-                // ========== PÁGINA 1: CABECERA Y DATOS ==========
-                pdf.setFontSize(20);
-                pdf.setTextColor(30, 60, 114); // Color primario
-                pdf.text("INFORME DE EVALUACIÓN CLÍNICA", 105, yPos, { align: 'center' });
-                yPos += 10;
-                
+                // Contenido básico del PDF (simplificado)
                 pdf.setFontSize(16);
-                pdf.setTextColor(42, 82, 152); // Color secundario
-                pdf.text("IRAT-5 Modificado + Tinetti + Norton", 105, yPos, { align: 'center' });
-                yPos += 15;
-                
-                // Línea divisoria
-                pdf.setDrawColor(30, 60, 114);
-                pdf.setLineWidth(0.5);
-                pdf.line(20, yPos, 190, yPos);
-                yPos += 10;
-                
-                // Fecha
-                pdf.setFontSize(10);
-                pdf.setTextColor(0, 0, 0);
-                pdf.text(`Fecha de emisión: ${new Date().toLocaleDateString('es-ES')}`, 20, yPos);
-                yPos += 10;
-                
-                // Sección: Datos del paciente
-                pdf.setFontSize(14);
-                pdf.setTextColor(30, 60, 114);
-                pdf.text("1. DATOS DEL PACIENTE", 20, yPos);
-                yPos += 10;
-                
-                pdf.setFontSize(10);
-                pdf.setTextColor(0, 0, 0);
-                
-                const datosPaciente = [
-                    [`Nombre completo:`, datosCompletos.paciente.nombre || 'No especificado'],
-                    [`RUT:`, datosCompletos.paciente.rut || 'No especificado'],
-                    [`Edad:`, datosCompletos.paciente.edad ? `${datosCompletos.paciente.edad} años` : 'No especificado'],
-                    [`Sexo:`, datosCompletos.paciente.sexo || 'No especificado'],
-                    [`Fecha evaluación:`, datosCompletos.paciente.fecha || 'No especificado'],
-                    [`Profesional evaluador:`, datosCompletos.paciente.evaluador || 'No especificado']
-                ];
-                
-                datosPaciente.forEach(([label, value]) => {
-                    if (yPos > pageHeight - 20) {
-                        pdf.addPage();
-                        yPos = 20;
-                    }
-                    pdf.text(`${label} ${value}`, 20, yPos);
-                    yPos += 7;
-                });
-                
-                yPos += 10;
-                
-                // ========== PÁGINA 2: IRAT-5 ==========
-                if (yPos > pageHeight - 50) {
-                    pdf.addPage();
-                    yPos = 20;
-                }
-                
-                pdf.setFontSize(14);
-                pdf.setTextColor(30, 60, 114);
-                pdf.text("2. EVALUACIÓN IRAT-5 MODIFICADO", 20, yPos);
-                yPos += 10;
-                
-                // Tabla IRAT-5
-                pdf.setFontSize(9);
-                const tablaIRAT = [
-                    ['Variable', 'Respuesta', 'Puntos'],
-                    ['1. Equilibrio unipodal', datosCompletos.irat5.equilibrio, document.getElementById('equilibrio').value || '0'],
-                    ['2. Tipo de amputación', datosCompletos.irat5.amputacion, 
-                     `${document.getElementById('amputacion').value || '0'} ${parseInt(document.getElementById('amputacion').value) >= 3 ? '+ 1 riesgo caídas' : ''}`],
-                    ['3. Función de brazos', datosCompletos.irat5.brazos, document.getElementById('brazos').value || '0'],
-                    ['4. Situación social', datosCompletos.irat5.social, document.getElementById('social').value || '0'],
-                    ['5. Cooperación', datosCompletos.irat5.cooperacion, document.getElementById('cooperacion').value || '0'],
-                    ['PUNTAJE TOTAL IRAT-5', '', datosCompletos.irat5.puntaje],
-                    ['NIVEL DE RIESGO', datosCompletos.irat5.riesgo, '']
-                ];
-                
-                // Dibujar tabla
-                const startX = 20;
-                let tableY = yPos;
-                
-                tablaIRAT.forEach((row, rowIndex) => {
-                    if (tableY > pageHeight - 20) {
-                        pdf.addPage();
-                        tableY = 20;
-                    }
-                    
-                    const isHeader = rowIndex === 0;
-                    const isTotal = rowIndex === tablaIRAT.length - 2 || rowIndex === tablaIRAT.length - 1;
-                    
-                    pdf.setFontStyle(isHeader || isTotal ? 'bold' : 'normal');
-                    pdf.setFillColor(isHeader ? 245, 247, 255 : 255, 255, 255);
-                    pdf.rect(startX, tableY - 5, 170, 8, 'F');
-                    
-                    pdf.text(row[0], startX + 2, tableY);
-                    pdf.text(row[1], startX + 80, tableY);
-                    pdf.text(row[2], startX + 150, tableY, { align: 'right' });
-                    
-                    tableY += 8;
-                });
-                
-                yPos = tableY + 10;
-                
-                // ========== PÁGINA 3: TINETTI ==========
-                if (yPos > pageHeight - 50) {
-                    pdf.addPage();
-                    yPos = 20;
-                }
-                
-                pdf.setFontSize(14);
-                pdf.setTextColor(30, 60, 114);
-                pdf.text("3. TEST DE TINETTI", 20, yPos);
-                yPos += 10;
-                
-                pdf.setFontSize(10);
-                pdf.setTextColor(0, 0, 0);
-                
-                if (tinettiNoEvaluable) {
-                    pdf.text("No evaluable - Paciente no puede realizar la prueba", 20, yPos);
-                    yPos += 7;
-                    pdf.text("Máximo riesgo de caídas - 4 puntos IRAT-5", 20, yPos);
-                    yPos += 10;
-                } else {
-                    pdf.text(`Puntaje total: ${puntajeTinetti}/28 puntos`, 20, yPos);
-                    yPos += 7;
-                    pdf.text(`Interpretación: ${datosCompletos.tinetti.riesgo}`, 20, yPos);
-                    yPos += 10;
-                    
-                    // Detalles por sección si hay espacio
-                    if (yPos < pageHeight - 100) {
-                        pdf.text("Equilibrio (Balance):", 20, yPos);
-                        yPos += 7;
-                        
-                        // Mostrar algunas respuestas clave
-                        const respuestasBalance = [
-                            respuestasTinetti.balance1,
-                            respuestasTinetti.balance2,
-                            respuestasTinetti.balance4,
-                            respuestasTinetti.balance5
-                        ].filter(r => r).map(r => `• ${r.texto.substring(0, 50)}...`);
-                        
-                        respuestasBalance.forEach(resp => {
-                            if (yPos > pageHeight - 20) {
-                                pdf.addPage();
-                                yPos = 20;
-                            }
-                            pdf.text(resp, 25, yPos);
-                            yPos += 6;
-                        });
-                        
-                        yPos += 5;
-                    }
-                }
-                
-                yPos += 10;
-                
-                // ========== PÁGINA 4: NORTON ==========
-                if (yPos > pageHeight - 50) {
-                    pdf.addPage();
-                    yPos = 20;
-                }
-                
-                pdf.setFontSize(14);
-                pdf.setTextColor(30, 60, 114);
-                pdf.text("4. ESCALA NORTON", 20, yPos);
-                yPos += 10;
-                
-                // Tabla Norton
-                pdf.setFontSize(9);
-                const tablaNorton = [
-                    ['Variable', 'Valoración', 'Puntos'],
-                    ['Estado físico', datosCompletos.norton.fisico, document.getElementById('norton-fisico').value],
-                    ['Estado mental', datosCompletos.norton.mental, document.getElementById('norton-mental').value],
-                    ['Actividad', datosCompletos.norton.actividad, document.getElementById('norton-actividad').value],
-                    ['Movilidad', datosCompletos.norton.movilidad, document.getElementById('norton-movilidad').value],
-                    ['Incontinencia', datosCompletos.norton.incontinencia, document.getElementById('norton-incontinencia').value],
-                    ['PUNTAJE TOTAL NORTON', '', datosCompletos.norton.puntaje],
-                    ['RIESGO ÚLCERAS POR PRESIÓN', datosCompletos.norton.riesgo, '']
-                ];
-                
-                // Dibujar tabla Norton
-                tableY = yPos;
-                
-                tablaNorton.forEach((row, rowIndex) => {
-                    if (tableY > pageHeight - 20) {
-                        pdf.addPage();
-                        tableY = 20;
-                    }
-                    
-                    const isHeader = rowIndex === 0;
-                    const isTotal = rowIndex === tablaNorton.length - 2 || rowIndex === tablaNorton.length - 1;
-                    
-                    pdf.setFontStyle(isHeader || isTotal ? 'bold' : 'normal');
-                    pdf.setFillColor(isHeader ? 245, 247, 255 : 255, 255, 255);
-                    pdf.rect(startX, tableY - 5, 170, 8, 'F');
-                    
-                    pdf.text(row[0], startX + 2, tableY);
-                    pdf.text(row[1], startX + 80, tableY);
-                    pdf.text(row[2], startX + 150, tableY, { align: 'right' });
-                    
-                    tableY += 8;
-                });
-                
-                yPos = tableY + 10;
-                
-                // ========== PÁGINA 5: RECOMENDACIONES ==========
-                if (yPos > pageHeight - 50) {
-                    pdf.addPage();
-                    yPos = 20;
-                }
-                
-                pdf.setFontSize(14);
-                pdf.setTextColor(30, 60, 114);
-                pdf.text("5. RECOMENDACIONES Y PLAN DE INTERVENCIÓN", 20, yPos);
-                yPos += 10;
-                
-                pdf.setFontSize(10);
-                recomendaciones.forEach((rec, index) => {
-                    if (yPos > pageHeight - 20) {
-                        pdf.addPage();
-                        yPos = 20;
-                    }
-                    pdf.text(`${index + 1}. ${rec}`, 20, yPos);
-                    yPos += 7;
-                });
-                
-                yPos += 10;
-                
-                // Próxima evaluación
-                if (yPos > pageHeight - 30) {
-                    pdf.addPage();
-                    yPos = 20;
-                }
-                
-                pdf.text(`Próxima evaluación recomendada: ${datosCompletos.resultados.proximaEvaluacion}`, 20, yPos);
-                yPos += 10;
-                
-                // Observaciones
-                pdf.text("Observaciones: Estas recomendaciones deben ser individualizadas según la evolución", 20, yPos);
-                yPos += 6;
-                pdf.text("del paciente y el criterio del profesional tratante.", 20, yPos);
-                yPos += 15;
-                
-                // ========== PÁGINA FINAL: FIRMAS ==========
-                if (yPos > pageHeight - 50) {
-                    pdf.addPage();
-                    yPos = 20;
-                }
+                pdf.text("INFORME DE EVALUACIÓN CLÍNICA", 105, 20, { align: 'center' });
+                pdf.text("IRAT-5 Modificado + Tinetti + Norton", 105, 30, { align: 'center' });
                 
                 pdf.setFontSize(12);
-                pdf.setTextColor(30, 60, 114);
-                pdf.text("6. FIRMAS", 20, yPos);
-                yPos += 15;
+                pdf.text(`Paciente: ${datosCompletos.paciente.nombre}`, 20, 50);
+                pdf.text(`Evaluador: ${datosCompletos.paciente.evaluador}`, 20, 60);
+                pdf.text(`Fecha: ${datosCompletos.paciente.fecha}`, 20, 70);
                 
-                // Firma profesional
-                pdf.setFontSize(10);
-                pdf.setTextColor(0, 0, 0);
-                pdf.text("_________________________________________", 20, yPos);
-                yPos += 7;
-                pdf.text("Firma del profesional evaluador", 20, yPos);
-                yPos += 7;
-                pdf.text(`Nombre: ${datosCompletos.paciente.evaluador || ''}`, 20, yPos);
-                yPos += 7;
-                pdf.text(`Fecha: ${new Date().toLocaleDateString('es-ES')}`, 20, yPos);
-                yPos += 20;
+                pdf.text(`Puntaje IRAT-5: ${datosCompletos.irat5.puntaje}`, 20, 90);
+                pdf.text(`Riesgo IRAT-5: ${datosCompletos.irat5.riesgo}`, 20, 100);
                 
-                // Firma paciente/familiar
-                pdf.text("_________________________________________", 20, yPos);
-                yPos += 7;
-                pdf.text("Firma del paciente o familiar", 20, yPos);
-                yPos += 7;
-                pdf.text(`Nombre: ${datosCompletos.paciente.nombre || ''}`, 20, yPos);
-                yPos += 7;
-                pdf.text(`Fecha: ${new Date().toLocaleDateString('es-ES')}`, 20, yPos);
-                yPos += 20;
+                pdf.text(`Puntaje Tinetti: ${datosCompletos.tinetti.puntaje}`, 20, 120);
+                pdf.text(`Riesgo Tinetti: ${datosCompletos.tinetti.riesgo}`, 20, 130);
                 
-                // Pie de página
-                pdf.setFontSize(8);
-                pdf.setTextColor(100, 100, 100);
-                pdf.text("Documento generado automáticamente por el sistema IRAT-5 Modificado + Tinetti + Norton", 105, 280, { align: 'center' });
-                pdf.text(new Date().toLocaleString('es-ES'), 105, 285, { align: 'center' });
+                pdf.text(`Puntaje Norton: ${datosCompletos.norton.puntaje}`, 20, 150);
+                pdf.text(`Riesgo Norton: ${datosCompletos.norton.riesgo}`, 20, 160);
                 
                 // Guardar PDF
-                const nombrePaciente = datosCompletos.paciente.nombre.replace(/\s+/g, '_');
-                const fecha = new Date().toISOString().split('T')[0];
-                pdf.save(`IRAT5_${nombrePaciente}_${fecha}.pdf`);
+                const nombreArchivo = `IRAT5_${datosCompletos.paciente.nombre.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+                pdf.save(nombreArchivo);
                 
-                mostrarNotificacion('PDF generado exitosamente (múltiples páginas)', 'success');
+                mostrarNotificacion('PDF generado exitosamente', 'success');
                 
             } catch (error) {
                 console.error('Error al generar PDF:', error);
-                mostrarNotificacion('Error al generar PDF: ' + error.message, 'error');
+                mostrarNotificacion('Error al generar PDF', 'error');
             }
         }
         
-        // 2. Compartir por WhatsApp
-        document.getElementById('compartir-whatsapp').addEventListener('click', compartirWhatsApp);
-        
         function compartirWhatsApp() {
-            // Verificar que hay datos
-            if (!datosCompletos.paciente.nombre) {
+            if (!datosCompletos.paciente || !datosCompletos.paciente.nombre) {
                 mostrarNotificacion('Primero calcule los resultados', 'error');
                 return;
             }
             
-            // Crear mensaje detallado
-            let mensaje = `*INFORME DE EVALUACIÓN IRAT-5 + TINETTI + NORTON*%0A%0A`;
+            const mensaje = `*Evaluación Clínica IRAT-5 + Tinetti + Norton*%0A%0A` +
+                           `*Paciente:* ${datosCompletos.paciente.nombre}%0A` +
+                           `*IRAT-5:* ${datosCompletos.irat5.puntaje} puntos - ${datosCompletos.irat5.riesgo}%0A` +
+                           `*Tinetti:* ${datosCompletos.tinetti.puntaje} - ${datosCompletos.tinetti.riesgo}%0A` +
+                           `*Norton:* ${datosCompletos.norton.puntaje} puntos - ${datosCompletos.norton.riesgo}%0A` +
+                           `*Evaluador:* ${datosCompletos.paciente.evaluador}%0A` +
+                           `*Fecha:* ${datosCompletos.paciente.fecha}`;
             
-            // Datos del paciente
-            mensaje += `*DATOS DEL PACIENTE*%0A`;
-            mensaje += `Nombre: ${datosCompletos.paciente.nombre}%0A`;
-            if (datosCompletos.paciente.rut) mensaje += `RUT: ${datosCompletos.paciente.rut}%0A`;
-            if (datosCompletos.paciente.edad) mensaje += `Edad: ${datosCompletos.paciente.edad} años%0A`;
-            if (datosCompletos.paciente.sexo) mensaje += `Sexo: ${datosCompletos.paciente.sexo}%0A`;
-            mensaje += `Fecha evaluación: ${datosCompletos.paciente.fecha}%0A`;
-            mensaje += `Evaluador: ${datosCompletos.paciente.evaluador}%0A%0A`;
-            
-            // Resultados IRAT-5
-            mensaje += `*RESULTADOS IRAT-5*%0A`;
-            mensaje += `1. Equilibrio: ${datosCompletos.irat5.equilibrio}%0A`;
-            mensaje += `2. Amputación: ${datosCompletos.irat5.amputacion}%0A`;
-            mensaje += `3. Brazos: ${datosCompletos.irat5.brazos}%0A`;
-            mensaje += `4. Social: ${datosCompletos.irat5.social}%0A`;
-            mensaje += `5. Cooperación: ${datosCompletos.irat5.cooperacion}%0A`;
-            mensaje += `Puntaje total: ${datosCompletos.irat5.puntaje}%0A`;
-            mensaje += `Riesgo: ${datosCompletos.irat5.riesgo}%0A%0A`;
-            
-            // Resultados Tinetti
-            mensaje += `*TEST DE TINETTI*%0A`;
-            if (tinettiNoEvaluable) {
-                mensaje += `No evaluable%0A`;
-                mensaje += `Máximo riesgo de caídas%0A`;
-            } else {
-                mensaje += `Puntaje: ${datosCompletos.tinetti.puntaje}/28%0A`;
-                mensaje += `Interpretación: ${datosCompletos.tinetti.riesgo}%0A`;
-            }
-            mensaje += `%0A`;
-            
-            // Resultados Norton
-            mensaje += `*ESCALA NORTON*%0A`;
-            mensaje += `Puntaje: ${datosCompletos.norton.puntaje}%0A`;
-            mensaje += `Riesgo UPP: ${datosCompletos.norton.riesgo}%0A%0A`;
-            
-            // Recomendaciones principales (máximo 3)
-            mensaje += `*RECOMENDACIONES PRINCIPALES*%0A`;
-            recomendaciones.slice(0, 3).forEach((rec, index) => {
-                mensaje += `${index + 1}. ${rec}%0A`;
-            });
-            
-            // Firma
-            mensaje += `%0A*Documento generado:* ${new Date().toLocaleDateString('es-ES')}%0A`;
-            mensaje += `*Próxima evaluación:* ${datosCompletos.resultados.proximaEvaluacion}`;
-            
-            // Codificar URL
-            const url = `https://wa.me/?text=${mensaje}`;
-            
-            // Abrir WhatsApp
-            window.open(url, '_blank');
-            
+            window.open(`https://wa.me/?text=${mensaje}`, '_blank');
             mostrarNotificacion('Abriendo WhatsApp...', 'info');
         }
         
-        // 3. Copiar texto completo
-        document.getElementById('copiar-texto').addEventListener('click', copiarTextoCompleto);
-        
         function copiarTextoCompleto() {
-            // Verificar que hay datos
-            if (!datosCompletos.paciente.nombre) {
+            if (!datosCompletos.paciente || !datosCompletos.paciente.nombre) {
                 mostrarNotificacion('Primero calcule los resultados', 'error');
                 return;
             }
             
-            // Crear texto detallado
-            let texto = "INFORME DE EVALUACIÓN CLÍNICA - IRAT-5 + TINETTI + NORTON\n\n";
+            const texto = `EVALUACIÓN CLÍNICA IRAT-5 + TINETTI + NORTON\n\n` +
+                         `Paciente: ${datosCompletos.paciente.nombre}\n` +
+                         `Evaluador: ${datosCompletos.paciente.evaluador}\n` +
+                         `Fecha: ${datosCompletos.paciente.fecha}\n\n` +
+                         `IRAT-5: ${datosCompletos.irat5.puntaje} puntos - ${datosCompletos.irat5.riesgo}\n` +
+                         `Tinetti: ${datosCompletos.tinetti.puntaje} - ${datosCompletos.tinetti.riesgo}\n` +
+                         `Norton: ${datosCompletos.norton.puntaje} puntos - ${datosCompletos.norton.riesgo}\n\n` +
+                         `Recomendaciones:\n${recomendaciones.map(r => `• ${r}`).join('\n')}`;
             
-            // Datos del paciente
-            texto += "DATOS DEL PACIENTE\n";
-            texto += `Nombre: ${datosCompletos.paciente.nombre}\n`;
-            if (datosCompletos.paciente.rut) texto += `RUT: ${datosCompletos.paciente.rut}\n`;
-            if (datosCompletos.paciente.edad) texto += `Edad: ${datosCompletos.paciente.edad} años\n`;
-            if (datosCompletos.paciente.sexo) texto += `Sexo: ${datosCompletos.paciente.sexo}\n`;
-            texto += `Fecha evaluación: ${datosCompletos.paciente.fecha}\n`;
-            texto += `Evaluador: ${datosCompletos.paciente.evaluador}\n\n`;
-            
-            // Resultados detallados
-            texto += "RESULTADOS DETALLADOS\n\n";
-            
-            texto += "IRAT-5 MODIFICADO:\n";
-            texto += `1. Equilibrio unipodal: ${datosCompletos.irat5.equilibrio}\n`;
-            texto += `2. Tipo de amputación: ${datosCompletos.irat5.amputacion}\n`;
-            texto += `3. Función de brazos: ${datosCompletos.irat5.brazos}\n`;
-            texto += `4. Situación social: ${datosCompletos.irat5.social}\n`;
-            texto += `5. Cooperación: ${datosCompletos.irat5.cooperacion}\n`;
-            texto += `PUNTAJE TOTAL IRAT-5: ${datosCompletos.irat5.puntaje}\n`;
-            texto += `NIVEL DE RIESGO: ${datosCompletos.irat5.riesgo}\n\n`;
-            
-            texto += "TEST DE TINETTI:\n";
-            if (tinettiNoEvaluable) {
-                texto += `No evaluable - Máximo riesgo de caídas\n`;
-            } else {
-                texto += `Puntaje: ${datosCompletos.tinetti.puntaje}/28\n`;
-                texto += `Interpretación: ${datosCompletos.tinetti.riesgo}\n`;
-            }
-            texto += "\n";
-            
-            texto += "ESCALA NORTON:\n";
-            texto += `Estado físico: ${datosCompletos.norton.fisico}\n`;
-            texto += `Estado mental: ${datosCompletos.norton.mental}\n`;
-            texto += `Actividad: ${datosCompletos.norton.actividad}\n`;
-            texto += `Movilidad: ${datosCompletos.norton.movilidad}\n`;
-            texto += `Incontinencia: ${datosCompletos.norton.incontinencia}\n`;
-            texto += `PUNTAJE TOTAL NORTON: ${datosCompletos.norton.puntaje}\n`;
-            texto += `RIESGO ÚLCERAS POR PRESIÓN: ${datosCompletos.norton.riesgo}\n\n`;
-            
-            // Recomendaciones
-            texto += "RECOMENDACIONES:\n";
-            recomendaciones.forEach((rec, index) => {
-                texto += `${index + 1}. ${rec}\n`;
-            });
-            
-            texto += `\nFecha de evaluación: ${datosCompletos.resultados.fechaCalculo}\n`;
-            texto += `Próxima evaluación recomendada: ${datosCompletos.resultados.proximaEvaluacion}\n\n`;
-            
-            texto += "---\n";
-            texto += "Documento generado automáticamente por el sistema IRAT-5 Modificado + Tinetti + Norton\n";
-            
-            // Copiar al portapapeles
             navigator.clipboard.writeText(texto)
-                .then(() => {
-                    mostrarNotificacion('Texto copiado al portapapeles', 'success');
-                })
-                .catch((err) => {
+                .then(() => mostrarNotificacion('Texto copiado al portapapeles', 'success'))
+                .catch(() => {
                     // Fallback para navegadores antiguos
                     const textarea = document.createElement('textarea');
                     textarea.value = texto;
@@ -2028,19 +1777,21 @@
                 });
         }
         
-        // 4. Nueva evaluación
-        document.getElementById('nueva-evaluacion').addEventListener('click', nuevaEvaluacion);
-        
         function nuevaEvaluacion() {
             if (confirm('¿Está seguro de comenzar una nueva evaluación? Se perderán los datos actuales.')) {
                 // Limpiar formularios
-                document.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
-                    input.value = '';
-                });
+                document.getElementById('nombre').value = '';
+                document.getElementById('rut').value = '';
+                document.getElementById('edad').value = '';
+                document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+                document.getElementById('sexo').value = '';
+                document.getElementById('evaluador').value = '';
                 
-                document.querySelectorAll('select').forEach(select => {
-                    select.selectedIndex = 0;
+                // Limpiar IRAT-5
+                ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'].forEach(id => {
+                    document.getElementById(id).value = '';
                 });
+                document.getElementById('puntaje-irat').textContent = '0';
                 
                 // Limpiar Tinetti
                 document.querySelectorAll('.tinetti-option').forEach(opt => {
@@ -2048,14 +1799,23 @@
                 });
                 document.getElementById('test-tinetti-completo').style.display = 'block';
                 document.getElementById('resultado-tinetti').style.display = 'none';
+                tinettiNoEvaluable = false;
+                respuestasTinetti = {};
                 
-                // Restablecer valores por defecto
-                document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+                // Restablecer Norton
                 document.getElementById('norton-fisico').value = '3';
                 document.getElementById('norton-mental').value = '3';
                 document.getElementById('norton-actividad').value = '3';
                 document.getElementById('norton-movilidad').value = '3';
                 document.getElementById('norton-incontinencia').value = '3';
+                document.getElementById('puntaje-norton').textContent = '15';
+                
+                // Limpiar resultados
+                document.getElementById('contenido-resultados').innerHTML = `
+                    <p style="text-align: center; color: #666; padding: 40px;">
+                        Complete todas las secciones anteriores y haga clic en "Calcular Resultados"
+                    </p>
+                `;
                 
                 // Resetear variables
                 puntajeTotalIRAT = 0;
@@ -2065,22 +1825,11 @@
                 nivelRiesgoNorton = "";
                 recomendaciones = [];
                 datosCompletos = {};
-                tinettiNoEvaluable = false;
-                respuestasTinetti = {};
-                
-                // Resetear displays
-                document.getElementById('puntaje-irat').textContent = '0';
-                document.getElementById('puntaje-norton').textContent = '15';
-                document.getElementById('contenido-resultados').innerHTML = `
-                    <p style="text-align: center; color: #666; padding: 40px;">
-                        Complete todas las secciones anteriores y haga clic en "Calcular Resultados"
-                    </p>
-                `;
                 
                 // Ir a identificación
-                document.querySelector('[data-section="identificacion"]').click();
+                mostrarSeccion('identificacion');
                 
-                mostrarNotificacion('Nueva evaluación lista para comenzar', 'success');
+                mostrarNotificacion('Nueva evaluación lista', 'success');
             }
         }
         
@@ -2093,8 +1842,8 @@
             
             setTimeout(() => {
                 notificacion.style.display = 'none';
-            }, 5000);
+            }, 4000);
         }
     </script>
 </body>
-</html>
+                        </html>
