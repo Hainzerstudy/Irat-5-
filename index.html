@@ -1160,7 +1160,9 @@
             
             // Botones principales
             document.getElementById('siguiente-irat').addEventListener('click', function() {
-                cambiarSeccion('evaluacion');
+                if (validarIdentificacion()) {
+                    cambiarSeccion('evaluacion');
+                }
             });
             
             document.getElementById('volver-identificacion').addEventListener('click', function() {
@@ -1168,7 +1170,9 @@
             });
             
             document.getElementById('siguiente-tinetti').addEventListener('click', function() {
-                cambiarSeccion('tinetti');
+                if (validarIRAT5()) {
+                    cambiarSeccion('tinetti');
+                }
             });
             
             document.getElementById('volver-irat').addEventListener('click', function() {
@@ -1176,7 +1180,9 @@
             });
             
             document.getElementById('siguiente-norton').addEventListener('click', function() {
-                cambiarSeccion('norton');
+                if (validarTinetti()) {
+                    cambiarSeccion('norton');
+                }
             });
             
             document.getElementById('volver-tinetti').addEventListener('click', function() {
@@ -1226,6 +1232,66 @@
             
             // Scroll al inicio
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // ========== VALIDACIONES ==========
+        function validarIdentificacion() {
+            const nombre = document.getElementById('nombre').value.trim();
+            const evaluador = document.getElementById('evaluador').value.trim();
+            const fecha = document.getElementById('fecha').value;
+            
+            if (!nombre) {
+                mostrarNotificacion('Por favor ingrese el nombre del paciente', 'error');
+                document.getElementById('nombre').focus();
+                return false;
+            }
+            
+            if (!evaluador) {
+                mostrarNotificacion('Por favor ingrese el nombre del evaluador', 'error');
+                document.getElementById('evaluador').focus();
+                return false;
+            }
+            
+            if (!fecha) {
+                mostrarNotificacion('Por favor ingrese la fecha de evaluación', 'error');
+                document.getElementById('fecha').focus();
+                return false;
+            }
+            
+            return true;
+        }
+        
+        function validarIRAT5() {
+            const selectsIRAT = ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'];
+            
+            for (let id of selectsIRAT) {
+                const select = document.getElementById(id);
+                if (!select.value) {
+                    mostrarNotificacion(`Por favor complete la pregunta: ${select.previousElementSibling.textContent}`, 'error');
+                    select.focus();
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        function validarTinetti() {
+            if (!tinettiNoEvaluable) {
+                // Verificar que todas las preguntas de Tinetti estén completas
+                const gruposNecesarios = [];
+                for (let i = 1; i <= 8; i++) gruposNecesarios.push(`balance${i}`);
+                for (let i = 9; i <= 16; i++) gruposNecesarios.push(`gait${i}`);
+                
+                const todosCompletos = gruposNecesarios.every(grupo => respuestasTinetti[grupo]);
+                
+                if (!todosCompletos) {
+                    mostrarNotificacion('Por favor complete todas las preguntas del Test de Tinetti o seleccione "No Evaluable"', 'error');
+                    return false;
+                }
+            }
+            
+            return true;
         }
 
         // ========== CONFIGURACIONES ==========
@@ -1479,6 +1545,12 @@
 
         // ========== CÁLCULO DE RESULTADOS ==========
         function calcularResultadosCompletos() {
+            // Validar que todos los campos estén completos
+            if (!validarIdentificacion() || !validarIRAT5() || !validarTinetti()) {
+                mostrarNotificacion('Complete todos los campos antes de calcular resultados', 'error');
+                return;
+            }
+            
             // Calcular puntaje IRAT-5 completo (con Tinetti)
             let puntajeIRAT = 0;
             const selectsIRAT = ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'];
@@ -2272,21 +2344,8 @@ Sistema IRAT-5 + Tinetti + Norton`;
             
             selectsNorton.forEach(id => {
                 document.getElementById(id).addEventListener('change', calcularNorton);
-
-                const firebaseConfig = 
-
-  apiKey: "AIzaSyDJbtRuEwWVAsC1Nz6LbeF5a99LcUfAz4g",
-  authDomain: "irat-5-evaluaciones.firebaseapp.com",
-  databaseURL: "https://irat-5-evaluaciones-default-rtdb.firebaseio.com",
-  projectId: "irat-5-evaluaciones",
-  storageBucket: "irat-5-evaluaciones.firebasestorage.app",
-  messagingSenderId: "487279274410",
-  appId: "1:487279274410:web:146e9c35a0bf795c5423d3",
-  measurementId: "G-WSXJY5QHJS"
-
             });
         });
     </script>
 </body>
-    </html>
-
+</html>
