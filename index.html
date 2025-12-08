@@ -7,6 +7,9 @@
     <!-- Bibliotecas para PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -182,6 +185,11 @@
         
         .btn-warning {
             background: linear-gradient(135deg, #FF9800, #EF6C00);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #F44336, #C62828);
             color: white;
         }
         
@@ -553,6 +561,16 @@
             border-color: var(--danger-color) !important;
             background-color: #fff5f5;
         }
+        
+        /* Estilos para botón guardar */
+        .guardar-container {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px dashed var(--primary-color);
+        }
     </style>
 </head>
 <body>
@@ -571,6 +589,7 @@
             <button class="nav-tab" data-section="norton">Norton</button>
             <button class="nav-tab" data-section="resultados">Resultados</button>
             <button class="nav-tab" data-section="compartir">Compartir</button>
+            <button class="nav-tab" data-section="historial">Historial</button>
         </div>
         
         <!-- Sección 1: Identificación -->
@@ -584,13 +603,13 @@
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">RUT / Identificación</label>
-                    <input type="text" id="rut" class="form-control" placeholder="Ej: 12.345.678-9">
+                    <label class="form-label">RUT / Identificación <span style="color:red">*</span></label>
+                    <input type="text" id="rut" class="form-control" placeholder="Ej: 12.345.678-9" required>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Edad</label>
-                    <input type="number" id="edad" class="form-control" placeholder="Edad en años">
+                    <label class="form-label">Edad <span style="color:red">*</span></label>
+                    <input type="number" id="edad" class="form-control" placeholder="Edad en años" required min="1" max="120">
                 </div>
                 
                 <div class="form-group">
@@ -599,8 +618,8 @@
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Sexo</label>
-                    <select id="sexo" class="form-control">
+                    <label class="form-label">Sexo <span style="color:red">*</span></label>
+                    <select id="sexo" class="form-control" required>
                         <option value="">Seleccione...</option>
                         <option value="masculino">Masculino</option>
                         <option value="femenino">Femenino</option>
@@ -1051,6 +1070,15 @@
                 </p>
             </div>
             
+            <div class="guardar-container">
+                <button class="btn btn-success" id="guardar-firebase">
+                    <i class="fas fa-save"></i> Guardar Evaluación en Base de Datos
+                </button>
+                <p style="margin-top: 10px; color: #666; font-size: 0.9rem;">
+                    Los datos se guardarán de forma segura para su historial clínico
+                </p>
+            </div>
+            
             <div class="action-buttons">
                 <button class="btn btn-warning" id="volver-norton">
                     <i class="fas fa-arrow-left"></i> Anterior
@@ -1110,6 +1138,37 @@
                 </button>
             </div>
         </section>
+        
+        <!-- Sección 7: Historial -->
+        <section id="historial" class="section">
+            <h2 class="section-title"><i class="fas fa-history"></i> Historial de Evaluaciones</h2>
+            
+            <div class="info-box">
+                <strong><i class="fas fa-database"></i> Base de Datos Firebase</strong>
+                <p>Aquí podrá ver todas las evaluaciones guardadas en la base de datos.</p>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="cargar-historial">
+                    <i class="fas fa-sync"></i> Cargar Historial
+                </button>
+                <button class="btn btn-danger" id="limpiar-historial">
+                    <i class="fas fa-trash"></i> Limpiar Historial Local
+                </button>
+            </div>
+            
+            <div id="contenido-historial" style="margin-top: 20px;">
+                <p style="text-align: center; color: #666; padding: 40px;">
+                    Haga clic en "Cargar Historial" para ver las evaluaciones guardadas
+                </p>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-warning" id="volver-compartir">
+                    <i class="fas fa-arrow-left"></i> Anterior
+                </button>
+            </div>
+        </section>
     </div>
     
     <!-- Notificación -->
@@ -1128,6 +1187,22 @@
         let respuestasTinetti = {};
         let respuestasIRAT = {};
         let respuestasNorton = {};
+
+        // ========== CONFIGURACIÓN FIREBASE ==========
+        const firebaseConfig = {
+            apiKey: "AIzaSyDJbtRuEwWVAsC1Nz6LbeF5a99LcUfAz4g",
+            authDomain: "irat-5-evaluaciones.firebaseapp.com",
+            databaseURL: "https://irat-5-evaluaciones-default-rtdb.firebaseio.com",
+            projectId: "irat-5-evaluaciones",
+            storageBucket: "irat-5-evaluaciones.firebasestorage.app",
+            messagingSenderId: "487279274410",
+            appId: "1:487279274410:web:146e9c35a0bf795c5423d3",
+            measurementId: "G-WSXJY5QHJS"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
         // Configurar fecha actual por defecto
         document.addEventListener('DOMContentLoaded', function() {
@@ -1208,6 +1283,15 @@
             document.getElementById('volver-resultados').addEventListener('click', function() {
                 cambiarSeccion('resultados');
             });
+            
+            document.getElementById('volver-compartir').addEventListener('click', function() {
+                cambiarSeccion('compartir');
+            });
+            
+            // Botones Firebase
+            document.getElementById('guardar-firebase').addEventListener('click', guardarEnFirebase);
+            document.getElementById('cargar-historial').addEventListener('click', cargarHistorialFirebase);
+            document.getElementById('limpiar-historial').addEventListener('click', limpiarHistorialLocal);
         }
         
         function cambiarSeccion(sectionId) {
@@ -1237,12 +1321,27 @@
         // ========== VALIDACIONES ==========
         function validarIdentificacion() {
             const nombre = document.getElementById('nombre').value.trim();
+            const rut = document.getElementById('rut').value.trim();
+            const edad = document.getElementById('edad').value.trim();
             const evaluador = document.getElementById('evaluador').value.trim();
             const fecha = document.getElementById('fecha').value;
+            const sexo = document.getElementById('sexo').value;
             
             if (!nombre) {
                 mostrarNotificacion('Por favor ingrese el nombre del paciente', 'error');
                 document.getElementById('nombre').focus();
+                return false;
+            }
+            
+            if (!rut) {
+                mostrarNotificacion('Por favor ingrese el RUT del paciente', 'error');
+                document.getElementById('rut').focus();
+                return false;
+            }
+            
+            if (!edad) {
+                mostrarNotificacion('Por favor ingrese la edad del paciente', 'error');
+                document.getElementById('edad').focus();
                 return false;
             }
             
@@ -1255,6 +1354,12 @@
             if (!fecha) {
                 mostrarNotificacion('Por favor ingrese la fecha de evaluación', 'error');
                 document.getElementById('fecha').focus();
+                return false;
+            }
+            
+            if (!sexo) {
+                mostrarNotificacion('Por favor seleccione el sexo del paciente', 'error');
+                document.getElementById('sexo').focus();
                 return false;
             }
             
@@ -1277,13 +1382,17 @@
         }
         
         function validarTinetti() {
-            if (!tinettiNoEvaluable) {
+            // Verificar si se seleccionó "No evaluable" o si están completas todas las preguntas
+            if (!document.getElementById('opcion-no-evaluable').classList.contains('selected')) {
                 // Verificar que todas las preguntas de Tinetti estén completas
                 const gruposNecesarios = [];
                 for (let i = 1; i <= 8; i++) gruposNecesarios.push(`balance${i}`);
                 for (let i = 9; i <= 16; i++) gruposNecesarios.push(`gait${i}`);
                 
-                const todosCompletos = gruposNecesarios.every(grupo => respuestasTinetti[grupo]);
+                const todosCompletos = gruposNecesarios.every(grupo => {
+                    const elemento = document.querySelector(`.tinetti-option[data-grupo="${grupo}"].selected`);
+                    return elemento !== null;
+                });
                 
                 if (!todosCompletos) {
                     mostrarNotificacion('Por favor complete todas las preguntas del Test de Tinetti o seleccione "No Evaluable"', 'error');
@@ -1861,6 +1970,275 @@
             if (puntajeTotalIRAT <= 12) return "Ayudas avanzadas. Andador fijo + colchón estático.";
             return "Ayudas de movilización. Silla de ruedas + colchón alternante.";
         }
+
+        // ========== FIREBASE FUNCTIONS ==========
+        function guardarEnFirebase() {
+            if (!datosCompletos.paciente || !datosCompletos.paciente.nombre) {
+                mostrarNotificacion('Primero calcule los resultados', 'error');
+                return;
+            }
+            
+            mostrarNotificacion('Guardando evaluación en base de datos...', 'info');
+            
+            // Generar un ID único para esta evaluación
+            const evaluacionId = 'eval_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            // Crear objeto completo para guardar
+            const evaluacionCompleta = {
+                id: evaluacionId,
+                fechaGuardado: new Date().toISOString(),
+                ...datosCompletos
+            };
+            
+            // Guardar en Firebase
+            database.ref('evaluaciones/' + evaluacionId).set(evaluacionCompleta)
+                .then(() => {
+                    mostrarNotificacion('Evaluación guardada exitosamente en Firebase', 'success');
+                    
+                    // También guardar en localStorage para acceso rápido
+                    guardarEnLocalStorage(evaluacionCompleta);
+                })
+                .catch((error) => {
+                    console.error('Error al guardar en Firebase:', error);
+                    mostrarNotificacion('Error al guardar en Firebase: ' + error.message, 'error');
+                    
+                    // Intentar guardar solo en localStorage como respaldo
+                    guardarEnLocalStorage(evaluacionCompleta);
+                });
+        }
+        
+        function guardarEnLocalStorage(evaluacion) {
+            try {
+                // Obtener evaluaciones existentes
+                let evaluaciones = JSON.parse(localStorage.getItem('evaluacionesIRAT') || '[]');
+                
+                // Agregar nueva evaluación
+                evaluaciones.push(evaluacion);
+                
+                // Guardar en localStorage (máximo 50 evaluaciones)
+                if (evaluaciones.length > 50) {
+                    evaluaciones = evaluaciones.slice(-50);
+                }
+                
+                localStorage.setItem('evaluacionesIRAT', JSON.stringify(evaluaciones));
+                console.log('Evaluación guardada en localStorage');
+            } catch (error) {
+                console.error('Error al guardar en localStorage:', error);
+            }
+        }
+        
+        function cargarHistorialFirebase() {
+            mostrarNotificacion('Cargando historial de evaluaciones...', 'info');
+            
+            // Intentar cargar desde Firebase primero
+            database.ref('evaluaciones').once('value')
+                .then((snapshot) => {
+                    const evaluacionesFirebase = snapshot.val();
+                    let evaluaciones = [];
+                    
+                    if (evaluacionesFirebase) {
+                        // Convertir objeto de Firebase a array
+                        Object.keys(evaluacionesFirebase).forEach(key => {
+                            evaluaciones.push(evaluacionesFirebase[key]);
+                        });
+                        
+                        // Ordenar por fecha más reciente
+                        evaluaciones.sort((a, b) => new Date(b.fechaGuardado) - new Date(a.fechaGuardado));
+                        
+                        mostrarHistorial(evaluaciones, 'firebase');
+                        mostrarNotificacion(`Cargadas ${evaluaciones.length} evaluaciones de Firebase`, 'success');
+                    } else {
+                        // Si no hay datos en Firebase, cargar de localStorage
+                        cargarHistorialLocalStorage();
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error al cargar de Firebase:', error);
+                    mostrarNotificacion('Error al cargar de Firebase, cargando datos locales...', 'warning');
+                    cargarHistorialLocalStorage();
+                });
+        }
+        
+        function cargarHistorialLocalStorage() {
+            try {
+                const evaluaciones = JSON.parse(localStorage.getItem('evaluacionesIRAT') || '[]');
+                
+                if (evaluaciones.length > 0) {
+                    // Ordenar por fecha más reciente
+                    evaluaciones.sort((a, b) => new Date(b.fechaGuardado) - new Date(a.fechaGuardado));
+                    
+                    mostrarHistorial(evaluaciones, 'local');
+                    mostrarNotificacion(`Cargadas ${evaluaciones.length} evaluaciones de almacenamiento local`, 'success');
+                } else {
+                    document.getElementById('contenido-historial').innerHTML = `
+                        <div class="info-box">
+                            <p style="text-align: center;">No hay evaluaciones guardadas todavía.</p>
+                            <p style="text-align: center; margin-top: 10px;">
+                                Complete una evaluación y guárdela para verla aquí.
+                            </p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error al cargar de localStorage:', error);
+                mostrarNotificacion('Error al cargar el historial', 'error');
+            }
+        }
+        
+        function mostrarHistorial(evaluaciones, fuente) {
+            let html = `
+                <div class="info-box">
+                    <p><strong>Fuente:</strong> ${fuente === 'firebase' ? 'Base de datos Firebase' : 'Almacenamiento local'}</p>
+                    <p><strong>Total de evaluaciones:</strong> ${evaluaciones.length}</p>
+                </div>
+            `;
+            
+            if (evaluaciones.length === 0) {
+                html += `
+                    <div class="info-box">
+                        <p style="text-align: center;">No hay evaluaciones guardadas todavía.</p>
+                    </div>
+                `;
+            } else {
+                evaluaciones.forEach((evalItem, index) => {
+                    const fecha = new Date(evalItem.fechaGuardado).toLocaleString('es-ES');
+                    const riesgoColor = evalItem.irat5.riesgo.includes("BAJO") ? "risk-low" :
+                                       evalItem.irat5.riesgo.includes("MODERADO") ? "risk-moderate" :
+                                       evalItem.irat5.riesgo.includes("ALTO") ? "risk-high" : "risk-very-high";
+                    
+                    html += `
+                        <div class="question-group" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <h4 style="margin: 0;">${evalItem.paciente.nombre}</h4>
+                                <span style="font-size: 0.9rem; color: #666;">${fecha}</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <div class="resultado-item">
+                                    <span class="resultado-label">RUT:</span>
+                                    <span class="resultado-valor">${evalItem.paciente.rut}</span>
+                                </div>
+                                <div class="resultado-item">
+                                    <span class="resultado-label">Edad:</span>
+                                    <span class="resultado-valor">${evalItem.paciente.edad} años</span>
+                                </div>
+                                <div class="resultado-item">
+                                    <span class="resultado-label">Evaluador:</span>
+                                    <span class="resultado-valor">${evalItem.paciente.evaluador}</span>
+                                </div>
+                                <div class="resultado-item">
+                                    <span class="resultado-label">IRAT-5:</span>
+                                    <span class="resultado-valor"><strong>${evalItem.irat5.puntaje} puntos</strong> - ${evalItem.irat5.riesgo}</span>
+                                </div>
+                                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                                    <button class="btn btn-primary btn-sm" onclick="verDetalleEvaluacion('${evalItem.id}', ${index})" style="padding: 8px 15px; font-size: 0.9rem;">
+                                        <i class="fas fa-eye"></i> Ver Detalle
+                                    </button>
+                                    <button class="btn btn-success btn-sm" onclick="descargarEvaluacion(${index})" style="padding: 8px 15px; font-size: 0.9rem;">
+                                        <i class="fas fa-download"></i> Descargar
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="eliminarEvaluacion('${evalItem.id}', ${index})" style="padding: 8px 15px; font-size: 0.9rem;">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            document.getElementById('contenido-historial').innerHTML = html;
+        }
+        
+        function limpiarHistorialLocal() {
+            if (confirm('¿Está seguro de eliminar todas las evaluaciones del almacenamiento local?')) {
+                localStorage.removeItem('evaluacionesIRAT');
+                mostrarNotificacion('Historial local eliminado', 'success');
+                cargarHistorialLocalStorage();
+            }
+        }
+        
+        // Funciones globales para los botones del historial
+        window.verDetalleEvaluacion = function(id, index) {
+            // Cargar evaluaciones
+            let evaluaciones = [];
+            try {
+                evaluaciones = JSON.parse(localStorage.getItem('evaluacionesIRAT') || '[]');
+            } catch (error) {
+                console.error('Error al cargar evaluación:', error);
+                mostrarNotificacion('Error al cargar la evaluación', 'error');
+                return;
+            }
+            
+            if (evaluaciones[index]) {
+                const evalItem = evaluaciones[index];
+                alert(`
+Detalle de Evaluación:
+----------------------
+Paciente: ${evalItem.paciente.nombre}
+RUT: ${evalItem.paciente.rut}
+Edad: ${evalItem.paciente.edad}
+Fecha evaluación: ${evalItem.paciente.fecha}
+Evaluador: ${evalItem.paciente.evaluador}
+
+IRAT-5: ${evalItem.irat5.puntaje} puntos - ${evalItem.irat5.riesgo}
+Tinetti: ${evalItem.tinetti.evaluable ? evalItem.tinetti.puntaje + '/28' : 'No evaluable'} - ${evalItem.tinetti.riesgo}
+Norton: ${evalItem.norton.puntaje} puntos - ${evalItem.norton.riesgo}
+                `);
+            }
+        };
+        
+        window.descargarEvaluacion = function(index) {
+            // Cargar evaluaciones
+            let evaluaciones = [];
+            try {
+                evaluaciones = JSON.parse(localStorage.getItem('evaluacionesIRAT') || '[]');
+            } catch (error) {
+                console.error('Error al cargar evaluación:', error);
+                mostrarNotificacion('Error al cargar la evaluación', 'error');
+                return;
+            }
+            
+            if (evaluaciones[index]) {
+                const evalItem = evaluaciones[index];
+                const datos = JSON.stringify(evalItem, null, 2);
+                const blob = new Blob([datos], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Evaluacion_${evalItem.paciente.nombre.replace(/\s+/g, '_')}_${evalItem.fechaGuardado.split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                mostrarNotificacion('Evaluación descargada', 'success');
+            }
+        };
+        
+        window.eliminarEvaluacion = function(id, index) {
+            if (confirm('¿Está seguro de eliminar esta evaluación?')) {
+                // Eliminar de Firebase si existe
+                database.ref('evaluaciones/' + id).remove()
+                    .then(() => {
+                        console.log('Eliminado de Firebase');
+                    })
+                    .catch((error) => {
+                        console.error('Error al eliminar de Firebase:', error);
+                    });
+                
+                // Eliminar de localStorage
+                let evaluaciones = [];
+                try {
+                    evaluaciones = JSON.parse(localStorage.getItem('evaluacionesIRAT') || '[]');
+                    evaluaciones.splice(index, 1);
+                    localStorage.setItem('evaluacionesIRAT', JSON.stringify(evaluaciones));
+                    mostrarNotificacion('Evaluación eliminada', 'success');
+                    cargarHistorialFirebase(); // Recargar vista
+                } catch (error) {
+                    console.error('Error al eliminar evaluación:', error);
+                    mostrarNotificacion('Error al eliminar la evaluación', 'error');
+                }
+            }
+        };
 
         // ========== PDF PROFESIONAL CON DETALLE COMPLETO ==========
         async function generarPDFProfesional() {
