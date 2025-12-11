@@ -512,8 +512,6 @@
             background-color: #F44336;
         }
         
-        /* [ELIMINADO: AUTENTICACIÓN] .login-container { ... } */
-        
         .historial-item {
             background: #f8f9fa;
             padding: 15px;
@@ -1295,16 +1293,18 @@
     <div id="notification" class="notification"></div>
 
     <script>
-        // ========== CONFIGURACIÓN FIREBASE ==========
-        // REEMPLAZA ESTOS VALORES CON TUS CREDENCIALES DE FIREBASE
-        const firebaseConfig = {
-            apiKey: "AIzaSyC7WgFJ8p6B8P3O0mZ7L9vKjNqXrS1T2U3V",
-            authDomain: "irat-evaluaciones.firebaseapp.com",
-            projectId: "irat-evaluaciones",
-            storageBucket: "irat-evaluaciones.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcdef1234567890"
-        };
+        
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDJbtRuEwWVAsC1Nz6LbeF5a99LcUfAz4g",
+  authDomain: "irat-5-evaluaciones.firebaseapp.com",
+  databaseURL: "https://irat-5-evaluaciones-default-rtdb.firebaseio.com",
+  projectId: "irat-5-evaluaciones",
+  storageBucket: "irat-5-evaluaciones.firebasestorage.app",
+  messagingSenderId: "487279274410",
+  appId: "1:487279274410:web:146e9c35a0bf795c5423d3",
+  measurementId: "G-WSXJY5QHJS"
+};
 
         // ========== VARIABLES GLOBALES ==========
         let firebaseApp;
@@ -1317,7 +1317,6 @@
         const itemsPerPage = 5;
         let lastVisible = null;
         let firstVisible = null;
-        let currentQuery = null;
         
         // Variables del formulario
         let puntajeTotalIRAT = 0;
@@ -1366,6 +1365,7 @@
         // ========== INICIALIZAR FIREBASE ==========
         function inicializarFirebase() {
             try {
+                // Usar el SDK v9 compatibility
                 firebaseApp = firebase.initializeApp(firebaseConfig);
                 db = firebase.firestore();
                 
@@ -1374,7 +1374,7 @@
             } catch (error) {
                 console.error('Error inicializando Firebase:', error);
                 actualizarEstadoFirebase('Error de conexión a Firestore', 'firebase-disconnected');
-                mostrarNotificacion('Error conectando a Firebase', 'error');
+                mostrarNotificacion('Error conectando a Firebase. Revisa tus credenciales.', 'error');
             }
         }
 
@@ -1401,53 +1401,87 @@
             document.getElementById('btn-limpiar-filtros').addEventListener('click', limpiarFiltros);
         }
         
-        // ========== CARGAR HISTORIAL DESDE FIREBASE ==========
+        // ========== CARGAR HISTORIAL DESDE FIREBASE (CORREGIDO) ==========
         async function cargarHistorialFirebase(direction = 'first') {
-            
-            // Código de carga de historial (mantenido del código anterior)
             try {
                 mostrarCargandoHistorial(true);
                 
-                let query = db.collection('evaluaciones')
-                    .orderBy('fechaEvaluacion', 'desc')
-                    .limit(itemsPerPage);
-                
-                const nombreFilter = document.getElementById('filter-nombre').value.trim();
+                // 1. Obtener valores de filtro
+                const nombreFilter = document.getElementById('filter-nombre').value.trim().toLowerCase();
                 const fechaDesdeFilter = document.getElementById('filter-fecha-desde').value;
                 const fechaHastaFilter = document.getElementById('filter-fecha-hasta').value;
                 
-                // Si hay filtros, mejor usar la lógica de aplicarFiltros (o simplificar la query)
+                let query = db.collection('evaluaciones');
+                let reversed = false;
                 
-                // Manejar paginación
-                if (direction === 'next' && lastVisible) {
-                    query = query.startAfter(lastVisible);
-                } else if (direction === 'prev' && firstVisible) {
-                    query = query.endBefore(firstVisible).limitToLast(itemsPerPage);
+                // 2. Determinar orden y punto de inicio para la paginación
+                if (direction === 'prev' && firstVisible) {
+                    // Paginación hacia atrás: ordenar ascendente y usar endBefore
+                    query = query.orderBy('fechaEvaluacion', 'asc');
+                    query = query.endBefore(firstVisible);
+                    reversed = true;
+                } else {
+                    // Primera carga o paginación hacia adelante: ordenar descendente y usar startAfter
+                    query = query.orderBy('fechaEvaluacion', 'desc');
+                    if (direction === 'next' && lastVisible) {
+                        query = query.startAfter(lastVisible);
+                    }
                 }
+                
+                // 3. Aplicar filtros de fecha directamente en la consulta (Firestore requiere un campo para order y filter)
+                if (fechaDesdeFilter) {
+                    query = query.where('fechaEvaluacion', '>=', fechaDesdeFilter);
+                }
+                
+                if (fechaHastaFilter) {
+                    // Para incluir el día completo, buscar hasta el día siguiente (exclusivo)
+                    const fechaHastaObj = new Date(fechaHastaFilter + 'T00:00:00'); // Asegura la medianoche
+                    fechaHastaObj.setDate(fechaHastaObj.getDate() + 1);
+                    const fechaHastaExclusiva = fechaHastaObj.toISOString().split('T')[0];
+                    query = query.where('fechaEvaluacion', '<', fechaHastaExclusiva);
+                }
+                
+                // 4. Aplicar límite
+                query = query.limit(itemsPerPage);
                 
                 const snapshot = await query.get();
                 
                 if (snapshot.empty) {
-                    mostrarHistorialVacio();
+                    historialFirebase = [];
+                    mostrarHistorialVacio(nombreFilter.length > 0 || fechaDesdeFilter || fechaHastaFilter);
                     actualizarEstadisticas(0);
+                    actualizarPaginacion();
                     return;
                 }
                 
-                // Procesar documentos
+                // 5. Procesar documentos
                 historialFirebase = [];
                 snapshot.forEach(doc => {
-                    const data = doc.data();
-                    historialFirebase.push({
-                        id: doc.id,
-                        ...data
-                    });
+                    historialFirebase.push({ id: doc.id, ...doc.data() });
                 });
                 
-                // Actualizar marcadores de paginación
+                if (reversed) {
+                    // Si consultamos en orden inverso (paginación hacia atrás), revertimos el array
+                    historialFirebase.reverse();
+                }
+                
+                // 6. Filtrado por Nombre (Lado del Cliente) - Solución para búsqueda parcial compleja
+                let resultadosFiltrados = historialFirebase;
+                
+                if (nombreFilter) {
+                    resultadosFiltrados = historialFirebase.filter(evaluacion => {
+                        const nombrePaciente = (evaluacion.paciente?.nombre || '').toLowerCase();
+                        return nombrePaciente.includes(nombreFilter); // Usar includes para búsqueda parcial
+                    });
+                }
+                
+                historialFirebase = resultadosFiltrados; // Reasignar resultados filtrados
+                
+                // 7. Actualizar marcadores de paginación (usan el snapshot original)
                 lastVisible = snapshot.docs[snapshot.docs.length - 1];
                 firstVisible = snapshot.docs[0];
                 
-                // Actualizar UI
+                // 8. Actualizar UI
                 actualizarVistaHistorial();
                 actualizarEstadisticas(historialFirebase.length);
                 actualizarPaginacion();
@@ -1470,18 +1504,18 @@
                     </div>
                 `;
             } else if (!historialFirebase.length) {
-                 // Si no se está cargando y no hay datos
-                 mostrarHistorialVacio();
+                 // Si no se está cargando y no hay datos, llamar a la función de vacío sin ser filtro
+                 mostrarHistorialVacio(false);
             }
         }
         
-        function mostrarHistorialVacio() {
+        function mostrarHistorialVacio(esFiltro = false) {
             const container = document.getElementById('historial-container');
             container.innerHTML = `
                 <div style="text-align: center; padding: 40px; color: #666;">
                     <i class="fas fa-inbox fa-2x" style="margin-bottom: 20px; opacity: 0.5;"></i>
-                    <h4>No hay evaluaciones registradas</h4>
-                    <p>Realice su primera evaluación para verla aquí</p>
+                    <h4>${esFiltro ? 'No se encontraron resultados' : 'No hay evaluaciones registradas'}</h4>
+                    <p>${esFiltro ? 'Pruebe con otros criterios de búsqueda.' : 'Realice su primera evaluación para verla aquí'}</p>
                 </div>
             `;
             document.getElementById('pagination-container').style.display = 'none';
@@ -1505,7 +1539,9 @@
             const container = document.getElementById('historial-container');
             
             if (!historialFirebase || historialFirebase.length === 0) {
-                mostrarHistorialVacio();
+                mostrarHistorialVacio(document.getElementById('filter-nombre').value.trim().length > 0 || 
+                                     document.getElementById('filter-fecha-desde').value.length > 0 || 
+                                     document.getElementById('filter-fecha-hasta').value.length > 0);
                 return;
             }
             
@@ -1522,6 +1558,7 @@
                 let fechaFormateada = 'Sin fecha';
                 try {
                     if (fechaEvaluacion) {
+                        // Asegurarse de que el string de fecha tenga el formato correcto para new Date
                         const fecha = new Date(fechaEvaluacion.split('T')[0]); 
                         fechaFormateada = fecha.toLocaleDateString('es-ES', { 
                             year: 'numeric', 
@@ -1569,18 +1606,23 @@
             const nextBtn = document.getElementById('btn-next');
             const pageInfo = document.getElementById('page-info');
             
+            // Deshabilitar Prev si estamos en la primera página
             prevBtn.disabled = currentPage === 1;
             pageInfo.textContent = `Página ${currentPage}`;
             
             const paginationContainer = document.getElementById('pagination-container');
-            paginationContainer.style.display = historialFirebase.length > 0 ? 'block' : 'none';
+            // Mostrar paginación solo si hay resultados o se intentó cargar
+            paginationContainer.style.display = (historialFirebase.length > 0 || (currentPage > 1 && lastVisible)) ? 'flex' : 'none';
             
+            // Si la última carga fue menor a la página, no hay más elementos hacia adelante
+            // Se usa el número de resultados filtrados (historialFirebase.length)
             nextBtn.disabled = historialFirebase.length < itemsPerPage;
         }
         
-        // ========== OPERACIONES CRUD FIREBASE (MODIFICADAS) ==========
+        // ========== OPERACIONES CRUD FIREBASE ==========
         async function guardarEnFirebase() {
             
+            // 1. Validar si hay resultados calculados
             if (!datosCompletos) {
                 mostrarNotificacion('Primero calcule los resultados para guardar la evaluación', 'error');
                 // Intentar calcular si estamos en resultados
@@ -1599,7 +1641,8 @@
                     userId: 'free_access', 
                     userEmail: datosCompletos.paciente.evaluador || 'Acceso Libre',
                     fechaGuardado: firebase.firestore.FieldValue.serverTimestamp(),
-                    fechaEvaluacion: datosCompletos.paciente.fecha || new Date().toISOString()
+                    // Aseguramos que la fechaEvaluacion sea un string ISO (YYYY-MM-DD) para los filtros
+                    fechaEvaluacion: datosCompletos.paciente.fecha || new Date().toISOString().split('T')[0]
                 };
                 
                 // Validar datos requeridos
@@ -1646,10 +1689,7 @@
                 
                 const evaluacion = { id: doc.id, ...doc.data() };
                 
-                // Asignar el ID de la evaluación para posible actualización
                 idEvaluacionActual = id;
-                
-                // Mostrar en sección de resultados
                 mostrarEvaluacionFirebase(evaluacion);
                 cambiarSeccion('resultados');
                 
@@ -1665,10 +1705,8 @@
                     throw new Error('Datos de evaluación inválidos');
                 }
                 
-                // Asignar a datosCompletos
                 datosCompletos = evaluacion;
                 
-                // Extraer datos de forma segura
                 puntajeTotalIRAT = obtenerValorSeguro(evaluacion, 'irat5.puntaje', 0);
                 puntajeNorton = obtenerValorSeguro(evaluacion, 'norton.puntaje', 15);
                 puntajeTinetti = obtenerValorSeguro(evaluacion, 'tinetti.puntaje', 0);
@@ -1677,7 +1715,6 @@
                 recomendaciones = obtenerValorSeguro(evaluacion, 'resultados.recomendaciones', []);
                 tinettiNoEvaluable = obtenerValorSeguro(evaluacion, 'tinetti.evaluable', true) === false;
                 
-                // Mostrar resultados
                 mostrarResultados();
                 
             } catch (error) {
@@ -1713,9 +1750,10 @@
                     document.getElementById('historia-clinica').value = evaluacion.paciente.historiaClinica || '';
                 }
                 
-                // [NOTA] Para cargar COMPLETAMENTE la evaluación, también se necesitaría rellenar los selects
-                // de IRAT-5, Tinetti y Norton con los valores guardados. Esto es más complejo y se omitió por
-                // simplicidad en el rellenado automático de este ejemplo, dejando un *aviso al usuario*.
+                // NOTA: Para rellenar completamente las secciones de Tinetti, IRAT-5 y Norton,
+                // se necesitaría un código mucho más extenso para buscar y seleccionar los
+                // <option> y elementos de radio/botones correctos basados en 'evaluacion.irat5.respuestas', etc.
+                // Por simplicidad, se avisa al usuario que debe rellenar.
                 
                 mostrarNotificacion(`Datos de ${evaluacion.paciente?.nombre || 'paciente'} cargados para edición. *Nota: Debe rellenar Tinetti/IRAT/Norton manualmente y recalcular*`, 'warning');
                 cambiarSeccion('identificacion');
@@ -1742,7 +1780,6 @@
                 
                 mostrarNotificacion('Evaluación eliminada correctamente', 'success');
                 
-                // Si la evaluación eliminada es la que estamos editando, limpiar el ID
                 if (idEvaluacionActual === id) {
                     idEvaluacionActual = null;
                 }
@@ -1756,62 +1793,14 @@
             }
         }
         
-        // ========== FILTROS ==========
+        // ========== FILTROS (CORREGIDO) ==========
         async function aplicarFiltros() {
-            // Código de aplicación de filtros (mantenido del código anterior)
-            try {
-                const nombre = document.getElementById('filter-nombre').value.trim();
-                const fechaDesde = document.getElementById('filter-fecha-desde').value;
-                const fechaHasta = document.getElementById('filter-fecha-hasta').value;
-                
-                let query = db.collection('evaluaciones')
-                    .orderBy('fechaEvaluacion', 'desc');
-                
-                if (nombre) {
-                    query = query.where('paciente.nombre', '>=', nombre)
-                                 .where('paciente.nombre', '<=', nombre + '\uf8ff');
-                }
-                
-                if (fechaDesde) {
-                    query = query.where('fechaEvaluacion', '>=', fechaDesde);
-                }
-                
-                if (fechaHasta) {
-                    const fechaHastaObj = new Date(fechaHasta);
-                    fechaHastaObj.setDate(fechaHastaObj.getDate() + 1);
-                    query = query.where('fechaEvaluacion', '<', fechaHastaObj.toISOString().split('T')[0]);
-                }
-                
-                query = query.limit(itemsPerPage);
-                
-                const snapshot = await query.get();
-                
-                if (snapshot.empty) {
-                    mostrarNotificacion('No se encontraron evaluaciones con los filtros aplicados', 'info');
-                    mostrarHistorialVacio();
-                    return;
-                }
-                
-                historialFirebase = [];
-                snapshot.forEach(doc => {
-                    historialFirebase.push({
-                        id: doc.id,
-                        ...doc.data()
-                    });
-                });
-                
-                actualizarVistaHistorial();
-                mostrarNotificacion(`Encontradas ${historialFirebase.length} evaluación(es)`, 'success');
-                
-                currentPage = 1;
-                lastVisible = snapshot.docs[snapshot.docs.length - 1];
-                firstVisible = snapshot.docs[0];
-                actualizarPaginacion();
-                
-            } catch (error) {
-                console.error('Error aplicando filtros:', error);
-                mostrarNotificacion('Error en filtros: ' + error.message, 'error');
-            }
+            // Simplemente reinicia la paginación con los filtros aplicados
+            currentPage = 1;
+            lastVisible = null;
+            firstVisible = null;
+            cargarHistorialFirebase('first');
+            mostrarNotificacion('Filtros aplicados', 'info');
         }
         
         function limpiarFiltros() {
@@ -1820,6 +1809,8 @@
             document.getElementById('filter-fecha-hasta').value = '';
             
             currentPage = 1;
+            lastVisible = null;
+            firstVisible = null;
             cargarHistorialFirebase();
             mostrarNotificacion('Filtros limpiados', 'info');
         }
@@ -1902,7 +1893,7 @@
             });
             document.getElementById('volver-tinetti').addEventListener('click', () => cambiarSeccion('tinetti'));
             
-            // [MODIFICADO] Llamamos a calcular y guardar al mismo tiempo
+            // Llamamos a calcular y guardar al mismo tiempo
             document.getElementById('calcular-resultados').addEventListener('click', () => calcularResultadosCompletos(true)); 
             
             document.getElementById('volver-norton').addEventListener('click', () => cambiarSeccion('norton'));
@@ -2145,6 +2136,7 @@
             });
             
             const amputacion = document.getElementById('amputacion').value;
+            // Se suma un punto adicional si hay amputación de riesgo (3 o más)
             if (amputacion && parseInt(amputacion) >= 3) puntaje += 1;
             
             document.getElementById('puntaje-irat').textContent = puntaje;
@@ -2201,13 +2193,14 @@
             }
             
             try {
-                // 2. Calcular puntajes IRAT-5
-                let puntajeIRAT = 0;
+                // 2. Calcular puntajes IRAT-5 (incluye preliminar + Tinetti)
+                let puntajeIRATBase = 0;
                 ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'].forEach(id => {
-                    puntajeIRAT += parseInt(document.getElementById(id).value) || 0;
+                    puntajeIRATBase += parseInt(document.getElementById(id).value) || 0;
                 });
                 
-                if (parseInt(document.getElementById('amputacion').value) >= 3) puntajeIRAT += 1;
+                // Puntos extra por amputación de riesgo
+                if (parseInt(document.getElementById('amputacion').value) >= 3) puntajeIRATBase += 1;
                 
                 // Puntos Tinetti para IRAT-5
                 let puntosTinettiIRAT = 4;
@@ -2216,7 +2209,7 @@
                     else if (puntajeTinetti >= 19) puntosTinettiIRAT = 2;
                 }
                 
-                puntajeTotalIRAT = puntajeIRAT + puntosTinettiIRAT;
+                puntajeTotalIRAT = puntajeIRATBase + puntosTinettiIRAT;
                 
                 // 3. Niveles de riesgo
                 nivelRiesgoIRAT = puntajeTotalIRAT <= 6 ? "BAJO RIESGO" :
@@ -2236,7 +2229,7 @@
                 cambiarSeccion('resultados');
                 mostrarNotificacion('Resultados calculados exitosamente', 'success');
                 
-                // 6. [MEJORA: GUARDADO AUTOMÁTICO] Guardar en Firebase
+                // 6. Guardar en Firebase
                 if (shouldSave) {
                     guardarEnFirebase();
                 }
@@ -2253,7 +2246,8 @@
                     nombre: document.getElementById('nombre').value || 'Sin nombre',
                     rut: document.getElementById('rut').value || '',
                     edad: document.getElementById('edad').value || '',
-                    fecha: document.getElementById('fecha').value || '',
+                    // Guardamos la fecha en formato ISO string (YYYY-MM-DD)
+                    fecha: document.getElementById('fecha').value || new Date().toISOString().split('T')[0],
                     sexo: document.getElementById('sexo').value || '',
                     evaluador: document.getElementById('evaluador').value || 'Sin evaluador',
                     institucion: document.getElementById('institucion').value || '',
@@ -2321,12 +2315,26 @@
                         <div class="seccion-informe">
                             <h3><i class="fas fa-user"></i> Datos del Paciente</h3>
                             <div class="resultados-detallados">
-                                ${Object.entries(datosCompletos.paciente).map(([key, value]) => `
-                                    <div class="resultado-item">
-                                        <span class="resultado-label">${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</span>
-                                        <span class="resultado-valor">${value || "No especificado"}</span>
-                                    </div>
-                                `).join('')}
+                                ${Object.entries(datosCompletos.paciente).map(([key, value]) => {
+                                    const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                                    // Formatear la fecha para la visualización
+                                    let displayValue = value || "No especificado";
+                                    if (key === 'fecha' && value) {
+                                        try {
+                                            displayValue = new Date(value + 'T00:00:00').toLocaleDateString('es-ES', { 
+                                                day: '2-digit', 
+                                                month: 'long', 
+                                                year: 'numeric' 
+                                            });
+                                        } catch (e) { /* ignored */ }
+                                    }
+                                    return `
+                                        <div class="resultado-item">
+                                            <span class="resultado-label">${label}:</span>
+                                            <span class="resultado-valor">${displayValue}</span>
+                                        </div>
+                                    `;
+                                }).join('')}
                             </div>
                         </div>
                         
@@ -2478,6 +2486,13 @@
                 recs.push("Modificaciones estructurales en domicilio");
             }
             
+            // Recomendaciones adicionales basadas en Norton
+            if (puntajeNorton <= 11) {
+                recs.push(`**ALTO RIESGO UPP:** Implementar un plan de cambio postural estricto (< 2 horas) y uso de dispositivos de alivio de presión (colchón de presión alternante).`);
+            } else if (puntajeNorton <= 15) {
+                 recs.push(`**RIESGO MODERADO UPP:** Uso de cojín o colchón estático de alta calidad y vigilancia de la piel, especialmente en prominencias óseas.`);
+            }
+            
             return recs;
         }
         
@@ -2490,8 +2505,18 @@
         
         function obtenerProximaFechaEvaluacion() {
             const fecha = new Date();
-            fecha.setMonth(fecha.getMonth() + 3);
-            return fecha.toLocaleDateString('es-ES');
+            // Recomendación: 3 meses para riesgo moderado o alto, 6 meses para bajo
+            if (puntajeTotalIRAT >= 7 || puntajeNorton <= 15) {
+                 fecha.setMonth(fecha.getMonth() + 3);
+            } else {
+                 fecha.setMonth(fecha.getMonth() + 6);
+            }
+           
+            return fecha.toLocaleDateString('es-ES', { 
+                day: '2-digit', 
+                month: 'long', 
+                year: 'numeric' 
+            });
         }
         
         function configurarCompartir() {
@@ -2572,6 +2597,7 @@ Sistema IRAT-5 + Tinetti + Norton`;
             navigator.clipboard.writeText(informe)
                 .then(() => mostrarNotificacion('Informe copiado al portapapeles', 'success'))
                 .catch(() => {
+                    // Fallback para navegadores antiguos
                     const textarea = document.createElement('textarea');
                     textarea.value = informe;
                     document.body.appendChild(textarea);
