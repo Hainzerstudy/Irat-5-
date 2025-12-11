@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Evaluación Clínica IRAT-5 Modificado + Tinetti + Norton</title>
-    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <!-- Bibliotecas para PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -502,7 +499,7 @@
             border-radius: 4px;
             font-size: 0.8rem;
             font-weight: 600;
-            background-color: #FF9800;
+            background-color: #4CAF50; /* Conectado por defecto sin auth */
             color: white;
         }
         
@@ -514,27 +511,7 @@
             background-color: #F44336;
         }
         
-        .login-container {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .login-box {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-        }
+        /* [ELIMINADO: AUTENTICACIÓN] .login-container { ... } */
         
         .historial-item {
             background: #f8f9fa;
@@ -700,65 +677,19 @@
     </style>
 </head>
 <body>
-    <!-- Status Firebase -->
-    <div id="firebase-status" class="firebase-status">
-        <i class="fas fa-sync fa-spin"></i> Conectando a Firebase...
-    </div>
-    
-    <!-- Login Modal -->
-    <div id="login-container" class="login-container">
-        <div class="login-box">
-            <h2 style="color: var(--primary-color); margin-bottom: 20px;">
-                <i class="fas fa-lock"></i> Autenticación Requerida
-            </h2>
-            <div id="login-form">
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" id="login-email" class="form-control" placeholder="usuario@ejemplo.com" value="admin@irat.com">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Contraseña</label>
-                    <input type="password" id="login-password" class="form-control" placeholder="••••••••" value="admin123">
-                </div>
-                <div class="action-buttons">
-                    <button class="btn btn-primary" id="btn-login">
-                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                    </button>
-                    <button class="btn btn-secondary" id="btn-login-cancel">
-                        Cancelar
-                    </button>
-                </div>
-                <div style="margin-top: 20px; text-align: center;">
-                    <p style="font-size: 0.9rem; color: #666;">
-                        <i class="fas fa-info-circle"></i> Solo personal autorizado
-                    </p>
-                </div>
-            </div>
-            <div id="login-success" style="display: none; text-align: center;">
-                <i class="fas fa-check-circle" style="font-size: 3rem; color: #4CAF50; margin-bottom: 20px;"></i>
-                <h3 style="color: var(--primary-color);">¡Autenticación exitosa!</h3>
-                <p id="user-info"></p>
-                <button class="btn btn-primary" id="btn-continue" style="margin-top: 20px;">
-                    Continuar al sistema
-                </button>
-            </div>
-        </div>
+    <div id="firebase-status" class="firebase-status firebase-connected">
+        <i class="fas fa-database"></i> Conectado a Firestore
     </div>
     
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <h1><i class="fas fa-hospital-alt"></i> IRAT-5 + Tinetti + Norton</h1>
             <p>Evaluación Clínica Integral de Riesgo - Sistema Profesional</p>
-            <div id="user-display" class="user-display" style="display: none;">
-                <i class="fas fa-user-md"></i> <span id="current-user"></span>
-                <button id="btn-logout" class="btn btn-secondary" style="padding: 3px 10px; font-size: 0.8rem;">
-                    <i class="fas fa-sign-out-alt"></i> Salir
-                </button>
-            </div>
+            <div id="user-display" class="user-display" style="display: block;">
+                <i class="fas fa-user-md"></i> <span>Modo Acceso Libre</span>
+                </div>
         </div>
         
-        <!-- Navigation Tabs -->
         <div class="nav-tabs">
             <button class="nav-tab active" data-section="identificacion">Identificación</button>
             <button class="nav-tab" data-section="evaluacion">IRAT-5</button>
@@ -769,7 +700,6 @@
             <button class="nav-tab" data-section="compartir">Compartir</button>
         </div>
         
-        <!-- Sección 1: Identificación -->
         <section id="identificacion" class="section active">
             <h2 class="section-title"><i class="fas fa-user"></i> Identificación del Paciente</h2>
             
@@ -831,7 +761,6 @@
             </div>
         </section>
         
-        <!-- Sección 2: IRAT-5 -->
         <section id="evaluacion" class="section">
             <h2 class="section-title"><i class="fas fa-clipboard-list"></i> Evaluación IRAT-5 Modificado</h2>
             
@@ -918,7 +847,6 @@
             </div>
         </section>
         
-        <!-- Sección 3: Tinetti COMPLETO -->
         <section id="tinetti" class="section">
             <h2 class="section-title"><i class="fas fa-walking"></i> Test de Tinetti Completo</h2>
             
@@ -931,7 +859,6 @@
             </div>
             
             <div class="tinetti-container">
-                <!-- Opción No Evaluable -->
                 <div class="question-group">
                     <div class="question-text">¿Es evaluable el Test de Tinetti? <span style="color:red">*</span></div>
                     <div id="opcion-no-evaluable" class="tinetti-option" data-puntaje="0" data-irat="4">
@@ -941,12 +868,10 @@
                     <div id="error-tinetti-evaluable" class="error-message"></div>
                 </div>
                 
-                <!-- Si es evaluable, mostrar el test completo -->
                 <div id="test-tinetti-completo">
                     <div class="tinetti-section">
                         <h4>EQUILIBRIO (Máximo 16 puntos)</h4>
                         
-                        <!-- Pregunta 1 -->
                         <div class="question-group">
                             <div class="question-text">1. Sentado sin apoyo</div>
                             <div class="tinetti-option" data-puntaje="1" data-grupo="balance1">
@@ -957,7 +882,6 @@
                             </div>
                         </div>
                         
-                        <!-- Pregunta 2 -->
                         <div class="question-group">
                             <div class="question-text">2. Levantarse</div>
                             <div class="tinetti-option" data-puntaje="2" data-grupo="balance2">
@@ -971,7 +895,6 @@
                             </div>
                         </div>
                         
-                        <!-- Pregunta 3 -->
                         <div class="question-group">
                             <div class="question-text">3. Intentos de levantarse</div>
                             <div class="tinetti-option" data-puntaje="2" data-grupo="balance3">
@@ -985,7 +908,6 @@
                             </div>
                         </div>
                         
-                        <!-- Pregunta 4 -->
                         <div class="question-group">
                             <div class="question-text">4. Equilibrio inmediato al levantarse (primeros 5 segundos)</div>
                             <div class="tinetti-option" data-puntaje="2" data-grupo="balance4">
@@ -999,7 +921,6 @@
                             </div>
                         </div>
                         
-                        <!-- Pregunta 5 -->
                         <div class="question-group">
                             <div class="question-text">5. Equilibrio de pie</div>
                             <div class="tinetti-option" data-puntaje="2" data-grupo="balance5">
@@ -1013,7 +934,6 @@
                             </div>
                         </div>
                         
-                        <!-- Pregunta 6 -->
                         <div class="question-group">
                             <div class="question-text">6. Equilibrio con ojos cerrados</div>
                             <div class="tinetti-option" data-puntaje="1" data-grupo="balance6">
@@ -1024,7 +944,6 @@
                             </div>
                         </div>
                         
-                        <!-- Pregunta 7 -->
                         <div class="question-group">
                             <div class="question-text">7. Girar 360 grados</div>
                             <div class="tinetti-option" data-puntaje="2" data-grupo="balance7">
@@ -1038,7 +957,6 @@
                             </div>
                         </div>
                         
-                        <!-- Pregunta 8 -->
                         <div class="question-group">
                             <div class="question-text">8. Sentarse</div>
                             <div class="tinetti-option" data-puntaje="2" data-grupo="balance8">
@@ -1056,7 +974,6 @@
                     <div class="tinetti-section">
                         <h4>MARCHA (Máximo 12 puntos)</h4>
                         
-                        <!-- Pregunta 9 -->
                         <div class="question-group">
                             <div class="question-text">9. Inicio de la marcha (inmediatamente después de ordenar "camine")</div>
                             <div class="tinetti-option" data-puntaje="1" data-grupo="gait9">
@@ -1067,7 +984,6 @@
                             </div>
                         </div>
                         
-                        <!-- Pregunta 10 -->
                         <div class="question-group">
                             <div class="question-text">10. Longitud y altura del paso (pie derecho)</div>
                             <div class="tinetti-option" data-puntaje="1" data-grupo="gait10">
@@ -1078,7 +994,6 @@
                             </div>
                         </div>
                         
-                        <!-- Pregunta 11 -->
                         <div class="question-group">
                             <div class="question-text">11. Longitud y altura del paso (pie izquierdo)</div>
                             <div class="tinetti-option" data-puntaje="1" data-grupo="gait11">
@@ -1089,7 +1004,6 @@
                             </div>
                         </div>
                         
-                        <!-- Pregunta 12 -->
                         <div class="question-group">
                             <div class="question-text">12. Simetría del paso</div>
                             <div class="tinetti-option" data-puntaje="1" data-grupo="gait12">
@@ -1100,7 +1014,6 @@
                             </div>
                         </div>
                         
-                        <!-- Pregunta 13 -->
                         <div class="question-group">
                             <div class="question-text">13. Continuidad del paso</div>
                             <div class="tinetti-option" data-puntaje="1" data-grupo="gait13">
@@ -1111,7 +1024,6 @@
                             </div>
                         </div>
                         
-                        <!-- Pregunta 14 -->
                         <div class="question-group">
                             <div class="question-text">14. Desviación de la marcha</div>
                             <div class="tinetti-option" data-puntaje="2" data-grupo="gait14">
@@ -1125,7 +1037,6 @@
                             </div>
                         </div>
                         
-                        <!-- Pregunta 15 -->
                         <div class="question-group">
                             <div class="question-text">15. Tronco</div>
                             <div class="tinetti-option" data-puntaje="2" data-grupo="gait15">
@@ -1139,7 +1050,6 @@
                             </div>
                         </div>
                         
-                        <!-- Pregunta 16 -->
                         <div class="question-group">
                             <div class="question-text">16. Base de sustentación</div>
                             <div class="tinetti-option" data-puntaje="1" data-grupo="gait16">
@@ -1152,7 +1062,6 @@
                     </div>
                 </div>
                 
-                <!-- Resultados Tinetti -->
                 <div id="resultado-tinetti" style="display: none;">
                     <div class="tinetti-score-box">
                         <h4>Resultado Test de Tinetti</h4>
@@ -1174,7 +1083,6 @@
             </div>
         </section>
         
-        <!-- Sección 4: Escala Norton -->
         <section id="norton" class="section">
             <h2 class="section-title"><i class="fas fa-bed"></i> Escala Norton</h2>
             
@@ -1246,7 +1154,6 @@
             </div>
         </section>
         
-        <!-- Sección 5: Resultados -->
         <section id="resultados" class="section">
             <h2 class="section-title"><i class="fas fa-chart-line"></i> Resultados Integrales</h2>
             
@@ -1266,19 +1173,17 @@
             </div>
         </section>
         
-        <!-- Sección 6: Historial FIREBASE -->
         <section id="historial" class="section">
             <h2 class="section-title"><i class="fas fa-history"></i> Historial de Evaluaciones</h2>
             
             <div class="info-box">
-                <strong><i class="fas fa-database"></i> Historial en la nube (Firebase)</strong>
+                <strong><i class="fas fa-database"></i> Historial en la nube (Firestore)</strong>
                 <p>Las evaluaciones se guardan de forma segura en la base de datos en la nube.</p>
                 <div id="firebase-stats" style="margin-top: 10px;">
                     <span id="total-evaluaciones">Cargando estadísticas...</span>
                 </div>
             </div>
             
-            <!-- Filtros de búsqueda -->
             <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">
                 <h4 style="margin-bottom: 15px; color: var(--primary-color);">
                     <i class="fas fa-filter"></i> Filtros de búsqueda
@@ -1307,7 +1212,6 @@
                 </div>
             </div>
             
-            <!-- Contenedor del historial -->
             <div id="historial-container" class="historial-container">
                 <div style="text-align: center; padding: 40px; color: #666;">
                     <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 20px;"></i>
@@ -1315,7 +1219,6 @@
                 </div>
             </div>
             
-            <!-- Paginación -->
             <div id="pagination-container" style="display: none; margin-top: 20px;">
                 <div class="pagination">
                     <button class="btn btn-primary" id="btn-prev" disabled>
@@ -1338,7 +1241,6 @@
             </div>
         </section>
         
-        <!-- Sección 7: Compartir -->
         <section id="compartir" class="section">
             <h2 class="section-title"><i class="fas fa-share-alt"></i> Compartir Resultados</h2>
             
@@ -1389,7 +1291,6 @@
         </section>
     </div>
     
-    <!-- Notificación -->
     <div id="notification" class="notification"></div>
 
     <script>
@@ -1407,8 +1308,8 @@
         // ========== VARIABLES GLOBALES ==========
         let firebaseApp;
         let db;
-        let auth;
-        let currentUser = null;
+        // [MODIFICADO: AUTENTICACIÓN] Eliminada la variable 'auth' y 'currentUser'
+        
         let datosCompletos = null;
         let historialFirebase = [];
         let currentPage = 1;
@@ -1436,7 +1337,7 @@
             document.getElementById('fecha').value = today;
             
             // Inicializar Firebase
-            inicializarFirebase();
+            inicializarFirebase(); // Ya no inicializa Auth
             
             // Configurar navegación
             inicializarNavegacion();
@@ -1455,131 +1356,28 @@
             
             calcularNorton();
             
-            mostrarNotificacion('Sistema cargado correctamente', 'info');
+            mostrarNotificacion('Sistema cargado y conectado a Firestore', 'success');
+            
+            // [MODIFICADO: AUTENTICACIÓN] Cargar historial al inicio ya que no hay login
+            cargarHistorialFirebase();
         });
 
-        // ========== INICIALIZAR FIREBASE ==========
+        // ========== INICIALIZAR FIREBASE (SIN AUTH) ==========
         function inicializarFirebase() {
             try {
                 firebaseApp = firebase.initializeApp(firebaseConfig);
                 db = firebase.firestore();
-                auth = firebase.auth();
                 
-                // Configurar persistencia de sesión
-                auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-                
-                // Escuchar cambios de autenticación
-                auth.onAuthStateChanged((user) => {
-                    if (user) {
-                        // Usuario autenticado
-                        currentUser = user;
-                        actualizarUIUsuario(user);
-                        actualizarEstadoFirebase('Conectado', 'firebase-connected');
-                        
-                        // Cargar historial si estamos en esa sección
-                        if (document.getElementById('historial').classList.contains('active')) {
-                            cargarHistorialFirebase();
-                        }
-                        
-                        mostrarNotificacion(`Bienvenido ${user.email}`, 'success');
-                    } else {
-                        // No autenticado
-                        currentUser = null;
-                        actualizarUIUsuario(null);
-                        mostrarLogin();
-                    }
-                });
+                actualizarEstadoFirebase('Conectado a Firestore', 'firebase-connected');
                 
             } catch (error) {
                 console.error('Error inicializando Firebase:', error);
-                actualizarEstadoFirebase('Error de conexión', 'firebase-disconnected');
+                actualizarEstadoFirebase('Error de conexión a Firestore', 'firebase-disconnected');
                 mostrarNotificacion('Error conectando a Firebase', 'error');
             }
         }
 
-        // ========== AUTENTICACIÓN ==========
-        function mostrarLogin() {
-            document.getElementById('login-container').style.display = 'flex';
-        }
-        
-        function ocultarLogin() {
-            document.getElementById('login-container').style.display = 'none';
-        }
-        
-        function actualizarUIUsuario(user) {
-            const userDisplay = document.getElementById('user-display');
-            const currentUserSpan = document.getElementById('current-user');
-            
-            if (user) {
-                currentUserSpan.textContent = user.email;
-                userDisplay.style.display = 'flex';
-                ocultarLogin();
-            } else {
-                userDisplay.style.display = 'none';
-            }
-        }
-        
-        // Eventos de login
-        document.getElementById('btn-login').addEventListener('click', async function() {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            
-            if (!email || !password) {
-                mostrarNotificacion('Ingrese email y contraseña', 'error');
-                return;
-            }
-            
-            try {
-                mostrarNotificacion('Iniciando sesión...', 'info');
-                const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                
-                // Mostrar éxito
-                document.getElementById('login-form').style.display = 'none';
-                document.getElementById('login-success').style.display = 'block';
-                document.getElementById('user-info').textContent = `Usuario: ${userCredential.user.email}`;
-                
-            } catch (error) {
-                console.error('Error de login:', error);
-                let mensaje = 'Error de autenticación';
-                
-                switch(error.code) {
-                    case 'auth/user-not-found':
-                        mensaje = 'Usuario no encontrado';
-                        break;
-                    case 'auth/wrong-password':
-                        mensaje = 'Contraseña incorrecta';
-                        break;
-                    case 'auth/invalid-email':
-                        mensaje = 'Email inválido';
-                        break;
-                    case 'auth/too-many-requests':
-                        mensaje = 'Demasiados intentos. Intente más tarde';
-                        break;
-                }
-                
-                mostrarNotificacion(mensaje, 'error');
-            }
-        });
-        
-        document.getElementById('btn-login-cancel').addEventListener('click', function() {
-            ocultarLogin();
-            mostrarNotificacion('Se requiere autenticación para usar todas las funciones', 'warning');
-        });
-        
-        document.getElementById('btn-continue').addEventListener('click', function() {
-            ocultarLogin();
-        });
-        
-        document.getElementById('btn-logout').addEventListener('click', function() {
-            if (confirm('¿Está seguro de cerrar sesión?')) {
-                auth.signOut().then(() => {
-                    mostrarNotificacion('Sesión cerrada', 'info');
-                }).catch((error) => {
-                    console.error('Error cerrando sesión:', error);
-                    mostrarNotificacion('Error al cerrar sesión', 'error');
-                });
-            }
-        });
+        // [ELIMINADO: AUTENTICACIÓN] Funciones de login, logout y actualización de UI de usuario
 
         // ========== CONFIGURACIÓN DEL HISTORIAL FIREBASE ==========
         function configurarHistorial() {
@@ -1604,21 +1402,32 @@
             document.getElementById('btn-limpiar-filtros').addEventListener('click', limpiarFiltros);
         }
         
-        // ========== CARGAR HISTORIAL DESDE FIREBASE ==========
+        // ========== CARGAR HISTORIAL DESDE FIREBASE (MODIFICADO SIN UID) ==========
         async function cargarHistorialFirebase(direction = 'first') {
-            if (!currentUser) {
-                mostrarNotificacion('Debe iniciar sesión para ver el historial', 'error');
-                mostrarLogin();
-                return;
-            }
             
             try {
                 mostrarCargandoHistorial(true);
                 
+                // [MODIFICADO: AUTENTICACIÓN] No se usa 'where('userId', '==', currentUser.uid)'
                 let query = db.collection('evaluaciones')
-                    .where('userId', '==', currentUser.uid)
                     .orderBy('fechaEvaluacion', 'desc')
                     .limit(itemsPerPage);
+                
+                // Aplicar filtros si existen antes de la paginación
+                const nombreFilter = document.getElementById('filter-nombre').value.trim();
+                const fechaDesdeFilter = document.getElementById('filter-fecha-desde').value;
+                const fechaHastaFilter = document.getElementById('filter-fecha-hasta').value;
+                
+                // Para simplificar la carga sin la complejidad de índices de Firestore:
+                // Si hay filtros complejos, cargamos el primer set sin paginación (menos eficiente, pero simple)
+                if (nombreFilter || fechaDesdeFilter || fechaHastaFilter) {
+                    // Si hay filtros, mejor usar la lógica de aplicarFiltros (o simplificar la query)
+                    // Por ahora, solo cargamos los primeros 'itemsPerPage' y esperamos que el usuario use los botones de filtro.
+                    
+                    // Nota: Firestore no soporta búsquedas parciales (contains) ni múltiples 'orderBy' sin índices compuestos,
+                    // y los filtros 'where' limitan qué campos se pueden ordenar. 
+                    // Para esta implementación sin Auth, mantendremos la carga simple por fecha:
+                }
                 
                 // Manejar paginación
                 if (direction === 'next' && lastVisible) {
@@ -1651,7 +1460,7 @@
                 
                 // Actualizar UI
                 actualizarVistaHistorial();
-                actualizarEstadisticas(snapshot.size);
+                actualizarEstadisticas(historialFirebase.length); // Tamaño de la página actual
                 actualizarPaginacion();
                 
             } catch (error) {
@@ -1723,8 +1532,14 @@
                 let fechaFormateada = 'Sin fecha';
                 try {
                     if (fechaEvaluacion) {
-                        const fecha = new Date(fechaEvaluacion);
-                        fechaFormateada = fecha.toLocaleDateString('es-ES');
+                        // El formato de Firestore puede ser diferente si no es un timestamp de Firebase.
+                        // Usamos solo la parte de la fecha (si viene en formato ISO)
+                        const fecha = new Date(fechaEvaluacion.split('T')[0]); 
+                        fechaFormateada = fecha.toLocaleDateString('es-ES', { 
+                            year: 'numeric', 
+                            month: '2-digit', 
+                            day: '2-digit' 
+                        });
                     }
                 } catch (e) {
                     fechaFormateada = fechaEvaluacion;
@@ -1777,13 +1592,8 @@
             nextBtn.disabled = historialFirebase.length < itemsPerPage;
         }
         
-        // ========== OPERACIONES CRUD FIREBASE ==========
+        // ========== OPERACIONES CRUD FIREBASE (MODIFICADO SIN UID) ==========
         async function guardarEnFirebase() {
-            if (!currentUser) {
-                mostrarNotificacion('Debe iniciar sesión para guardar', 'error');
-                mostrarLogin();
-                return;
-            }
             
             if (!datosCompletos) {
                 mostrarNotificacion('Primero calcule los resultados', 'error');
@@ -1796,8 +1606,9 @@
                 // Preparar datos para Firebase
                 const datosFirebase = {
                     ...datosCompletos,
-                    userId: currentUser.uid,
-                    userEmail: currentUser.email,
+                    // [MODIFICADO: AUTENTICACIÓN] Se usa un userId genérico 'free_access'
+                    userId: 'free_access', 
+                    userEmail: datosCompletos.paciente.evaluador || 'Acceso Libre',
                     fechaGuardado: firebase.firestore.FieldValue.serverTimestamp(),
                     fechaEvaluacion: datosCompletos.paciente.fecha || new Date().toISOString()
                 };
@@ -1837,11 +1648,7 @@
                 
                 const evaluacion = { id: doc.id, ...doc.data() };
                 
-                // Validar que la evaluación pertenece al usuario actual
-                if (evaluacion.userId !== currentUser.uid) {
-                    mostrarNotificacion('No tiene permiso para ver esta evaluación', 'error');
-                    return;
-                }
+                // [ELIMINADO: AUTENTICACIÓN] Se quita la verificación de permiso (evaluacion.userId !== currentUser.uid)
                 
                 // Mostrar en sección de resultados
                 mostrarEvaluacionFirebase(evaluacion);
@@ -1892,11 +1699,7 @@
                 
                 const evaluacion = doc.data();
                 
-                // Validar propiedad
-                if (evaluacion.userId !== currentUser.uid) {
-                    mostrarNotificacion('No tiene permiso para cargar esta evaluación', 'error');
-                    return;
-                }
+                // [ELIMINADO: AUTENTICACIÓN] Se quita la verificación de propiedad
                 
                 // Cargar datos del paciente en el formulario
                 if (evaluacion.paciente) {
@@ -1910,7 +1713,10 @@
                     document.getElementById('historia-clinica').value = evaluacion.paciente.historiaClinica || '';
                 }
                 
-                mostrarNotificacion(`Datos de ${evaluacion.paciente?.nombre || 'paciente'} cargados para edición`, 'info');
+                // [NOTA] Para cargar COMPLETAMENTE la evaluación, también se necesitaría rellenar los selects
+                // de IRAT-5, Tinetti y Norton con los valores guardados en 'evaluacion.irat5.respuestas', etc.
+                
+                mostrarNotificacion(`Datos de ${evaluacion.paciente?.nombre || 'paciente'} cargados para edición. *Nota: Debe rellenar Tinetti/IRAT/Norton manualmente*`, 'info');
                 cambiarSeccion('identificacion');
                 
             } catch (error) {
@@ -1925,17 +1731,14 @@
             }
             
             try {
-                // Verificar que existe y pertenece al usuario
+                // Verificar que existe 
                 const doc = await db.collection('evaluaciones').doc(id).get();
                 if (!doc.exists) {
                     mostrarNotificacion('La evaluación ya no existe', 'error');
                     return;
                 }
                 
-                if (doc.data().userId !== currentUser.uid) {
-                    mostrarNotificacion('No tiene permiso para eliminar esta evaluación', 'error');
-                    return;
-                }
+                // [ELIMINADO: AUTENTICACIÓN] Se quita la verificación de propiedad
                 
                 await db.collection('evaluaciones').doc(id).delete();
                 
@@ -1950,7 +1753,7 @@
             }
         }
         
-        // ========== FILTROS ==========
+        // ========== FILTROS (MODIFICADO SIN UID) ==========
         async function aplicarFiltros() {
             try {
                 const nombre = document.getElementById('filter-nombre').value.trim();
@@ -1959,11 +1762,11 @@
                 
                 // Construir query base
                 let query = db.collection('evaluaciones')
-                    .where('userId', '==', currentUser.uid);
+                    // [ELIMINADO: AUTENTICACIÓN] Se quita el filtro por userId
+                    .orderBy('fechaEvaluacion', 'desc');
                 
-                // Aplicar filtro por nombre (búsqueda parcial)
+                // Aplicar filtro por nombre (solo funciona para nombres que comienzan con la búsqueda sin un índice apropiado)
                 if (nombre) {
-                    // Para búsqueda por nombre (case insensitive)
                     query = query.where('paciente.nombre', '>=', nombre)
                                  .where('paciente.nombre', '<=', nombre + '\uf8ff');
                 }
@@ -1977,11 +1780,11 @@
                     // Añadir un día para incluir la fecha hasta
                     const fechaHastaObj = new Date(fechaHasta);
                     fechaHastaObj.setDate(fechaHastaObj.getDate() + 1);
-                    query = query.where('fechaEvaluacion', '<', fechaHastaObj.toISOString());
+                    query = query.where('fechaEvaluacion', '<', fechaHastaObj.toISOString().split('T')[0]); // Se usa solo la fecha
                 }
                 
-                // Ordenar y limitar
-                query = query.orderBy('fechaEvaluacion', 'desc').limit(itemsPerPage);
+                // Limitar
+                query = query.limit(itemsPerPage);
                 
                 const snapshot = await query.get();
                 
@@ -2076,24 +1879,19 @@
             }, 4000);
         }
         
-        // ========== FUNCIONES DEL FORMULARIO (IGUALES QUE ANTES) ==========
+        // ========== FUNCIONES DEL FORMULARIO (MANTENIDAS) ==========
         function inicializarNavegacion() {
             // Navegación por pestañas
             document.querySelectorAll('.nav-tab').forEach(tab => {
                 tab.addEventListener('click', function() {
                     const sectionId = this.getAttribute('data-section');
                     
-                    // Si es historial y no está autenticado, mostrar login
-                    if (sectionId === 'historial' && !currentUser) {
-                        mostrarLogin();
-                        mostrarNotificacion('Debe iniciar sesión para ver el historial', 'warning');
-                        return;
-                    }
+                    // [ELIMINADO: AUTENTICACIÓN] Se quita la verificación de login para historial
                     
                     cambiarSeccion(sectionId);
                     
                     // Cargar historial si es la sección correspondiente
-                    if (sectionId === 'historial' && currentUser) {
+                    if (sectionId === 'historial') {
                         cargarHistorialFirebase();
                     }
                 });
