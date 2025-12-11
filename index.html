@@ -1426,15 +1426,18 @@
     </div>
 
     <script>
-        // ========== CONFIGURACIÓN FIREBASE ==========
-        // REEMPLAZA ESTOS VALORES CON TUS CREDENCIALES DE FIREBASE
-        const firebaseConfig = {
-            apiKey: "AIzaSyC7WgFJ8p6B8P3O0mZ7L9vKjNqXrS1T2U3V",
-            authDomain: "irat-evaluaciones.firebaseapp.com",
-            projectId: "irat-evaluaciones",
-            storageBucket: "irat-evaluaciones.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcdef1234567890"
+
+            // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDJbtRuEwWVAsC1Nz6LbeF5a99LcUfAz4g",
+  authDomain: "irat-5-evaluaciones.firebaseapp.com",
+  databaseURL: "https://irat-5-evaluaciones-default-rtdb.firebaseio.com",
+  projectId: "irat-5-evaluaciones",
+  storageBucket: "irat-5-evaluaciones.firebasestorage.app",
+  messagingSenderId: "487279274410",
+  appId: "1:487279274410:web:146e9c35a0bf795c5423d3",
+  measurementId: "G-WSXJY5QHJS"
+};
         };
 
         // ========== VARIABLES GLOBALES ==========
@@ -1727,7 +1730,202 @@
         // son idénticas a las que ya tenías en tu código original.
         // Solo necesitas copiar y pegar las funciones desde tu código anterior
         // que comienzan después de la línea: "// ========== FUNCIONES DEL FORMULARIO =========="
+// ========== FUNCIONES DEL FORMULARIO ==========
+function inicializarNavegacion() {
+    // Navegación por pestañas
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            const sectionId = this.getAttribute('data-section');
+            
+            // Si es historial y no está autenticado, mostrar login
+            if (sectionId === 'historial' && !currentUser) {
+                mostrarLogin();
+                mostrarNotificacion('Debe iniciar sesión para ver el historial', 'warning');
+                return;
+            }
+            
+            cambiarSeccion(sectionId);
+            
+            // Cargar historial si es la sección correspondiente
+            if (sectionId === 'historial' && currentUser) {
+                cargarHistorialFirebase();
+            }
+        });
+    });
+    
+    // Botones de navegación del formulario
+    document.getElementById('siguiente-irat').addEventListener('click', () => {
+        if (validarSeccionIdentificacion()) cambiarSeccion('evaluacion');
+    });
+    document.getElementById('volver-identificacion').addEventListener('click', () => cambiarSeccion('identificacion'));
+    document.getElementById('siguiente-tinetti').addEventListener('click', () => {
+        if (validarSeccionIRAT5()) cambiarSeccion('tinetti');
+    });
+    document.getElementById('volver-irat').addEventListener('click', () => cambiarSeccion('evaluacion'));
+    document.getElementById('siguiente-norton').addEventListener('click', () => {
+        if (validarSeccionTinetti()) cambiarSeccion('norton');
+    });
+    document.getElementById('volver-tinetti').addEventListener('click', () => cambiarSeccion('tinetti'));
+    document.getElementById('calcular-resultados').addEventListener('click', calcularResultadosCompletos);
+    document.getElementById('volver-norton').addEventListener('click', () => cambiarSeccion('norton'));
+    document.getElementById('ir-compartir').addEventListener('click', () => {
+        if (datosCompletos) cambiarSeccion('compartir');
+        else mostrarNotificacion('Primero calcule los resultados', 'error');
+    });
+    document.getElementById('volver-resultados-historial').addEventListener('click', () => cambiarSeccion('resultados'));
+    document.getElementById('volver-compartir').addEventListener('click', () => cambiarSeccion('resultados'));
+    document.getElementById('nueva-evaluacion').addEventListener('click', iniciarNuevaEvaluacion);
+}
 
+function cambiarSeccion(sectionId) {
+    document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    const seccion = document.getElementById(sectionId);
+    if (seccion) seccion.classList.add('active');
+    
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.getAttribute('data-section') === sectionId) {
+            tab.classList.add('active');
+        }
+    });
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function configurarValidaciones() {
+    const camposRequeridos = document.querySelectorAll('[required]');
+    camposRequeridos.forEach(campo => {
+        campo.addEventListener('blur', function() {
+            if (!this.value.trim()) {
+                this.classList.add('error-input');
+                mostrarErrorCampo(this.id, 'Este campo es requerido');
+            } else {
+                this.classList.remove('error-input');
+                eliminarErrorCampo(this.id);
+            }
+        });
+    });
+}
+
+function mostrarErrorCampo(idCampo, mensaje) {
+    const errorDiv = document.getElementById(`error-${idCampo}`);
+    if (errorDiv) {
+        errorDiv.textContent = mensaje;
+        errorDiv.style.display = 'block';
+    }
+}
+
+function eliminarErrorCampo(idCampo) {
+    const errorDiv = document.getElementById(`error-${idCampo}`);
+    if (errorDiv) errorDiv.style.display = 'none';
+}
+
+function validarSeccionIdentificacion() {
+    let valido = true;
+    ['nombre', 'fecha', 'evaluador'].forEach(campo => {
+        const elemento = document.getElementById(campo);
+        if (!elemento.value.trim()) {
+            elemento.classList.add('error-input');
+            mostrarErrorCampo(campo, 'Este campo es requerido');
+            valido = false;
+        } else {
+            elemento.classList.remove('error-input');
+            eliminarErrorCampo(campo);
+        }
+    });
+    if (!valido) mostrarNotificacion('Complete todos los campos requeridos', 'error');
+    return valido;
+}
+
+function validarSeccionIRAT5() {
+    let valido = true;
+    ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'].forEach(id => {
+        const select = document.getElementById(id);
+        if (!select.value) {
+            select.classList.add('error-input');
+            mostrarErrorCampo(id, 'Seleccione una opción');
+            valido = false;
+        } else {
+            select.classList.remove('error-input');
+            eliminarErrorCampo(id);
+        }
+    });
+    if (!valido) mostrarNotificacion('Complete todas las preguntas IRAT-5', 'error');
+    return valido;
+}
+
+function validarSeccionTinetti() {
+    if (tinettiNoEvaluable) return true;
+    for (let i = 1; i <= 16; i++) {
+        const grupo = i <= 8 ? `balance${i}` : `gait${i}`;
+        if (!respuestasTinetti[grupo]) {
+            mostrarNotificacion('Complete todas las preguntas del Test de Tinetti', 'error');
+            return false;
+        }
+    }
+    return true;
+}
+
+function configurarTinetti() {
+    document.getElementById('opcion-no-evaluable').addEventListener('click', function() {
+        tinettiNoEvaluable = true;
+        document.getElementById('test-tinetti-completo').style.display = 'none';
+        document.querySelectorAll('.tinetti-option[data-grupo]').forEach(opt => opt.classList.remove('selected'));
+        this.classList.add('selected');
+        mostrarResultadoTinetti();
+    });
+    
+    document.querySelectorAll('.tinetti-option[data-grupo]').forEach(option => {
+        option.addEventListener('click', function() {
+            tinettiNoEvaluable = false;
+            document.getElementById('test-tinetti-completo').style.display = 'block';
+            document.getElementById('opcion-no-evaluable').classList.remove('selected');
+            
+            const grupo = this.getAttribute('data-grupo');
+            document.querySelectorAll(`.tinetti-option[data-grupo="${grupo}"]`).forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            
+            respuestasTinetti[grupo] = {
+                numero: parseInt(grupo.replace(/[a-z]/g, '')),
+                pregunta: obtenerTextoPreguntaTinetti(grupo),
+                respuesta: this.querySelector('strong')?.textContent || this.textContent,
+                puntos: parseInt(this.getAttribute('data-puntaje'))
+            };
+            
+            calcularPuntajeTinetti();
+        });
+    });
+}
+
+function calcularPuntajeTinetti() {
+    if (tinettiNoEvaluable) {
+        puntajeTinetti = 0;
+        mostrarResultadoTinetti();
+        return;
+    }
+    
+    puntajeTinetti = 0;
+    for (let i = 1; i <= 16; i++) {
+        const grupo = i <= 8 ? `balance${i}` : `gait${i}`;
+        if (respuestasTinetti[grupo]) {
+            puntajeTinetti += respuestasTinetti[grupo].puntos || 0;
+        }
+    }
+    mostrarResultadoTinetti();
+}
+
+function mostrarResultadoTinetti() {
+    const resultadoDiv = document.getElementById('resultado-tinetti');
+    if (!resultadoDiv) return;
+    
+    if (tinettiNoEvaluable) {
+        resultadoDiv.style.display = 'block';
+        document.getElementById('puntaje-tinetti-total').textContent = 'No evaluable';
+        document.getElementById('interpretacion-tinetti').innerHTML = '<strong>Máximo riesgo de caídas</strong>';
+        document.getElementById('puntos-irat-tinetti').innerHTML =
         // ========== FUNCIONES AUXILIARES ==========
         function actualizarEstadoFirebase(mensaje, clase) {
             const statusElement = document.getElementById('firebase-status');
