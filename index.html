@@ -1,29 +1,437 @@
-<script>
-        // ========== CONFIGURACIÓN FIREBASE ==========
-        const firebaseConfig = {
-            apiKey: "AIzaSyDJbtRuEwWVAsC1Nz6LbeF5a99LcUfAz4g",
-            authDomain: "irat-5-evaluaciones.firebaseapp.com",
-            projectId: "irat-5-evaluaciones",
-            storageBucket: "irat-5-evaluaciones.firebasestorage.app",
-            messagingSenderId: "487279274410",
-            appId: "1:487279274410:web:146e9c35a0bf795c5423d3",
-            measurementId: "G-WSXJY5QHJS"
-        };
-
-        // ========== VARIABLES GLOBALES ==========
-        let firebaseApp;
-        let db;
-        let auth;
-        let currentUser = null;
-        let datosCompletos = null;
-        let historialFirebase = [];
-        let currentPage = 1;
-        const itemsPerPage = 5;
-        let lastVisible = null;
-        let firstVisible = null;
-        let currentQuery = null;
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación Clínica IRAT-5 Modificado + Tinetti + Norton</title>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <!-- Bibliotecas para PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1e3c72;
+            --secondary-color: #2a5298;
+            --accent-color: #4CAF50;
+            --warning-color: #FF9800;
+            --danger-color: #F44336;
+            --light-color: #f8f9fa;
+        }
         
-        // Variables del formulario
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7ff;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .section {
+            padding: 25px;
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary-color);
+            font-size: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        select.form-control {
+            background-color: white;
+            cursor: pointer;
+        }
+        
+        .question-group {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+        }
+        
+        .score-display {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 25px 0;
+        }
+        
+        .score-value {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 5px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #FF9800, #EF6C00);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #F44336, #C62828);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background: #f0f2f5;
+            border-bottom: 2px solid #e0e0e0;
+            overflow-x: auto;
+        }
+        
+        .nav-tab {
+            padding: 15px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 500;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .nav-tab:hover {
+            background: rgba(255,255,255,0.5);
+        }
+        
+        .nav-tab.active {
+            border-bottom-color: var(--primary-color);
+            background: white;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .error-input {
+            border-color: var(--danger-color) !important;
+            background-color: #fff5f5;
+        }
+        
+        .error-message {
+            color: var(--danger-color);
+            font-size: 0.875rem;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-hospital-alt"></i> IRAT-5 + Tinetti + Norton</h1>
+            <p>Evaluación Clínica Integral de Riesgo - Sistema Profesional</p>
+        </div>
+        
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-section="identificacion">Identificación</button>
+            <button class="nav-tab" data-section="evaluacion">IRAT-5</button>
+            <button class="nav-tab" data-section="tinetti">Tinetti</button>
+            <button class="nav-tab" data-section="norton">Norton</button>
+            <button class="nav-tab" data-section="resultados">Resultados</button>
+        </div>
+        
+        <!-- Sección 1: Identificación -->
+        <section id="identificacion" class="section active">
+            <h2 class="section-title"><i class="fas fa-user"></i> Identificación del Paciente</h2>
+            
+            <div class="form-group">
+                <label class="form-label">Nombre completo <span style="color:red">*</span></label>
+                <input type="text" id="nombre" class="form-control" placeholder="Nombre y apellidos del paciente" required>
+                <div id="error-nombre" class="error-message"></div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Fecha evaluación <span style="color:red">*</span></label>
+                <input type="date" id="fecha" class="form-control" required>
+                <div id="error-fecha" class="error-message"></div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Evaluador <span style="color:red">*</span></label>
+                <input type="text" id="evaluador" class="form-control" placeholder="Nombre del profesional" required>
+                <div id="error-evaluador" class="error-message"></div>
+            </div>
+            
+            <div class="action-buttons">
+                <div></div>
+                <button class="btn btn-primary" id="siguiente-irat">
+                    <i class="fas fa-arrow-right"></i> Siguiente: IRAT-5
+                </button>
+            </div>
+        </section>
+        
+        <!-- Sección 2: IRAT-5 -->
+        <section id="evaluacion" class="section">
+            <h2 class="section-title"><i class="fas fa-clipboard-list"></i> Evaluación IRAT-5 Modificado</h2>
+            
+            <div class="question-group">
+                <div class="question-text">1. Equilibrio Unipodal <span style="color:red">*</span></div>
+                <select id="equilibrio" class="form-control" required>
+                    <option value="">Seleccione...</option>
+                    <option value="0">≥ 30 segundos (0 pts)</option>
+                    <option value="1">15-29 segundos (1 pts)</option>
+                    <option value="2">5-14 segundos (2 pts)</option>
+                    <option value="3">< 5 segundos (3 pts)</option>
+                    <option value="4">No puede mantenerse (4 pts)</option>
+                </select>
+                <div id="error-equilibrio" class="error-message"></div>
+            </div>
+            
+            <div class="question-group">
+                <div class="question-text">2. Tipo de Amputación <span style="color:red">*</span></div>
+                <select id="amputacion" class="form-control" required>
+                    <option value="">Seleccione...</option>
+                    <option value="0">Sin amputaciones (0 pts)</option>
+                    <option value="1">Amputación transmetatarsiana (1 pts)</option>
+                    <option value="3">Unilateral infracondílea (3 pts + 1 riesgo caídas)</option>
+                    <option value="4">Bilateral infracondílea (4 pts + 1 riesgo caídas)</option>
+                    <option value="5">Supracondílea unilateral (5 pts + 1 riesgo caídas)</option>
+                    <option value="6">Supracondílea bilateral (6 pts + 1 riesgo caídas)</option>
+                </select>
+                <div id="error-amputacion" class="error-message"></div>
+            </div>
+            
+            <div class="question-group">
+                <div class="question-text">3. Función de Brazos <span style="color:red">*</span></div>
+                <select id="brazos" class="form-control" required>
+                    <option value="">Seleccione...</option>
+                    <option value="0">Ambos brazos normales o fuerza ≥3 (0 pts)</option>
+                    <option value="1">Problemas en un brazo/fuerza <3 (1 pts)</option>
+                    <option value="2">Problemas en ambos brazos (2 pts)</option>
+                </select>
+                <div id="error-brazos" class="error-message"></div>
+            </div>
+            
+            <div class="question-group">
+                <div class="question-text">4. Situación Social <span style="color:red">*</span></div>
+                <select id="social" class="form-control" required>
+                    <option value="">Seleccione...</option>
+                    <option value="0">Cuidador profesional (0 pts)</option>
+                    <option value="1">Cuidador informal (1 pts)</option>
+                    <option value="2">Vive solo o sin cuidador (2 pts)</option>
+                    <option value="3">Es cuidador de persona frágil (3 pts)</option>
+                </select>
+                <div id="error-social" class="error-message"></div>
+            </div>
+            
+            <div class="question-group">
+                <div class="question-text">5. Nivel de Cooperación <span style="color:red">*</span></div>
+                <select id="cooperacion" class="form-control" required>
+                    <option value="">Seleccione...</option>
+                    <option value="0">Excelente - Sigue todas las instrucciones (0 pts)</option>
+                    <option value="1">Buena - Sigue mayoría de instrucciones (1 pts)</option>
+                    <option value="2">Moderada - Requiere motivación constante (2 pts)</option>
+                    <option value="3">Mala - Se resiste o rechaza instrucciones (3 pts)</option>
+                </select>
+                <div id="error-cooperacion" class="error-message"></div>
+            </div>
+            
+            <div class="score-display">
+                <div>Puntaje IRAT-5 (preliminar)</div>
+                <div class="score-value" id="puntaje-irat">0</div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-warning" id="volver-identificacion">
+                    <i class="fas fa-arrow-left"></i> Anterior
+                </button>
+                <button class="btn btn-primary" id="siguiente-tinetti">
+                    Siguiente: Tinetti <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+        
+        <!-- Sección 3: Tinetti -->
+        <section id="tinetti" class="section">
+            <h2 class="section-title"><i class="fas fa-walking"></i> Test de Tinetti</h2>
+            
+            <div class="question-group">
+                <div class="question-text">¿Es evaluable el Test de Tinetti? <span style="color:red">*</span></div>
+                <select id="tinetti-evaluable" class="form-control" required>
+                    <option value="">Seleccione...</option>
+                    <option value="evaluable">Sí, es evaluable</option>
+                    <option value="no-evaluable">No, no es evaluable</option>
+                </select>
+                <div id="error-tinetti-evaluable" class="error-message"></div>
+            </div>
+            
+            <div id="tinetti-preguntas" style="display: none;">
+                <div class="question-group">
+                    <div class="question-text">Puntaje Tinetti (0-28)</div>
+                    <input type="number" id="puntaje-tinetti" class="form-control" min="0" max="28" placeholder="Ingrese puntaje 0-28">
+                    <div id="error-puntaje-tinetti" class="error-message"></div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-warning" id="volver-irat">
+                    <i class="fas fa-arrow-left"></i> Anterior
+                </button>
+                <button class="btn btn-primary" id="siguiente-norton">
+                    Siguiente: Norton <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+        
+        <!-- Sección 4: Escala Norton -->
+        <section id="norton" class="section">
+            <h2 class="section-title"><i class="fas fa-bed"></i> Escala Norton</h2>
+            
+            <div class="question-group">
+                <div class="question-text">Puntaje Norton (5-20)</div>
+                <input type="number" id="puntaje-norton" class="form-control" min="5" max="20" placeholder="Ingrese puntaje 5-20" value="15">
+                <div id="error-puntaje-norton" class="error-message"></div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-warning" id="volver-tinetti">
+                    <i class="fas fa-arrow-left"></i> Anterior
+                </button>
+                <button class="btn btn-success" id="calcular-resultados">
+                    <i class="fas fa-calculator"></i> Calcular Resultados
+                </button>
+            </div>
+        </section>
+        
+        <!-- Sección 5: Resultados -->
+        <section id="resultados" class="section">
+            <h2 class="section-title"><i class="fas fa-chart-line"></i> Resultados Integrales</h2>
+            
+            <div id="contenido-resultados">
+                <p style="text-align: center; color: #666; padding: 40px;">
+                    Complete todas las secciones anteriores y haga clic en "Calcular Resultados"
+                </p>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-warning" id="volver-norton">
+                    <i class="fas fa-arrow-left"></i> Anterior
+                </button>
+                <button class="btn btn-primary" id="nueva-evaluacion">
+                    <i class="fas fa-plus-circle"></i> Nueva Evaluación
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // ========== VARIABLES GLOBALES ==========
+        let datosCompletos = null;
         let puntajeTotalIRAT = 0;
         let puntajeNorton = 15;
         let puntajeTinetti = 0;
@@ -31,17 +439,10 @@
         let nivelRiesgoNorton = "";
         let recomendaciones = [];
         let tinettiNoEvaluable = false;
-        let respuestasTinetti = {};
-        let respuestasIRAT = {};
-        let respuestasNorton = {};
-        
-        // Storage local para modo offline
-        const LOCAL_STORAGE_KEY = 'irat_evaluaciones_pendientes';
-        let evaluacionesPendientes = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
 
         // ========== INICIALIZACIÓN ==========
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM cargado, inicializando...');
+            console.log('DOM cargado');
             
             // Configurar fecha actual
             const today = new Date().toISOString().split('T')[0];
@@ -50,956 +451,22 @@
             // Configurar navegación
             inicializarNavegacion();
             
-            // Configurar componentes del formulario
-            configurarTinetti();
-            configurarIRAT5();
-            configurarCompartir();
-            configurarHistorial();
-            configurarValidaciones();
+            // Configurar eventos
+            configurarEventos();
             
-            // Configurar eventos de Norton
-            ['norton-fisico', 'norton-mental', 'norton-actividad', 'norton-movilidad', 'norton-incontinencia'].forEach(id => {
-                document.getElementById(id).addEventListener('change', calcularNorton);
-            });
-            
-            calcularNorton();
-            
-            // Inicializar Firebase después de configurar todo
-            inicializarFirebase();
-            
-            // Configurar detección de conexión
-            configurarDeteccionConexion();
-            
-            mostrarNotificacion('Sistema cargado correctamente', 'info');
+            alert('Sistema cargado correctamente. Puede comenzar la evaluación.');
         });
 
-        // ========== INICIALIZAR FIREBASE ==========
-        function inicializarFirebase() {
-            try {
-                console.log('Inicializando Firebase...');
-                
-                // Evitar múltiples inicializaciones
-                if (!firebase.apps.length) {
-                    firebaseApp = firebase.initializeApp(firebaseConfig);
-                    console.log('Firebase inicializado por primera vez');
-                } else {
-                    firebaseApp = firebase.app();
-                    console.log('Firebase ya estaba inicializado');
-                }
-                
-                db = firebase.firestore();
-                auth = firebase.auth();
-                console.log('Firestore y Auth configurados');
-                
-                // Configurar persistencia de sesión
-                auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-                
-                // Escuchar cambios de autenticación
-                auth.onAuthStateChanged((user) => {
-                    console.log('Cambio en estado de autenticación:', user ? 'Usuario conectado' : 'No hay usuario');
-                    if (user) {
-                        // Usuario autenticado
-                        currentUser = user;
-                        actualizarUIUsuario(user);
-                        actualizarEstadoFirebase('Conectado ✓', 'firebase-connected');
-                        
-                        // Sincronizar evaluaciones pendientes
-                        sincronizarEvaluacionesPendientes();
-                        
-                        // Cargar historial si estamos en esa sección
-                        if (document.getElementById('historial').classList.contains('active')) {
-                            cargarHistorialFirebase();
-                        }
-                        
-                        mostrarNotificacion(`Bienvenido ${user.email}`, 'success');
-                    } else {
-                        // No autenticado
-                        currentUser = null;
-                        actualizarUIUsuario(null);
-                        mostrarLogin();
-                    }
-                });
-                
-            } catch (error) {
-                console.error('Error inicializando Firebase:', error);
-                actualizarEstadoFirebase('Error de conexión', 'firebase-disconnected');
-                mostrarNotificacion('Error conectando a Firebase. Trabajando en modo local.', 'warning');
-            }
-        }
-
-        // ========== DETECCIÓN DE CONEXIÓN ==========
-        function configurarDeteccionConexion() {
-            window.addEventListener('online', () => {
-                document.getElementById('offline-indicator').classList.remove('show');
-                actualizarEstadoFirebase('Conectado ✓', 'firebase-connected');
-                mostrarNotificacion('Conexión restablecida', 'success');
-                
-                // Sincronizar datos pendientes
-                if (currentUser) {
-                    sincronizarEvaluacionesPendientes();
-                }
-            });
-            
-            window.addEventListener('offline', () => {
-                document.getElementById('offline-indicator').classList.add('show');
-                actualizarEstadoFirebase('Sin conexión', 'firebase-disconnected');
-                mostrarNotificacion('Sin conexión a Internet', 'warning');
-            });
-        }
-
-        // ========== SISTEMA OFFLINE ==========
-        function guardarLocalmente(datos) {
-            try {
-                evaluacionesPendientes.push({
-                    ...datos,
-                    timestamp: Date.now(),
-                    status: 'pendiente'
-                });
-                
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(evaluacionesPendientes));
-                mostrarNotificacion('Evaluación guardada localmente. Se sincronizará cuando haya conexión.', 'info');
-                
-                return true;
-            } catch (error) {
-                console.error('Error guardando localmente:', error);
-                mostrarNotificacion('Error al guardar localmente', 'error');
-                return false;
-            }
-        }
-        
-        async function sincronizarEvaluacionesPendientes() {
-            if (evaluacionesPendientes.length === 0 || !currentUser) return;
-            
-            mostrarNotificacion('Sincronizando evaluaciones pendientes...', 'info');
-            
-            const exitosas = [];
-            const fallidas = [];
-            
-            for (let i = evaluacionesPendientes.length - 1; i >= 0; i--) {
-                const evaluacion = evaluacionesPendientes[i];
-                
-                try {
-                    await db.collection('evaluaciones').add({
-                        ...evaluacion,
-                        userId: currentUser.uid,
-                        userEmail: currentUser.email,
-                        fechaGuardado: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    
-                    exitosas.push(evaluacion);
-                    evaluacionesPendientes.splice(i, 1);
-                    
-                } catch (error) {
-                    console.error('Error sincronizando evaluación:', error);
-                    fallidas.push(evaluacion);
-                }
-            }
-            
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(evaluacionesPendientes));
-            
-            if (exitosas.length > 0) {
-                mostrarNotificacion(`${exitosas.length} evaluación(es) sincronizada(s)`, 'success');
-            }
-            
-            if (fallidas.length > 0) {
-                mostrarNotificacion(`${fallidas.length} evaluación(es) no se pudieron sincronizar`, 'warning');
-            }
-        }
-
-        // ========== AUTENTICACIÓN ==========
-        function mostrarLogin() {
-            document.getElementById('login-container').style.display = 'flex';
-        }
-        
-        function ocultarLogin() {
-            document.getElementById('login-container').style.display = 'none';
-        }
-        
-        function actualizarUIUsuario(user) {
-            const userDisplay = document.getElementById('user-display');
-            const currentUserSpan = document.getElementById('current-user');
-            
-            if (user) {
-                currentUserSpan.textContent = user.email;
-                userDisplay.style.display = 'flex';
-                ocultarLogin();
-            } else {
-                userDisplay.style.display = 'none';
-            }
-        }
-        
-        // Eventos de login
-        document.getElementById('btn-login').addEventListener('click', async function() {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            
-            if (!email || !password) {
-                mostrarNotificacion('Ingrese email y contraseña', 'error');
-                return;
-            }
-            
-            const btn = this;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="loading"></span> Iniciando sesión...';
-            btn.disabled = true;
-            
-            try {
-                console.log('Intentando iniciar sesión con:', email);
-                const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                console.log('Login exitoso:', userCredential.user.email);
-                
-                // Mostrar éxito
-                document.getElementById('login-form').style.display = 'none';
-                document.getElementById('login-success').style.display = 'block';
-                document.getElementById('user-info').textContent = `Usuario: ${userCredential.user.email}`;
-                
-            } catch (error) {
-                console.error('Error de login:', error);
-                let mensaje = 'Error de autenticación';
-                
-                switch(error.code) {
-                    case 'auth/user-not-found':
-                        mensaje = 'Usuario no encontrado';
-                        break;
-                    case 'auth/wrong-password':
-                        mensaje = 'Contraseña incorrecta';
-                        break;
-                    case 'auth/invalid-email':
-                        mensaje = 'Email inválido';
-                        break;
-                    case 'auth/too-many-requests':
-                        mensaje = 'Demasiados intentos. Intente más tarde';
-                        break;
-                    case 'auth/network-request-failed':
-                        mensaje = 'Error de red. Verifique su conexión';
-                        break;
-                    default:
-                        mensaje = `Error: ${error.code}`;
-                }
-                
-                mostrarNotificacion(mensaje, 'error');
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        });
-        
-        document.getElementById('btn-login-cancel').addEventListener('click', function() {
-            ocultarLogin();
-            mostrarNotificacion('Se requiere autenticación para usar todas las funciones', 'warning');
-        });
-        
-        document.getElementById('btn-continue').addEventListener('click', function() {
-            ocultarLogin();
-        });
-        
-        document.getElementById('btn-logout').addEventListener('click', function() {
-            if (confirm('¿Está seguro de cerrar sesión?')) {
-                auth.signOut().then(() => {
-                    mostrarNotificacion('Sesión cerrada', 'info');
-                }).catch((error) => {
-                    console.error('Error cerrando sesión:', error);
-                    mostrarNotificacion('Error al cerrar sesión', 'error');
-                });
-            }
-        });
-
-        // ========== CONFIGURACIÓN DEL HISTORIAL FIREBASE ==========
-        function configurarHistorial() {
-            // Botón guardar en Firebase
-            document.getElementById('btn-guardar-firebase').addEventListener('click', guardarEnFirebase);
-            
-            // Botón exportar CSV
-            document.getElementById('btn-exportar-csv').addEventListener('click', exportarHistorialCSV);
-            
-            // Botones de paginación
-            document.getElementById('btn-prev').addEventListener('click', () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    cargarHistorialFirebase('prev');
-                }
-            });
-            
-            document.getElementById('btn-next').addEventListener('click', () => {
-                currentPage++;
-                cargarHistorialFirebase('next');
-            });
-            
-            // Filtros
-            document.getElementById('btn-aplicar-filtros').addEventListener('click', aplicarFiltros);
-            document.getElementById('btn-limpiar-filtros').addEventListener('click', limpiarFiltros);
-        }
-        
-        // ========== CARGAR HISTORIAL DESDE FIREBASE ==========
-        async function cargarHistorialFirebase(direction = 'first') {
-            if (!currentUser) {
-                mostrarNotificacion('Debe iniciar sesión para ver el historial', 'error');
-                mostrarLogin();
-                return;
-            }
-            
-            try {
-                mostrarCargandoHistorial(true);
-                
-                let query = db.collection('evaluaciones')
-                    .where('userId', '==', currentUser.uid)
-                    .orderBy('fechaEvaluacion', 'desc')
-                    .limit(itemsPerPage);
-                
-                // Manejar paginación
-                if (direction === 'next' && lastVisible) {
-                    query = query.startAfter(lastVisible);
-                } else if (direction === 'prev' && firstVisible) {
-                    query = query.endBefore(firstVisible).limitToLast(itemsPerPage);
-                }
-                
-                const snapshot = await query.get();
-                
-                if (snapshot.empty) {
-                    mostrarHistorialVacio();
-                    actualizarEstadisticas(0);
-                    return;
-                }
-                
-                // Procesar documentos
-                historialFirebase = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    historialFirebase.push({
-                        id: doc.id,
-                        ...data
-                    });
-                });
-                
-                // Actualizar marcadores de paginación
-                lastVisible = snapshot.docs[snapshot.docs.length - 1];
-                firstVisible = snapshot.docs[0];
-                
-                // Actualizar UI
-                actualizarVistaHistorial();
-                actualizarEstadisticas(snapshot.size);
-                actualizarPaginacion();
-                
-            } catch (error) {
-                console.error('Error cargando historial Firebase:', error);
-                mostrarErrorHistorial(error.message);
-            } finally {
-                mostrarCargandoHistorial(false);
-            }
-        }
-        
-        function mostrarCargandoHistorial(mostrar) {
-            const container = document.getElementById('historial-container');
-            if (mostrar) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: #666;">
-                        <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 20px;"></i>
-                        <p>Cargando historial desde Firebase...</p>
-                    </div>
-                `;
-            }
-        }
-        
-        function mostrarHistorialVacio() {
-            const container = document.getElementById('historial-container');
-            container.innerHTML = `
-                <div style="text-align: center; padding: 40px; color: #666;">
-                    <i class="fas fa-inbox fa-2x" style="margin-bottom: 20px; opacity: 0.5;"></i>
-                    <h4>No hay evaluaciones registradas</h4>
-                    <p>Realice su primera evaluación para verla aquí</p>
-                </div>
-            `;
-            document.getElementById('pagination-container').style.display = 'none';
-        }
-        
-        function mostrarErrorHistorial(mensaje) {
-            const container = document.getElementById('historial-container');
-            container.innerHTML = `
-                <div class="warning-box" style="text-align: center; padding: 30px;">
-                    <i class="fas fa-exclamation-triangle fa-2x" style="color: var(--warning-color); margin-bottom: 20px;"></i>
-                    <h4>Error cargando historial</h4>
-                    <p>${mensaje || 'Error desconocido'}</p>
-                    <button class="btn btn-primary" onclick="cargarHistorialFirebase()" style="margin-top: 15px;">
-                        <i class="fas fa-redo"></i> Reintentar
-                    </button>
-                </div>
-            `;
-        }
-        
-        function actualizarVistaHistorial() {
-            const container = document.getElementById('historial-container');
-            
-            if (!historialFirebase || historialFirebase.length === 0) {
-                mostrarHistorialVacio();
-                return;
-            }
-            
-            let historialHTML = '';
-            
-            historialFirebase.forEach((evaluacion) => {
-                // Validar y obtener datos de forma segura
-                const paciente = evaluacion.paciente || {};
-                const fechaEvaluacion = evaluacion.fechaEvaluacion || paciente.fecha || 'Sin fecha';
-                const nombre = paciente.nombre || 'Sin nombre';
-                const evaluador = paciente.evaluador || 'Sin evaluador';
-                const puntajeIRAT = evaluacion.irat5?.puntaje || 0;
-                const riesgoIRAT = evaluacion.irat5?.riesgo || 'No calculado';
-                
-                // Formatear fecha
-                let fechaFormateada = 'Sin fecha';
-                try {
-                    if (fechaEvaluacion) {
-                        const fecha = new Date(fechaEvaluacion);
-                        fechaFormateada = fecha.toLocaleDateString('es-ES');
-                    }
-                } catch (e) {
-                    fechaFormateada = fechaEvaluacion;
-                }
-                
-                historialHTML += `
-                    <div class="historial-item">
-                        <h4>${nombre}</h4>
-                        <p><strong>Fecha:</strong> ${fechaFormateada}</p>
-                        <p><strong>Evaluador:</strong> ${evaluador}</p>
-                        <p><strong>IRAT-5:</strong> ${puntajeIRAT} puntos - ${riesgoIRAT}</p>
-                        <div class="firebase-actions">
-                            <button class="btn btn-primary" onclick="verDetalleEvaluacion('${evaluacion.id}')">
-                                <i class="fas fa-eye"></i> Ver detalle
-                            </button>
-                            <button class="btn btn-warning" onclick="cargarEvaluacionFirebase('${evaluacion.id}')">
-                                <i class="fas fa-edit"></i> Cargar
-                            </button>
-                            <button class="btn btn-danger" onclick="eliminarEvaluacionFirebase('${evaluacion.id}', '${nombre.replace(/'/g, "\\'")}')">
-                                <i class="fas fa-trash"></i> Eliminar
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = historialHTML;
-        }
-        
-        async function verDetalleEvaluacion(id) {
-            try {
-                const doc = await db.collection('evaluaciones').doc(id).get();
-                
-                if (!doc.exists) {
-                    mostrarNotificacion('Evaluación no encontrada', 'error');
-                    return;
-                }
-                
-                const evaluacion = { id: doc.id, ...doc.data() };
-                
-                // Validar que la evaluación pertenece al usuario actual
-                if (evaluacion.userId !== currentUser.uid) {
-                    mostrarNotificacion('No tiene permiso para ver esta evaluación', 'error');
-                    return;
-                }
-                
-                // Mostrar en modal
-                mostrarModalDetalle(evaluacion);
-                
-            } catch (error) {
-                console.error('Error cargando evaluación:', error);
-                mostrarNotificacion('Error: ' + error.message, 'error');
-            }
-        }
-        
-        function mostrarModalDetalle(evaluacion) {
-            const modal = document.getElementById('detail-modal');
-            const modalBody = document.getElementById('modal-body');
-            
-            const paciente = evaluacion.paciente || {};
-            const irat5 = evaluacion.irat5 || {};
-            const tinetti = evaluacion.tinetti || {};
-            const norton = evaluacion.norton || {};
-            const resultados = evaluacion.resultados || {};
-            
-            let fechaFormateada = 'Sin fecha';
-            try {
-                if (evaluacion.fechaEvaluacion) {
-                    const fecha = new Date(evaluacion.fechaEvaluacion);
-                    fechaFormateada = fecha.toLocaleDateString('es-ES');
-                }
-            } catch (e) {
-                fechaFormateada = evaluacion.fechaEvaluacion;
-            }
-            
-            modalBody.innerHTML = `
-                <div class="informe-profesional" style="margin: 0; box-shadow: none;">
-                    <div class="cabecera-informe" style="padding: 0 0 20px 0;">
-                        <div class="logo-informe">
-                            <i class="fas fa-file-medical-alt"></i>
-                        </div>
-                        <h2 class="titulo-informe">Detalle de Evaluación</h2>
-                        <p class="subtitulo-informe">ID: ${evaluacion.id.substring(0, 8)}...</p>
-                    </div>
-                    
-                    <div class="seccion-informe">
-                        <h3><i class="fas fa-user"></i> Datos del Paciente</h3>
-                        <div class="resultados-detallados">
-                            <div class="resultado-item">
-                                <span class="resultado-label">Nombre:</span>
-                                <span class="resultado-valor">${paciente.nombre || "Sin nombre"}</span>
-                            </div>
-                            <div class="resultado-item">
-                                <span class="resultado-label">RUT:</span>
-                                <span class="resultado-valor">${paciente.rut || "No especificado"}</span>
-                            </div>
-                            <div class="resultado-item">
-                                <span class="resultado-label">Edad:</span>
-                                <span class="resultado-valor">${paciente.edad || "No especificado"}</span>
-                            </div>
-                            <div class="resultado-item">
-                                <span class="resultado-label">Fecha evaluación:</span>
-                                <span class="resultado-valor">${fechaFormateada}</span>
-                            </div>
-                            <div class="resultado-item">
-                                <span class="resultado-label">Evaluador:</span>
-                                <span class="resultado-valor">${paciente.evaluador || "Sin evaluador"}</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="seccion-informe">
-                        <h3><i class="fas fa-chart-bar"></i> Resultados</h3>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
-                            <div class="score-display" style="margin: 0; padding: 15px;">
-                                <div>IRAT-5</div>
-                                <div class="score-value" style="font-size: 2.5rem;">${irat5.puntaje || 0}</div>
-                                <div>${irat5.riesgo || "Sin riesgo"}</div>
-                            </div>
-                            
-                            <div class="score-display" style="margin: 0; padding: 15px;">
-                                <div>Tinetti</div>
-                                <div class="score-value" style="font-size: 2.5rem;">${tinetti.evaluable === false ? 'NE' : tinetti.puntaje || 0}${tinetti.evaluable === false ? '' : '/28'}</div>
-                                <div>${tinetti.riesgo || "Sin riesgo"}</div>
-                            </div>
-                            
-                            <div class="score-display" style="margin: 0; padding: 15px;">
-                                <div>Norton</div>
-                                <div class="score-value" style="font-size: 2.5rem;">${norton.puntaje || 0}</div>
-                                <div>${norton.riesgo || "Sin riesgo"}</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    ${resultados.recomendaciones && resultados.recomendaciones.length > 0 ? `
-                        <div class="seccion-informe">
-                            <h3><i class="fas fa-clipboard-check"></i> Recomendaciones</h3>
-                            <div class="recommendations-grid">
-                                ${resultados.recomendaciones.map((rec, index) => `
-                                    <div class="recommendation-card">
-                                        <div style="font-weight: 600; color: var(--primary-color);">
-                                            <i class="fas fa-check-circle"></i> Recomendación ${index + 1}
-                                        </div>
-                                        <p style="margin-top: 8px;">${rec}</p>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    ` : ''}
-                    
-                    <div class="firma-informe" style="margin-top: 20px;">
-                        <p><strong>Guardado el:</strong> ${evaluacion.fechaGuardado ? new Date(evaluacion.fechaGuardado.toDate()).toLocaleString('es-ES') : 'No disponible'}</p>
-                        <p style="margin-top: 15px; text-align: right;">
-                            <strong>ID de evaluación:</strong> ${evaluacion.id}
-                        </p>
-                    </div>
-                </div>
-            `;
-            
-            modal.style.display = 'flex';
-        }
-        
-        // Cerrar modal
-        document.getElementById('close-modal').addEventListener('click', () => {
-            document.getElementById('detail-modal').style.display = 'none';
-        });
-        
-        // Cerrar modal al hacer clic fuera
-        document.getElementById('detail-modal').addEventListener('click', (e) => {
-            if (e.target.id === 'detail-modal') {
-                document.getElementById('detail-modal').style.display = 'none';
-            }
-        });
-        
-        function actualizarEstadisticas(total) {
-            const statsElement = document.getElementById('total-evaluaciones');
-            const pendientes = evaluacionesPendientes.length;
-            
-            let html = `<i class="fas fa-chart-bar"></i> Mostrando ${total} evaluación(es)`;
-            
-            if (pendientes > 0) {
-                html += ` | <i class="fas fa-clock"></i> ${pendientes} pendiente(s)`;
-            }
-            
-            statsElement.innerHTML = html;
-        }
-        
-        function actualizarPaginacion() {
-            const prevBtn = document.getElementById('btn-prev');
-            const nextBtn = document.getElementById('btn-next');
-            const pageInfo = document.getElementById('page-info');
-            
-            prevBtn.disabled = currentPage === 1;
-            pageInfo.textContent = `Página ${currentPage}`;
-            
-            // Mostrar/ocultar paginación
-            const paginationContainer = document.getElementById('pagination-container');
-            paginationContainer.style.display = historialFirebase.length > 0 ? 'block' : 'none';
-            
-            // Habilitar/deshabilitar siguiente botón
-            nextBtn.disabled = historialFirebase.length < itemsPerPage;
-        }
-        
-        // ========== OPERACIONES CRUD FIREBASE ==========
-        async function guardarEnFirebase() {
-            if (!datosCompletos) {
-                mostrarNotificacion('Primero calcule los resultados', 'error');
-                return;
-            }
-            
-            const btn = document.getElementById('btn-guardar-firebase');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="loading"></span> Guardando...';
-            btn.disabled = true;
-            
-            try {
-                // Preparar datos para Firebase
-                const datosFirebase = {
-                    ...datosCompletos,
-                    fechaEvaluacion: datosCompletos.paciente.fecha || new Date().toISOString()
-                };
-                
-                // Validar datos requeridos
-                if (!datosFirebase.paciente || !datosFirebase.paciente.nombre) {
-                    throw new Error('Datos incompletos para guardar');
-                }
-                
-                // Guardar en Firestore si hay conexión y usuario autenticado
-                if (currentUser && navigator.onLine) {
-                    datosFirebase.userId = currentUser.uid;
-                    datosFirebase.userEmail = currentUser.email;
-                    datosFirebase.fechaGuardado = firebase.firestore.FieldValue.serverTimestamp();
-                    
-                    const docRef = await db.collection('evaluaciones').add(datosFirebase);
-                    
-                    mostrarNotificacion(`Evaluación guardada correctamente (ID: ${docRef.id.substring(0, 8)}...)`, 'success');
-                    
-                    // Recargar historial si estamos en esa sección
-                    if (document.getElementById('historial').classList.contains('active')) {
-                        cargarHistorialFirebase();
-                    }
-                } else {
-                    // Guardar localmente para sincronizar después
-                    guardarLocalmente(datosFirebase);
-                }
-                
-            } catch (error) {
-                console.error('Error guardando en Firebase:', error);
-                mostrarNotificacion('Error al guardar: ' + error.message, 'error');
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        }
-        
-        async function cargarEvaluacionFirebase(id) {
-            try {
-                const doc = await db.collection('evaluaciones').doc(id).get();
-                
-                if (!doc.exists) {
-                    mostrarNotificacion('Evaluación no encontrada', 'error');
-                    return;
-                }
-                
-                const evaluacion = doc.data();
-                
-                // Validar propiedad
-                if (evaluacion.userId !== currentUser.uid) {
-                    mostrarNotificacion('No tiene permiso para cargar esta evaluación', 'error');
-                    return;
-                }
-                
-                // Cargar datos del paciente en el formulario
-                if (evaluacion.paciente) {
-                    document.getElementById('nombre').value = evaluacion.paciente.nombre || '';
-                    document.getElementById('rut').value = evaluacion.paciente.rut || '';
-                    document.getElementById('edad').value = evaluacion.paciente.edad || '';
-                    document.getElementById('fecha').value = evaluacion.paciente.fecha || '';
-                    document.getElementById('sexo').value = evaluacion.paciente.sexo || '';
-                    document.getElementById('evaluador').value = evaluacion.paciente.evaluador || '';
-                    document.getElementById('institucion').value = evaluacion.paciente.institucion || '';
-                    document.getElementById('historia-clinica').value = evaluacion.paciente.historiaClinica || '';
-                }
-                
-                mostrarNotificacion(`Datos de ${evaluacion.paciente?.nombre || 'paciente'} cargados para edición`, 'info');
-                cambiarSeccion('identificacion');
-                
-            } catch (error) {
-                console.error('Error cargando evaluación:', error);
-                mostrarNotificacion('Error al cargar: ' + error.message, 'error');
-            }
-        }
-        
-        async function eliminarEvaluacionFirebase(id, nombre) {
-            if (!confirm(`¿Está seguro de eliminar la evaluación de "${nombre}"?\nEsta acción no se puede deshacer.`)) {
-                return;
-            }
-            
-            try {
-                // Verificar que existe y pertenece al usuario
-                const doc = await db.collection('evaluaciones').doc(id).get();
-                if (!doc.exists) {
-                    mostrarNotificacion('La evaluación ya no existe', 'error');
-                    return;
-                }
-                
-                if (doc.data().userId !== currentUser.uid) {
-                    mostrarNotificacion('No tiene permiso para eliminar esta evaluación', 'error');
-                    return;
-                }
-                
-                await db.collection('evaluaciones').doc(id).delete();
-                
-                mostrarNotificacion('Evaluación eliminada correctamente', 'success');
-                
-                // Recargar historial
-                cargarHistorialFirebase();
-                
-            } catch (error) {
-                console.error('Error eliminando evaluación:', error);
-                mostrarNotificacion('Error al eliminar: ' + error.message, 'error');
-            }
-        }
-        
-        // ========== EXPORTAR CSV ==========
-        async function exportarHistorialCSV() {
-            if (!currentUser) {
-                mostrarNotificacion('Debe iniciar sesión para exportar', 'error');
-                mostrarLogin();
-                return;
-            }
-            
-            try {
-                mostrarNotificacion('Preparando exportación...', 'info');
-                
-                // Obtener todas las evaluaciones del usuario
-                const snapshot = await db.collection('evaluaciones')
-                    .where('userId', '==', currentUser.uid)
-                    .orderBy('fechaEvaluacion', 'desc')
-                    .get();
-                
-                if (snapshot.empty) {
-                    mostrarNotificacion('No hay evaluaciones para exportar', 'warning');
-                    return;
-                }
-                
-                // Crear CSV
-                const headers = [
-                    'ID',
-                    'Nombre Paciente',
-                    'RUT',
-                    'Edad',
-                    'Fecha Evaluación',
-                    'Evaluador',
-                    'Puntaje IRAT-5',
-                    'Riesgo IRAT-5',
-                    'Puntaje Tinetti',
-                    'Riesgo Tinetti',
-                    'Puntaje Norton',
-                    'Riesgo Norton',
-                    'Fecha Guardado'
-                ];
-                
-                let csvContent = headers.join(';') + '\n';
-                
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const paciente = data.paciente || {};
-                    const irat5 = data.irat5 || {};
-                    const tinetti = data.tinetti || {};
-                    const norton = data.norton || {};
-                    
-                    const row = [
-                        doc.id.substring(0, 8) + '...',
-                        `"${paciente.nombre || ''}"`,
-                        `"${paciente.rut || ''}"`,
-                        paciente.edad || '',
-                        data.fechaEvaluacion || '',
-                        `"${paciente.evaluador || ''}"`,
-                        irat5.puntaje || 0,
-                        `"${irat5.riesgo || ''}"`,
-                        tinetti.evaluable === false ? 'NE' : (tinetti.puntaje || 0),
-                        `"${tinetti.riesgo || ''}"`,
-                        norton.puntaje || 0,
-                        `"${norton.riesgo || ''}"`,
-                        data.fechaGuardado ? new Date(data.fechaGuardado.toDate()).toLocaleString('es-ES') : ''
-                    ];
-                    
-                    csvContent += row.join(';') + '\n';
-                });
-                
-                // Crear y descargar archivo
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                const url = URL.createObjectURL(blob);
-                
-                link.setAttribute('href', url);
-                link.setAttribute('download', `evaluaciones_irat_${new Date().toISOString().split('T')[0]}.csv`);
-                link.style.visibility = 'hidden';
-                
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                mostrarNotificacion(`Exportadas ${snapshot.size} evaluaciones en CSV`, 'success');
-                
-            } catch (error) {
-                console.error('Error exportando CSV:', error);
-                mostrarNotificacion('Error al exportar: ' + error.message, 'error');
-            }
-        }
-        
-        // ========== FILTROS ==========
-        async function aplicarFiltros() {
-            try {
-                const nombre = document.getElementById('filter-nombre').value.trim();
-                const fechaDesde = document.getElementById('filter-fecha-desde').value;
-                const fechaHasta = document.getElementById('filter-fecha-hasta').value;
-                
-                // Construir query base
-                let query = db.collection('evaluaciones')
-                    .where('userId', '==', currentUser.uid);
-                
-                // Aplicar filtro por nombre (búsqueda parcial)
-                if (nombre) {
-                    // Para búsqueda por nombre (case insensitive)
-                    query = query.where('paciente.nombre', '>=', nombre)
-                                 .where('paciente.nombre', '<=', nombre + '\uf8ff');
-                }
-                
-                // Aplicar filtros por fecha
-                if (fechaDesde) {
-                    query = query.where('fechaEvaluacion', '>=', fechaDesde);
-                }
-                
-                if (fechaHasta) {
-                    // Añadir un día para incluir la fecha hasta
-                    const fechaHastaObj = new Date(fechaHasta);
-                    fechaHastaObj.setDate(fechaHastaObj.getDate() + 1);
-                    query = query.where('fechaEvaluacion', '<', fechaHastaObj.toISOString());
-                }
-                
-                // Ordenar y limitar
-                query = query.orderBy('fechaEvaluacion', 'desc').limit(itemsPerPage);
-                
-                const snapshot = await query.get();
-                
-                if (snapshot.empty) {
-                    mostrarNotificacion('No se encontraron evaluaciones con los filtros aplicados', 'info');
-                    mostrarHistorialVacio();
-                    return;
-                }
-                
-                // Procesar resultados
-                historialFirebase = [];
-                snapshot.forEach(doc => {
-                    historialFirebase.push({
-                        id: doc.id,
-                        ...doc.data()
-                    });
-                });
-                
-                // Actualizar UI
-                actualizarVistaHistorial();
-                mostrarNotificacion(`Encontradas ${historialFirebase.length} evaluación(es)`, 'success');
-                
-                // Reiniciar paginación
-                currentPage = 1;
-                lastVisible = snapshot.docs[snapshot.docs.length - 1];
-                firstVisible = snapshot.docs[0];
-                actualizarPaginacion();
-                
-            } catch (error) {
-                console.error('Error aplicando filtros:', error);
-                mostrarNotificacion('Error en filtros: ' + error.message, 'error');
-            }
-        }
-        
-        function limpiarFiltros() {
-            document.getElementById('filter-nombre').value = '';
-            document.getElementById('filter-fecha-desde').value = '';
-            document.getElementById('filter-fecha-hasta').value = '';
-            
-            currentPage = 1;
-            cargarHistorialFirebase();
-            mostrarNotificacion('Filtros limpiados', 'info');
-        }
-        
-        // ========== FUNCIONES AUXILIARES ==========
-        function obtenerValorSeguro(obj, path, defaultValue) {
-            try {
-                if (!obj) return defaultValue;
-                
-                const keys = path.split('.');
-                let result = obj;
-                
-                for (const key of keys) {
-                    if (result === null || result === undefined) {
-                        return defaultValue;
-                    }
-                    result = result[key];
-                }
-                
-                return result !== undefined ? result : defaultValue;
-            } catch (error) {
-                return defaultValue;
-            }
-        }
-        
-        function actualizarEstadoFirebase(mensaje, clase) {
-            const statusElement = document.getElementById('firebase-status');
-            statusElement.textContent = mensaje;
-            statusElement.className = `firebase-status ${clase}`;
-        }
-        
-        function mostrarNotificacion(mensaje, tipo) {
-            const notificacion = document.getElementById('notification');
-            notificacion.textContent = mensaje;
-            notificacion.className = `notification ${tipo}`;
-            notificacion.style.display = 'block';
-            
-            setTimeout(() => {
-                notificacion.style.display = 'none';
-            }, 4000);
-        }
-        
-        // ========== FUNCIONES DEL FORMULARIO ==========
+        // ========== CONFIGURAR NAVEGACIÓN ==========
         function inicializarNavegacion() {
-            console.log('Configurando navegación...');
+            console.log('Inicializando navegación...');
             
             // Navegación por pestañas
             document.querySelectorAll('.nav-tab').forEach(tab => {
                 tab.addEventListener('click', function() {
                     console.log('Click en pestaña:', this.getAttribute('data-section'));
                     const sectionId = this.getAttribute('data-section');
-                    
-                    // Si es historial y no está autenticado, mostrar login
-                    if (sectionId === 'historial' && !currentUser) {
-                        mostrarLogin();
-                        mostrarNotificacion('Debe iniciar sesión para ver el historial', 'warning');
-                        return;
-                    }
-                    
                     cambiarSeccion(sectionId);
-                    
-                    // Cargar historial si es la sección correspondiente
-                    if (sectionId === 'historial' && currentUser) {
-                        cargarHistorialFirebase();
-                    }
                 });
             });
             
@@ -1033,60 +500,61 @@
                 console.log('Click en volver Norton');
                 cambiarSeccion('norton');
             });
-            document.getElementById('ir-compartir').addEventListener('click', () => {
-                console.log('Click en ir a compartir');
-                if (datosCompletos) cambiarSeccion('compartir');
-                else mostrarNotificacion('Primero calcule los resultados', 'error');
-            });
-            document.getElementById('volver-resultados-historial').addEventListener('click', () => {
-                console.log('Click en volver resultados');
-                cambiarSeccion('resultados');
-            });
-            document.getElementById('volver-compartir').addEventListener('click', () => {
-                console.log('Click en volver compartir');
-                cambiarSeccion('resultados');
-            });
             document.getElementById('nueva-evaluacion').addEventListener('click', iniciarNuevaEvaluacion);
         }
-        
+
         function cambiarSeccion(sectionId) {
             console.log('Cambiando a sección:', sectionId);
             
+            // Ocultar todas las secciones
             document.querySelectorAll('.section').forEach(section => {
                 section.classList.remove('active');
             });
             
+            // Mostrar sección seleccionada
             const seccion = document.getElementById(sectionId);
             if (seccion) {
                 seccion.classList.add('active');
                 console.log('Sección activada:', sectionId);
             }
             
+            // Actualizar pestañas activas
             document.querySelectorAll('.nav-tab').forEach(tab => {
                 tab.classList.remove('active');
                 if (tab.getAttribute('data-section') === sectionId) {
                     tab.classList.add('active');
                 }
             });
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-        
-        function configurarValidaciones() {
-            const camposRequeridos = document.querySelectorAll('[required]');
-            camposRequeridos.forEach(campo => {
-                campo.addEventListener('blur', function() {
-                    if (!this.value.trim()) {
-                        this.classList.add('error-input');
-                        mostrarErrorCampo(this.id, 'Este campo es requerido');
-                    } else {
-                        this.classList.remove('error-input');
-                        eliminarErrorCampo(this.id);
-                    }
-                });
+
+        // ========== CONFIGURAR EVENTOS ==========
+        function configurarEventos() {
+            console.log('Configurando eventos...');
+            
+            // Calcular puntaje IRAT-5 en tiempo real
+            ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'].forEach(id => {
+                document.getElementById(id).addEventListener('change', calcularPuntajeIRATPreliminar);
+            });
+            
+            // Mostrar/ocultar preguntas Tinetti
+            document.getElementById('tinetti-evaluable').addEventListener('change', function() {
+                const tinettiPreguntas = document.getElementById('tinetti-preguntas');
+                if (this.value === 'evaluable') {
+                    tinettiPreguntas.style.display = 'block';
+                    tinettiNoEvaluable = false;
+                } else if (this.value === 'no-evaluable') {
+                    tinettiPreguntas.style.display = 'none';
+                    tinettiNoEvaluable = true;
+                }
+            });
+            
+            // Evento para Norton
+            document.getElementById('puntaje-norton').addEventListener('input', function() {
+                puntajeNorton = parseInt(this.value) || 15;
             });
         }
-        
+
+        // ========== VALIDACIONES ==========
         function mostrarErrorCampo(idCampo, mensaje) {
             const errorDiv = document.getElementById(`error-${idCampo}`);
             if (errorDiv) {
@@ -1113,7 +581,7 @@
                     eliminarErrorCampo(campo);
                 }
             });
-            if (!valido) mostrarNotificacion('Complete todos los campos requeridos', 'error');
+            if (!valido) alert('Complete todos los campos requeridos');
             return valido;
         }
         
@@ -1130,159 +598,38 @@
                     eliminarErrorCampo(id);
                 }
             });
-            if (!valido) mostrarNotificacion('Complete todas las preguntas IRAT-5', 'error');
+            if (!valido) alert('Complete todas las preguntas IRAT-5');
             return valido;
         }
         
         function validarSeccionTinetti() {
-            if (tinettiNoEvaluable) return true;
-            for (let i = 1; i <= 16; i++) {
-                const grupo = i <= 8 ? `balance${i}` : `gait${i}`;
-                if (!respuestasTinetti[grupo]) {
-                    mostrarNotificacion('Complete todas las preguntas del Test de Tinetti', 'error');
+            const select = document.getElementById('tinetti-evaluable');
+            if (!select.value) {
+                select.classList.add('error-input');
+                mostrarErrorCampo('tinetti-evaluable', 'Seleccione una opción');
+                return false;
+            }
+            
+            select.classList.remove('error-input');
+            eliminarErrorCampo('tinetti-evaluable');
+            
+            if (select.value === 'evaluable') {
+                const puntaje = document.getElementById('puntaje-tinetti');
+                if (!puntaje.value || puntaje.value < 0 || puntaje.value > 28) {
+                    puntaje.classList.add('error-input');
+                    mostrarErrorCampo('puntaje-tinetti', 'Ingrese un puntaje válido (0-28)');
                     return false;
                 }
+                puntaje.classList.remove('error-input');
+                eliminarErrorCampo('puntaje-tinetti');
             }
+            
             return true;
         }
-        
-        function configurarTinetti() {
-            console.log('Configurando Tinetti...');
-            document.getElementById('opcion-no-evaluable').addEventListener('click', function() {
-                console.log('Click en no evaluable');
-                tinettiNoEvaluable = true;
-                document.getElementById('test-tinetti-completo').style.display = 'none';
-                document.querySelectorAll('.tinetti-option[data-grupo]').forEach(opt => opt.classList.remove('selected'));
-                this.classList.add('selected');
-                mostrarResultadoTinetti();
-            });
-            
-            document.querySelectorAll('.tinetti-option[data-grupo]').forEach(option => {
-                option.addEventListener('click', function() {
-                    console.log('Click en opción Tinetti');
-                    tinettiNoEvaluable = false;
-                    document.getElementById('test-tinetti-completo').style.display = 'block';
-                    document.getElementById('opcion-no-evaluable').classList.remove('selected');
-                    
-                    const grupo = this.getAttribute('data-grupo');
-                    document.querySelectorAll(`.tinetti-option[data-grupo="${grupo}"]`).forEach(opt => opt.classList.remove('selected'));
-                    this.classList.add('selected');
-                    
-                    respuestasTinetti[grupo] = {
-                        numero: parseInt(grupo.replace(/[a-z]/g, '')),
-                        pregunta: obtenerTextoPreguntaTinetti(grupo),
-                        respuesta: this.querySelector('strong')?.textContent || this.textContent,
-                        puntos: parseInt(this.getAttribute('data-puntaje'))
-                    };
-                    
-                    calcularPuntajeTinetti();
-                });
-            });
-        }
-        
-        function calcularPuntajeTinetti() {
-            if (tinettiNoEvaluable) {
-                puntajeTinetti = 0;
-                mostrarResultadoTinetti();
-                return;
-            }
-            
-            puntajeTinetti = 0;
-            for (let i = 1; i <= 16; i++) {
-                const grupo = i <= 8 ? `balance${i}` : `gait${i}`;
-                if (respuestasTinetti[grupo]) {
-                    puntajeTinetti += respuestasTinetti[grupo].puntos || 0;
-                }
-            }
-            mostrarResultadoTinetti();
-        }
-        
-        function mostrarResultadoTinetti() {
-            const resultadoDiv = document.getElementById('resultado-tinetti');
-            if (!resultadoDiv) return;
-            
-            if (tinettiNoEvaluable) {
-                resultadoDiv.style.display = 'block';
-                document.getElementById('puntaje-tinetti-total').textContent = 'No evaluable';
-                document.getElementById('interpretacion-tinetti').innerHTML = '<strong>Máximo riesgo de caídas</strong>';
-                document.getElementById('puntos-irat-tinetti').innerHTML = '<strong>4 puntos IRAT-5 (máximo)</strong>';
-                return;
-            }
-            
-            // Verificar que todas las preguntas estén respondidas
-            let todasRespondidas = true;
-            for (let i = 1; i <= 16; i++) {
-                const grupo = i <= 8 ? `balance${i}` : `gait${i}`;
-                if (!respuestasTinetti[grupo]) {
-                    todasRespondidas = false;
-                    break;
-                }
-            }
-            
-            if (todasRespondidas) {
-                resultadoDiv.style.display = 'block';
-                document.getElementById('puntaje-tinetti-total').textContent = puntajeTinetti;
-                
-                let interpretacion = '';
-                let puntosIRAT = 0;
-                
-                if (puntajeTinetti >= 25) {
-                    interpretacion = '<strong>Bajo riesgo de caídas</strong>';
-                    puntosIRAT = 0;
-                } else if (puntajeTinetti >= 19) {
-                    interpretacion = '<strong>Riesgo moderado de caídas</strong>';
-                    puntosIRAT = 2;
-                } else {
-                    interpretacion = '<strong>Alto riesgo de caídas</strong>';
-                    puntosIRAT = 4;
-                }
-                
-                document.getElementById('interpretacion-tinetti').innerHTML = interpretacion;
-                document.getElementById('puntos-irat-tinetti').innerHTML = `<strong>${puntosIRAT} puntos IRAT-5</strong>`;
-            } else {
-                resultadoDiv.style.display = 'none';
-            }
-        }
-        
-        function obtenerTextoPreguntaTinetti(grupo) {
-            const preguntas = {
-                'balance1': '1. Sentado sin apoyo',
-                'balance2': '2. Levantarse',
-                'balance3': '3. Intentos de levantarse',
-                'balance4': '4. Equilibrio inmediato al levantarse',
-                'balance5': '5. Equilibrio de pie',
-                'balance6': '6. Equilibrio con ojos cerrados',
-                'balance7': '7. Girar 360 grados',
-                'balance8': '8. Sentarse',
-                'gait9': '9. Inicio de la marcha',
-                'gait10': '10. Longitud y altura del paso (pie derecho)',
-                'gait11': '11. Longitud y altura del paso (pie izquierdo)',
-                'gait12': '12. Simetría del paso',
-                'gait13': '13. Continuidad del paso',
-                'gait14': '14. Desviación de la marcha',
-                'gait15': '15. Tronco',
-                'gait16': '16. Base de sustentación'
-            };
-            return preguntas[grupo] || grupo;
-        }
-        
-        function configurarIRAT5() {
-            console.log('Configurando IRAT-5...');
-            ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'].forEach(id => {
-                document.getElementById(id).addEventListener('change', function() {
-                    console.log('Cambio en', id, 'valor:', this.value);
-                    calcularPuntajeIRATPreliminar();
-                    respuestasIRAT[id] = {
-                        pregunta: obtenerNombrePreguntaIRAT(id),
-                        respuesta: this.options[this.selectedIndex].text,
-                        puntos: parseInt(this.value) || 0
-                    };
-                });
-            });
-            calcularPuntajeIRATPreliminar();
-        }
-        
+
+        // ========== CÁLCULOS ==========
         function calcularPuntajeIRATPreliminar() {
+            console.log('Calculando puntaje IRAT-5...');
             let puntaje = 0;
             ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'].forEach(id => {
                 const select = document.getElementById(id);
@@ -1293,63 +640,28 @@
             if (amputacion && parseInt(amputacion) >= 3) puntaje += 1;
             
             document.getElementById('puntaje-irat').textContent = puntaje;
-        }
-        
-        function obtenerNombrePreguntaIRAT(id) {
-            const nombres = {
-                'equilibrio': '1. Equilibrio Unipodal',
-                'amputacion': '2. Tipo de Amputación',
-                'brazos': '3. Función de Brazos',
-                'social': '4. Situación Social',
-                'cooperacion': '5. Nivel de Cooperación'
-            };
-            return nombres[id] || id;
-        }
-        
-        function calcularNorton() {
-            puntajeNorton = 0;
-            ['norton-fisico', 'norton-mental', 'norton-actividad', 'norton-movilidad', 'norton-incontinencia'].forEach(id => {
-                const select = document.getElementById(id);
-                const valor = parseInt(select.value) || 0;
-                puntajeNorton += valor;
-                
-                respuestasNorton[id] = {
-                    pregunta: obtenerNombrePreguntaNorton(id),
-                    respuesta: select.options[select.selectedIndex].text,
-                    puntos: valor
-                };
-            });
-            document.getElementById('puntaje-norton').textContent = puntajeNorton;
-        }
-        
-        function obtenerNombrePreguntaNorton(id) {
-            const nombres = {
-                'norton-fisico': 'Estado Físico',
-                'norton-mental': 'Estado Mental',
-                'norton-actividad': 'Actividad',
-                'norton-movilidad': 'Movilidad',
-                'norton-incontinencia': 'Incontinencia'
-            };
-            return nombres[id] || id;
+            return puntaje;
         }
         
         function calcularResultadosCompletos() {
             try {
                 console.log('Calculando resultados completos...');
-                // Validaciones
-                if (!validarSeccionIRAT5() || !validarSeccionTinetti()) return;
+                
+                // Validar última sección
+                const puntajeNortonInput = document.getElementById('puntaje-norton');
+                if (!puntajeNortonInput.value || puntajeNortonInput.value < 5 || puntajeNortonInput.value > 20) {
+                    alert('Ingrese un puntaje Norton válido (5-20)');
+                    return;
+                }
                 
                 // Calcular puntajes IRAT-5
-                let puntajeIRAT = 0;
-                ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'].forEach(id => {
-                    puntajeIRAT += parseInt(document.getElementById(id).value) || 0;
-                });
+                let puntajeIRAT = calcularPuntajeIRATPreliminar();
                 
-                if (parseInt(document.getElementById('amputacion').value) >= 3) puntajeIRAT += 1;
-                
-                // Puntos Tinetti para IRAT-5
+                // Calcular puntos Tinetti para IRAT-5
                 let puntosTinettiIRAT = 4;
                 if (!tinettiNoEvaluable) {
+                    const puntajeTinettiInput = document.getElementById('puntaje-tinetti');
+                    puntajeTinetti = parseInt(puntajeTinettiInput.value) || 0;
                     if (puntajeTinetti >= 25) puntosTinettiIRAT = 0;
                     else if (puntajeTinetti >= 19) puntosTinettiIRAT = 2;
                 }
@@ -1370,18 +682,15 @@
                 
                 // Generar recomendaciones
                 recomendaciones = generarRecomendaciones();
-                if (datosCompletos.resultados) {
-                    datosCompletos.resultados.recomendaciones = recomendaciones;
-                }
                 
                 // Mostrar resultados
                 mostrarResultados();
                 cambiarSeccion('resultados');
-                mostrarNotificacion('Resultados calculados exitosamente', 'success');
+                alert('Resultados calculados exitosamente');
                 
             } catch (error) {
                 console.error('Error calculando resultados:', error);
-                mostrarNotificacion('Error: ' + error.message, 'error');
+                alert('Error: ' + error.message);
             }
         }
         
@@ -1389,216 +698,29 @@
             datosCompletos = {
                 paciente: {
                     nombre: document.getElementById('nombre').value || 'Sin nombre',
-                    rut: document.getElementById('rut').value || '',
-                    edad: document.getElementById('edad').value || '',
                     fecha: document.getElementById('fecha').value || '',
-                    sexo: document.getElementById('sexo').value || '',
-                    evaluador: document.getElementById('evaluador').value || 'Sin evaluador',
-                    institucion: document.getElementById('institucion').value || '',
-                    historiaClinica: document.getElementById('historia-clinica').value || ''
+                    evaluador: document.getElementById('evaluador').value || 'Sin evaluador'
                 },
                 irat5: {
-                    respuestas: Object.values(respuestasIRAT).filter(r => r),
                     puntaje: puntajeTotalIRAT,
-                    riesgo: nivelRiesgoIRAT,
-                    puntosTinetti: tinettiNoEvaluable ? 4 : (puntajeTinetti >= 25 ? 0 : puntajeTinetti >= 19 ? 2 : 4)
+                    riesgo: nivelRiesgoIRAT
                 },
                 tinetti: {
                     evaluable: !tinettiNoEvaluable,
-                    puntaje: puntajeTinetti,
-                    riesgo: tinettiNoEvaluable ? 'Máximo riesgo (No evaluable)' : 
-                           puntajeTinetti >= 25 ? 'Bajo riesgo caídas' : 
-                           puntajeTinetti >= 19 ? 'Riesgo moderado caídas' : 'Alto riesgo caídas',
-                    respuestas: tinettiNoEvaluable ? 
-                        [{pregunta: 'Test de Tinetti', respuesta: 'NO EVALUABLE', puntos: 0}] : 
-                        Object.values(respuestasTinetti).sort((a, b) => (a.numero || 0) - (b.numero || 0))
+                    puntaje: tinettiNoEvaluable ? 0 : puntajeTinetti,
+                    riesgo: tinettiNoEvaluable ? 'No evaluable' : 
+                           puntajeTinetti >= 25 ? 'Bajo riesgo' : 
+                           puntajeTinetti >= 19 ? 'Riesgo moderado' : 'Alto riesgo'
                 },
                 norton: {
-                    respuestas: Object.values(respuestasNorton).filter(r => r),
                     puntaje: puntajeNorton,
                     riesgo: nivelRiesgoNorton
                 },
                 resultados: {
-                    fechaCalculo: new Date().toLocaleString('es-ES'),
-                    proximaEvaluacion: obtenerProximaFechaEvaluacion(),
                     recomendaciones: recomendaciones
                 }
             };
-            console.log('Datos completos recopilados:', datosCompletos);
-        }
-        
-        function mostrarResultados() {
-            try {
-                if (!datosCompletos) {
-                    throw new Error('No hay datos para mostrar');
-                }
-                
-                const riesgoColorIRAT = nivelRiesgoIRAT.includes("BAJO") ? "risk-low" :
-                                       nivelRiesgoIRAT.includes("MODERADO") ? "risk-moderate" :
-                                       nivelRiesgoIRAT.includes("ALTO") ? "risk-high" : "risk-very-high";
-                
-                const riesgoColorNorton = nivelRiesgoNorton.includes("BAJO") ? "risk-low" :
-                                         nivelRiesgoNorton.includes("MODERADO") ? "risk-moderate" : "risk-high";
-                
-                let riesgoTinettiHTML = '';
-                if (tinettiNoEvaluable) {
-                    riesgoTinettiHTML = '<strong>NO EVALUABLE - MÁXIMO RIESGO</strong>';
-                } else {
-                    riesgoTinettiHTML = `<strong>${datosCompletos.tinetti.riesgo}</strong> (${datosCompletos.tinetti.puntaje}/28)`;
-                }
-                
-                const html = `
-                    <div class="informe-profesional">
-                        <div class="cabecera-informe">
-                            <div class="logo-informe">
-                                <i class="fas fa-hospital-alt"></i>
-                            </div>
-                            <h2 class="titulo-informe">Informe de Evaluación Clínica</h2>
-                            <p class="subtitulo-informe">IRAT-5 Modificado + Test de Tinetti + Escala Norton</p>
-                        </div>
-                        
-                        <div class="seccion-informe">
-                            <h3><i class="fas fa-user"></i> Datos del Paciente</h3>
-                            <div class="resultados-detallados">
-                                ${Object.entries(datosCompletos.paciente).map(([key, value]) => `
-                                    <div class="resultado-item">
-                                        <span class="resultado-label">${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</span>
-                                        <span class="resultado-valor">${value || "No especificado"}</span>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                        
-                        <div class="seccion-informe">
-                            <h3><i class="fas fa-chart-bar"></i> Resultados de las Evaluaciones</h3>
-                            
-                            <div class="score-display">
-                                <div>Puntaje Total IRAT-5 Modificado</div>
-                                <div class="score-value">${puntajeTotalIRAT}</div>
-                                <div>Puntos de corte: 0-6 (Bajo) | 7-9 (Moderado) | 10-12 (Alto) | ≥13 (Muy Alto)</div>
-                            </div>
-                            
-                            <div class="risk-level ${riesgoColorIRAT}">
-                                <h3 style="margin-bottom: 10px;">${nivelRiesgoIRAT}</h3>
-                                <p>${obtenerDescripcionRiesgoIRAT()}</p>
-                            </div>
-                            
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 25px;">
-                                <div>
-                                    <div class="score-display" style="margin: 0;">
-                                        <div>Test de Tinetti</div>
-                                        <div class="score-value">${tinettiNoEvaluable ? 'NE' : puntajeTinetti}${tinettiNoEvaluable ? '' : '/28'}</div>
-                                        <div>${riesgoTinettiHTML}</div>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <div class="score-display" style="margin: 0;">
-                                        <div>Escala Norton</div>
-                                        <div class="score-value">${puntajeNorton}</div>
-                                        <div>${nivelRiesgoNorton}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="seccion-informe">
-                            <h3><i class="fas fa-clipboard-check"></i> Detalle de Evaluaciones</h3>
-                            
-                            <div style="margin: 20px 0;">
-                                <h4><i class="fas fa-list"></i> IRAT-5 Modificado - Respuestas Detalladas</h4>
-                                <div class="resultados-detallados">
-                                    ${datosCompletos.irat5.respuestas.map(resp => `
-                                        <div class="resultado-item">
-                                            <span class="resultado-label">${resp.pregunta}:</span>
-                                            <span class="resultado-valor">${resp.respuesta}</span>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                            
-                            <div style="margin: 20px 0;">
-                                <h4><i class="fas fa-walking"></i> Test de Tinetti - Respuestas Detalladas</h4>
-                                <div class="resultados-detallados">
-                                    ${datosCompletos.tinetti.respuestas.map(resp => `
-                                        <div class="resultado-item">
-                                            <span class="resultado-label">${resp.pregunta}:</span>
-                                            <span class="resultado-valor">${resp.respuesta} ${resp.puntos !== undefined ? '(' + resp.puntos + ' puntos)' : ''}</span>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                            
-                            <div style="margin: 20px 0;">
-                                <h4><i class="fas fa-bed"></i> Escala Norton - Respuestas Detalladas</h4>
-                                <div class="resultados-detallados">
-                                    ${datosCompletos.norton.respuestas.map(resp => `
-                                        <div class="resultado-item">
-                                            <span class="resultado-label">${resp.pregunta}:</span>
-                                            <span class="resultado-valor">${resp.respuesta} (${resp.puntos} puntos)</span>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="seccion-informe">
-                            <h3><i class="fas fa-prescription-bottle-alt"></i> Recomendaciones Integrales</h3>
-                            
-                            <div class="recommendations-grid">
-                                ${recomendaciones.map((rec, index) => `
-                                    <div class="recommendation-card">
-                                        <div style="font-weight: 600; color: var(--primary-color);">
-                                            <i class="fas fa-check-circle"></i> Recomendación ${index + 1}
-                                        </div>
-                                        <p style="margin-top: 8px;">${rec}</p>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                        
-                        <div class="seccion-informe">
-                            <h3><i class="fas fa-calendar-check"></i> Plan de Seguimiento</h3>
-                            <div class="info-box">
-                                <p><strong>Próxima evaluación recomendada:</strong> ${obtenerProximaFechaEvaluacion()}</p>
-                                <p><strong>Fecha de este informe:</strong> ${new Date().toLocaleDateString('es-ES', { 
-                                    day: '2-digit', 
-                                    month: 'long', 
-                                    year: 'numeric' 
-                                })}</p>
-                            </div>
-                        </div>
-                        
-                        <div class="firma-informe">
-                            <p><strong>Nota:</strong> Este informe es una guía clínica y debe ser interpretado por profesionales capacitados.</p>
-                            <p style="margin-top: 30px; text-align: right;">
-                                <strong>Profesional evaluador:</strong><br>
-                                ${datosCompletos.paciente.evaluador || "No especificado"}
-                            </p>
-                        </div>
-                    </div>
-                `;
-                
-                document.getElementById('contenido-resultados').innerHTML = html;
-                
-            } catch (error) {
-                console.error('Error mostrando resultados:', error);
-                mostrarErrorEnResultados(error.message);
-            }
-        }
-        
-        function mostrarErrorEnResultados(mensaje) {
-            const errorHTML = `
-                <div class="warning-box" style="padding: 30px; text-align: center;">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--warning-color); margin-bottom: 20px;"></i>
-                    <h3>Error al cargar evaluación</h3>
-                    <p>${mensaje}</p>
-                    <button class="btn btn-primary" onclick="cambiarSeccion('historial')" style="margin-top: 20px;">
-                        <i class="fas fa-arrow-left"></i> Volver al historial
-                    </button>
-                </div>
-            `;
-            document.getElementById('contenido-resultados').innerHTML = errorHTML;
+            console.log('Datos completos:', datosCompletos);
         }
         
         function generarRecomendaciones() {
@@ -1614,163 +736,118 @@
                 recs.push("Cojín antiescaras para silla o sillón");
                 recs.push("Instalación de barras de apoyo en baño");
                 recs.push("Programa de ejercicios de fortalecimiento");
-                recs.push("Evaluación por terapia ocupacional");
             } else if (puntajeTotalIRAT <= 12) {
                 recs.push("Andador fijo (sin ruedas) para máxima estabilidad");
                 recs.push("Colchón estático de alta densidad");
                 recs.push("Supervisión durante la deambulación");
                 recs.push("Adaptaciones domiciliarias prioritarias");
-                recs.push("Entrenamiento básico para cuidadores");
             } else {
                 recs.push("Silla de ruedas adaptada con cojín antiescaras");
                 recs.push("Colchón alternante de aire para prevención UPP");
                 recs.push("Plan de movilización cada 2-3 horas");
                 recs.push("Valoración por equipo multidisciplinar");
-                recs.push("Entrenamiento formal para cuidadores");
-                recs.push("Modificaciones estructurales en domicilio");
             }
             
             return recs;
         }
         
-        function obtenerDescripcionRiesgoIRAT() {
-            if (puntajeTotalIRAT <= 6) return "Ayudas básicas o ninguna. Bastón simple o sin ayuda.";
-            if (puntajeTotalIRAT <= 9) return "Ayudas intermedias. Andador con ruedas + cojín antiescaras.";
-            if (puntajeTotalIRAT <= 12) return "Ayudas avanzadas. Andador fijo + colchón estático.";
-            return "Ayudas de movilización. Silla de ruedas + colchón alternante.";
-        }
-        
-        function obtenerProximaFechaEvaluacion() {
-            const fecha = new Date();
-            fecha.setMonth(fecha.getMonth() + 3);
-            return fecha.toLocaleDateString('es-ES');
-        }
-        
-        function configurarCompartir() {
-            console.log('Configurando compartir...');
-            document.getElementById('generar-pdf').addEventListener('click', generarPDFProfesional);
-            document.getElementById('compartir-whatsapp').addEventListener('click', compartirWhatsAppProfesional);
-            document.getElementById('copiar-texto').addEventListener('click', copiarInformeCompleto);
-            document.getElementById('nueva-evaluacion').addEventListener('click', iniciarNuevaEvaluacion);
-        }
-        
-        async function generarPDFProfesional() {
-            if (!datosCompletos) {
-                mostrarNotificacion('Primero calcule los resultados', 'error');
-                return;
-            }
-            
+        function mostrarResultados() {
             try {
-                mostrarNotificacion('Generando PDF...', 'info');
+                if (!datosCompletos) {
+                    throw new Error('No hay datos para mostrar');
+                }
                 
-                const element = document.querySelector('.informe-profesional');
-                const opt = {
-                    margin:       10,
-                    filename:     `Evaluacion_${datosCompletos.paciente.nombre.replace(/[^a-z0-9]/gi, '_')}.pdf`,
-                    image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { 
-                        scale: 2,
-                        useCORS: true,
-                        logging: false
-                    },
-                    jsPDF:        { 
-                        unit: 'mm', 
-                        format: 'a4', 
-                        orientation: 'portrait' 
-                    }
-                };
+                const riesgoColorIRAT = nivelRiesgoIRAT.includes("BAJO") ? "#4CAF50" :
+                                       nivelRiesgoIRAT.includes("MODERADO") ? "#FF9800" :
+                                       nivelRiesgoIRAT.includes("ALTO") ? "#F44336" : "#9C27B0";
                 
-                await html2pdf().set(opt).from(element).save();
-                mostrarNotificacion('PDF generado correctamente', 'success');
+                const riesgoColorNorton = nivelRiesgoNorton.includes("BAJO") ? "#4CAF50" :
+                                         nivelRiesgoNorton.includes("MODERADO") ? "#FF9800" : "#F44336";
+                
+                const html = `
+                    <div style="background: white; padding: 30px; border-radius: 10px; border: 2px solid #e0e0e0;">
+                        <div style="text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 3px solid var(--primary-color);">
+                            <h2 style="color: var(--primary-color); margin-bottom: 5px;">Informe de Evaluación Clínica</h2>
+                            <p style="color: #666;">IRAT-5 Modificado + Test de Tinetti + Escala Norton</p>
+                        </div>
+                        
+                        <div style="margin-bottom: 25px;">
+                            <h3 style="color: var(--primary-color); margin-bottom: 15px;">
+                                <i class="fas fa-user"></i> Datos del Paciente
+                            </h3>
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                                <p><strong>Nombre:</strong> ${datosCompletos.paciente.nombre}</p>
+                                <p><strong>Fecha evaluación:</strong> ${datosCompletos.paciente.fecha}</p>
+                                <p><strong>Evaluador:</strong> ${datosCompletos.paciente.evaluador}</p>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 25px;">
+                            <h3 style="color: var(--primary-color); margin-bottom: 15px;">
+                                <i class="fas fa-chart-bar"></i> Resultados
+                            </h3>
+                            
+                            <div style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white; padding: 25px; border-radius: 10px; text-align: center; margin: 20px 0;">
+                                <div>Puntaje Total IRAT-5 Modificado</div>
+                                <div style="font-size: 3.5rem; font-weight: bold; margin: 10px 0;">${puntajeTotalIRAT}</div>
+                                <div style="background: ${riesgoColorIRAT}; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                                    <strong>${nivelRiesgoIRAT}</strong>
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
+                                    <div style="font-weight: 600; color: var(--primary-color); margin-bottom: 10px;">Test de Tinetti</div>
+                                    <div style="font-size: 2.5rem; font-weight: bold; margin: 10px 0;">
+                                        ${tinettiNoEvaluable ? 'NE' : puntajeTinetti}${tinettiNoEvaluable ? '' : '/28'}
+                                    </div>
+                                    <div>${datosCompletos.tinetti.riesgo}</div>
+                                </div>
+                                
+                                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
+                                    <div style="font-weight: 600; color: var(--primary-color); margin-bottom: 10px;">Escala Norton</div>
+                                    <div style="font-size: 2.5rem; font-weight: bold; margin: 10px 0;">${puntajeNorton}</div>
+                                    <div style="background: ${riesgoColorNorton}; color: white; padding: 5px 10px; border-radius: 5px; margin-top: 10px;">
+                                        ${nivelRiesgoNorton}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 25px;">
+                            <h3 style="color: var(--primary-color); margin-bottom: 15px;">
+                                <i class="fas fa-prescription-bottle-alt"></i> Recomendaciones
+                            </h3>
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                                ${recomendaciones.map((rec, index) => `
+                                    <div style="margin-bottom: 10px; padding: 10px; background: white; border-radius: 5px; border-left: 4px solid var(--accent-color);">
+                                        <strong>Recomendación ${index + 1}:</strong> ${rec}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #e0e0e0; text-align: right;">
+                            <p><strong>Profesional evaluador:</strong> ${datosCompletos.paciente.evaluador}</p>
+                            <p style="color: #666; font-size: 0.9rem; margin-top: 10px;">
+                                Fecha de emisión: ${new Date().toLocaleDateString('es-ES')}
+                            </p>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('contenido-resultados').innerHTML = html;
                 
             } catch (error) {
-                console.error('Error generando PDF:', error);
-                mostrarNotificacion('Error al generar PDF: ' + error.message, 'error');
+                console.error('Error mostrando resultados:', error);
+                document.getElementById('contenido-resultados').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #F44336;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                        <h3>Error al cargar resultados</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
             }
-        }
-        
-        function compartirWhatsAppProfesional() {
-            if (!datosCompletos) {
-                mostrarNotificacion('Primero calcule los resultados', 'error');
-                return;
-            }
-            
-            const mensaje = `*INFORME DE EVALUACIÓN CLÍNICA*%0A%0A` +
-                           `*Paciente:* ${datosCompletos.paciente.nombre}%0A` +
-                           `*Fecha:* ${datosCompletos.paciente.fecha}%0A` +
-                           `*Evaluador:* ${datosCompletos.paciente.evaluador}%0A%0A` +
-                           `*RESULTADOS:*%0A` +
-                           `• IRAT-5: ${puntajeTotalIRAT} pts - ${nivelRiesgoIRAT}%0A` +
-                           `• Tinetti: ${tinettiNoEvaluable ? 'No evaluable' : puntajeTinetti + '/28'} - ${datosCompletos.tinetti.riesgo}%0A` +
-                           `• Norton: ${puntajeNorton} pts - ${nivelRiesgoNorton}%0A%0A` +
-                           `*Próxima evaluación:* ${obtenerProximaFechaEvaluacion()}%0A` +
-                           `*Informe completo disponible en el sistema*`;
-            
-            window.open(`https://wa.me/?text=${mensaje}`, '_blank');
-            mostrarNotificacion('Compartiendo por WhatsApp...', 'info');
-        }
-        
-        function copiarInformeCompleto() {
-            if (!datosCompletos) {
-                mostrarNotificacion('Primero calcule los resultados', 'error');
-                return;
-            }
-            
-            let informe = `INFORME DE EVALUACIÓN CLÍNICA PROFESIONAL
-================================================================
-
-DATOS DEL PACIENTE
-------------------
-${Object.entries(datosCompletos.paciente)
-    .map(([key, value]) => `${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}: ${value || 'No especificado'}`)
-    .join('\n')}
-
-RESULTADOS PRINCIPALES
-----------------------
-• IRAT-5 Modificado: ${puntajeTotalIRAT} puntos - ${nivelRiesgoIRAT}
-• Test de Tinetti: ${tinettiNoEvaluable ? 'No evaluable' : puntajeTinetti + '/28 puntos'} - ${datosCompletos.tinetti.riesgo}
-• Escala Norton: ${puntajeNorton} puntos - ${nivelRiesgoNorton}
-
-RECOMENDACIONES INTEGRALES
---------------------------
-${recomendaciones.map((r, i) => `${i + 1}. ${r}`).join('\n')}
-
-PLAN DE SEGUIMIENTO
--------------------
-• Próxima evaluación recomendada: ${obtenerProximaFechaEvaluacion()}
-
-FIRMAS
-------
-Profesional evaluador: ${datosCompletos.paciente.evaluador}
-Paciente/Representante: _________________________
-
-Fecha de emisión: ${new Date().toLocaleDateString('es-ES')}
-================================================================
-Sistema IRAT-5 + Tinetti + Norton`;
-
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(informe)
-                    .then(() => mostrarNotificacion('Informe copiado al portapapeles', 'success'))
-                    .catch(() => {
-                        copiarTextoFallback(informe);
-                    });
-            } else {
-                copiarTextoFallback(informe);
-            }
-        }
-        
-        function copiarTextoFallback(texto) {
-            const textarea = document.createElement('textarea');
-            textarea.value = texto;
-            textarea.style.position = 'fixed';
-            textarea.style.left = '-999999px';
-            textarea.style.top = '-999999px';
-            document.body.appendChild(textarea);
-            textarea.focus();
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            mostrarNotificacion('Informe copiado al portapapeles', 'success');
         }
         
         function iniciarNuevaEvaluacion() {
@@ -1779,3 +856,5 @@ Sistema IRAT-5 + Tinetti + Norton`;
             }
         }
     </script>
+</body>
+</html>
