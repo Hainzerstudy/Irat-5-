@@ -40,10 +40,9 @@
         .result-box strong { display: block; font-size: 1.1em; color: #1e3c72; margin-bottom: 5px; }
         .resultado-valor { font-size: 1.8em; font-weight: bold; }
         
-        .risk-low { color: #4CAF50; }
-        .risk-moderate { color: #FF9800; }
-        .risk-high { color: #F44336; }
-        .risk-CRÍTICO { color: #8B0000; }
+        .risk-success { color: #4CAF50; }
+        .risk-warning { color: #FF9800; }
+        .risk-danger { color: #F44336; }
 
         /* Tarjetas de Recomendación */
         .recommendation-card { margin-top: 15px; padding: 15px; border-radius: 8px; border-left: 8px solid; background-color: #f9f9f9; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); }
@@ -372,7 +371,7 @@
                     <div class="result-box" style="border: 2px solid #1e3c72;">
                         <strong>IRAT-5 (Caída/Amputación)</strong>
                         <span id="res-irat-total" class="resultado-valor">0</span>
-                        <p id="res-irat-riesgo" class="resultado-valor risk-low" style="font-size: 1em;"></p>
+                        <p id="res-irat-riesgo" class="resultado-valor risk-success" style="font-size: 1em;"></p>
                     </div>
                     <div class="result-box" style="border: 2px solid #1e3c72;">
                         <strong>Tinetti (Movilidad)</strong>
@@ -382,11 +381,11 @@
                     <div class="result-box" style="border: 2px solid #1e3c72;">
                         <strong>Norton (Úlcera)</strong>
                         <span id="res-norton-total" class="resultado-valor">0 / 20</span>
-                        <p id="res-norton-riesgo" class="resultado-valor risk-high" style="font-size: 1em;"></p>
+                        <p id="res-norton-riesgo" class="resultado-valor risk-success" style="font-size: 1em;"></p>
                     </div>
                      <div class="result-box" style="border: 3px solid #ff5a60; background-color: #fff9f9;">
                         <strong>CLASIFICACIÓN COMBINADA</strong>
-                        <span id="res-global-riesgo" class="resultado-valor risk-low" style="font-size: 1.5em;">BAJO</span>
+                        <span id="res-global-riesgo" class="resultado-valor risk-success" style="font-size: 1.5em;">BAJO</span>
                         <p style="font-size: 0.9em;">Recomendaciones clave a continuación.</p>
                     </div>
                 </div>
@@ -654,46 +653,34 @@ const firebaseConfig = {
         }
 
         // ------------------------------------------------------------------
-        // LÓGICA DE CLASIFICACIÓN COMBINADA (RESPUESTA AL REQUERIMIENTO)
+        // LÓGICA DE CLASIFICACIÓN COMBINADA (ACTUALIZADA CON INTERDISCIPLINA Y CONTROL)
         // ------------------------------------------------------------------
 
         /**
          * Crea una clasificación clínica unificada y genera las recomendaciones 
-         * de ayuda técnica priorizando los riesgos más altos.
+         * de ayuda técnica y plan de acción interdisciplinar.
          */
         function getCombinedClinicalClassification(iratScore, tinettiScore, nortonScore) {
             const iratAmputacion = getIratAmputacionValue();
             let recomendaciones = [];
             let nivelRiesgoGlobal = 'BAJO';
             let colorGlobal = 'success';
-
-            // 1. Clasificación por riesgo de Úlcera (Norton - CRÍTICO si <= 14)
-            if (nortonScore <= 14) {
-                recomendaciones.push({ 
-                    titulo: '🚨 Riesgo de Úlcera por Presión ALTO', 
-                    texto: 'Protocolo de cambios posturales cada 2-3 horas (registro obligatorio). Uso de colchón/cojín de presión alterna o viscoelástico. Inspección diaria de piel. Fomentar la autonomía en el cambio postural si es posible.', 
-                    color: 'danger', 
-                    tipo: 'Ulcera' 
-                });
-                nivelRiesgoGlobal = 'ALTO';
-                colorGlobal = 'danger';
-            }
-
-            // 2. Clasificación por Amputación (IRAT - CRÍTICO si >= 3)
+            
+            // 1. Lógica por Amputación (IRAT - CRÍTICO si >= 3)
             if (iratAmputacion >= 3) {
                 // Amputación Unilateral/Bilateral Infracondílea/Supracondílea
                 recomendaciones.push({
-                    titulo: '🚨 Consideración por Amputación',
-                    texto: 'Requiere evaluación y manejo protésico urgente. Se debe entrenar el uso del dispositivo principal de apoyo para prevenir caídas.',
+                    titulo: '🚨 Consideración: Amputación Presente',
+                    texto: 'Requiere evaluación y manejo protésico urgente (o adaptación si ya posee prótesis). Enseñar técnicas de cuidado del muñón para prevenir infecciones y úlceras.',
                     color: 'danger',
                     tipo: 'Amputacion'
                 });
                 
                 if (iratAmputacion === 4 || iratAmputacion === 6) { 
                     // Amputación Bilateral
-                    recomendaciones.unshift({ // unshift para PRIORIZAR esta ayuda
-                        titulo: "♿ Ayuda Técnica CRÍTICA: Silla de Ruedas",
-                        texto: "Amputación Bilateral. La ayuda principal de movilidad es la Silla de Ruedas. Dispositivos de marcha (andador/bastón) contraindicados hasta adaptación protésica.",
+                    recomendaciones.unshift({ // PRIORIZAR esta ayuda
+                        titulo: "♿ Ayuda Técnica Principal: Silla de Ruedas",
+                        texto: "Amputación Bilateral. La ayuda principal de movilidad es la Silla de Ruedas. Dispositivos de marcha (andador/bastón) contraindicados hasta adaptación protésica. Requiere entrenamiento en silla.",
                         color: 'danger',
                         tipo: 'Movilidad Principal'
                     });
@@ -702,7 +689,7 @@ const firebaseConfig = {
                 }
             }
 
-            // 3. Clasificación por Movilidad/Caída (Tinetti)
+            // 2. Clasificación por Movilidad (Tinetti) y Asignación de Ayuda Principal
             let ayudaPrincipalAsignada = recomendaciones.some(r => r.tipo === 'Movilidad Principal');
 
             if (!ayudaPrincipalAsignada) {
@@ -710,7 +697,7 @@ const firebaseConfig = {
                     // Riesgo Alto de Caída - Tinetti Severo
                     recomendaciones.push({ 
                         titulo: "🚶 Ayuda Técnica Principal: Andador (Fijo o con Ruedas)",
-                        texto: "Tinetti Severo. Se recomienda Andador Fijo o de 2 ruedas (si hay fuerza en MMSS) y entrenamiento de marcha supervisado intensivo para recuperar equilibrio.",
+                        texto: "Tinetti Severo (Riesgo de Caída ALTO). Se recomienda Andador Fijo o de 2 ruedas (si hay fuerza en MMSS) y entrenamiento de marcha supervisado intensivo.",
                         color: 'danger',
                         tipo: 'Movilidad Principal'
                     });
@@ -731,31 +718,99 @@ const firebaseConfig = {
                         colorGlobal = 'warning';
                     }
                 } else {
-                    // Tinetti Óptimo
-                     recomendaciones.push({ 
+                    recomendaciones.push({ 
                         titulo: "🟢 Ayuda Técnica Principal: Preventiva / No Requerida",
-                        texto: "Tinetti Óptimo. No se requiere ayuda técnica principal. Se recomienda el uso preventivo de un bastón simple solo en exteriores o terrenos irregulares. Mantener actividad física.",
+                        texto: "Tinetti Óptimo. No se requiere ayuda técnica principal. Uso de bastón simple solo en exteriores o terrenos irregulares. Mantener actividad física y reevaluación.",
                         color: 'success',
                         tipo: 'Movilidad Principal'
                     });
                 }
             }
             
-            // 4. Recomendaciones generales de Caída (IRAT)
-            if (iratScore >= 11) {
-                recomendaciones.push({ titulo: '🚨 Riesgo de Caída por IRAT ALTO', texto: 'Requiere supervisión constante. Adaptar el hogar (barras de apoyo, suelos antideslizantes, iluminación nocturna). Revisión urgente de factores de riesgo.', color: 'danger', tipo: 'Caida General' });
-                 if (nivelRiesgoGlobal !== 'CRÍTICO' && nivelRiesgoGlobal !== 'ALTO') {
-                        nivelRiesgoGlobal = 'ALTO';
-                        colorGlobal = 'danger';
-                    }
-            } else if (iratScore >= 7) {
-                recomendaciones.push({ titulo: '⚠️ Riesgo de Caída por IRAT MODERADO', texto: 'Revisar medicación (Polifarmacia). Implementar ejercicios de fortalecimiento, coordinación y equilibrio 3 veces por semana.', color: 'warning', tipo: 'Caida General' });
-                 if (nivelRiesgoGlobal === 'BAJO') {
-                        nivelRiesgoGlobal = 'MODERADO';
-                        colorGlobal = 'warning';
-                    }
+            // 3. Clasificación por riesgo de Úlcera (Norton - ALTO si <= 14)
+            if (nortonScore <= 14) {
+                recomendaciones.push({ 
+                    titulo: '🚨 Riesgo de Úlcera por Presión ALTO', 
+                    texto: 'Protocolo estricto de cambios posturales cada 2-3 horas (registro obligatorio). Uso inmediato de colchón y cojín de presión alterna o viscoelástico.', 
+                    color: 'danger', 
+                    tipo: 'Ulcera' 
+                });
+                if (nivelRiesgoGlobal !== 'CRÍTICO' && nivelRiesgoGlobal !== 'ALTO') {
+                    nivelRiesgoGlobal = 'ALTO';
+                    colorGlobal = 'danger';
+                }
+            }
+
+            // 4. Recomendaciones Interdisciplinarias y de Nivel de Riesgo Global
+            
+            // --- Recomendaciones para RIESGO CRÍTICO ---
+            if (nivelRiesgoGlobal === 'CRÍTICO') {
+                recomendaciones.push(
+                    { titulo: 'KINESIOLOGÍA/TERAPIA FÍSICA', texto: 'Inmediata. Énfasis en el entrenamiento de transferencias (cama-silla), fortalecimiento de MMSS y acondicionamiento del tronco (Kinesiterapia).', color: 'danger' },
+                    { titulo: 'TERAPIA OCUPACIONAL', texto: 'Evaluación y adaptación del hogar y el entorno para permitir el uso seguro de la silla de ruedas (rampas, ancho de puertas).', color: 'danger' },
+                    { titulo: 'INTERCONSULTA NUTRICIÓN', texto: 'Urgente. Evaluar ingesta proteica y estado nutricional para favorecer la cicatrización y prevenir el deterioro muscular (Sarcopenia).', color: 'danger' },
+                    { titulo: 'INTERCONSULTA MÉDICA', texto: 'Urgente con Especialista (Cirujano, Geriatra) para manejo del dolor, polifarmacia y manejo de comorbilidades agudas.', color: 'danger' },
+                    { titulo: 'ENFERMERÍA', texto: 'Protocolo de inspección de piel 3 veces al día y manejo avanzado de heridas (si existen). Entrenar a cuidadores.', color: 'danger' },
+                    { titulo: 'CUIDADOR', texto: 'Se requiere cuidador 24 horas al día, capacitado en manejo de cambios posturales y transferencias seguras.', color: 'danger' },
+                    { titulo: 'REVISIÓN EXÁMENES CLÍNICOS', texto: 'Urgente. Revisar resultados de Hemograma, Glicemia, Electrolitos y función renal. Considerar gases arteriales si hay compromiso respiratorio.', color: 'danger' },
+                    { titulo: 'FECHA DE CONTROL PRÓXIMO', texto: 'Control Interdisciplinar (Médico y Kinesiólogo) semanal, dadas las condiciones de criticidad y necesidad de ajustes inmediatos.', color: 'danger' }
+                );
+            } 
+            // --- Recomendaciones para RIESGO ALTO ---
+            else if (nivelRiesgoGlobal === 'ALTO') {
+                recomendaciones.push(
+                    { titulo: 'KINESIOLOGÍA/TERAPIA FÍSICA', texto: 'Intensiva. Foco en la reeducación de la marcha con el andador, entrenamiento de equilibrio dinámico y fortalecimiento específico de músculos clave (Kinesiterapia).', color: 'danger' },
+                    { titulo: 'TERAPIA OCUPACIONAL', texto: 'Adaptación del entorno: instalación de barras de apoyo en baño, eliminación de alfombras y optimización de iluminación para reducir caídas.', color: 'danger' },
+                    { titulo: 'INTERCONSULTA MÉDICA', texto: 'Prioritaria. Revisión de polifarmacia, especialmente sedantes y antihipertensivos que puedan causar inestabilidad.', color: 'danger' },
+                    { titulo: 'ENFERMERÍA/ATENCIÓN DOMICILIARIA', texto: 'Monitoreo diario de la piel en puntos de presión. Educación a paciente y familia sobre el uso correcto del dispositivo de ayuda técnica.', color: 'warning' },
+                    { titulo: 'NUTRICIÓN', texto: 'Optimización de la hidratación y soporte calórico-proteico si hay riesgo de úlcera o desnutrición.', color: 'warning' },
+                    { titulo: 'PSICOLOGÍA', texto: 'Soporte emocional por la pérdida de autonomía y miedo a caer (Ptofobia). Fomentar la participación activa.', color: 'warning' },
+                    { titulo: 'REVISIÓN EXÁMENES CLÍNICOS', texto: 'Urgente. Evaluar Vitamina D, Calcio, B12 y perfil tiroideo, ya que son causas comunes de debilidad y riesgo de caída en adultos mayores.', color: 'danger' },
+                    { titulo: 'FECHA DE CONTROL PRÓXIMO', texto: 'Control Interdisciplinar (Kinesiología y T. Ocupacional) cada 1-2 semanas hasta mejorar puntaje de Tinetti a >18. Control médico mensual.', color: 'danger' }
+                );
+                // Recomendación adicional de IRAT Alto (si no fue el factor dominante)
+                if (iratScore >= 11) {
+                    recomendaciones.push({ titulo: '🚨 Riesgo de Caída por IRAT ALTO', texto: 'Urgente: Revisión de la Agudeza Visual y eliminación de calzado inestable. Uso de alarma personal.', color: 'danger' });
+                }
+            } 
+            // --- Recomendaciones para RIESGO MODERADO ---
+            else if (nivelRiesgoGlobal === 'MODERADO') {
+                recomendaciones.push(
+                    { titulo: 'KINESIOLOGÍA/TERAPIA FÍSICA', texto: 'Moderada. Programa de ejercicios en casa (Ejercicios de Otago o similares) y reentrenamiento de la marcha con el bastón para mejorar la confianza.', color: 'warning' },
+                    { titulo: 'TERAPIA OCUPACIONAL', texto: 'Recomendaciones básicas de seguridad en el hogar (cables, altura de sillas) y simplificación de tareas diarias.', color: 'warning' },
+                    { titulo: 'INTERCONSULTA MÉDICA', texto: 'Control. Revisión de polifarmacia, especialmente de ansiolíticos e hipnóticos. Seguimiento de la presión arterial y control de glicemia.', color: 'info' },
+                    { titulo: 'CUIDADO', texto: 'Fomentar la autonomía, pero con supervisión intermitente. El paciente debe ser capaz de realizar la mayoría de las AVD por sí mismo.', color: 'info' },
+                    { titulo: 'EDUCACIÓN', texto: 'Enseñar al paciente técnicas para levantarse del suelo de forma segura en caso de caída (si es viable).', color: 'info' },
+                    { titulo: 'EQUILIBRIO', texto: 'Realizar ejercicios de equilibrio sobre una pierna (con apoyo) 3 veces por semana para mejorar la estabilidad y reflejos.', color: 'warning' },
+                    { titulo: 'REVISIÓN EXÁMENES CLÍNICOS', texto: 'Control de rutina. Verificar Hemoglobina y Ferritina (anemia), y Creatinina (función renal) como factores de riesgo de fatiga y caída.', color: 'info' },
+                    { titulo: 'FECHA DE CONTROL PRÓXIMO', texto: 'Control Kinesiológico y Terapia Ocupacional cada 4-6 semanas. Reevaluación global en 3 meses.', color: 'warning' }
+                );
+            }
+            // --- Recomendaciones para RIESGO BAJO ---
+            else if (nivelRiesgoGlobal === 'BAJO') {
+                recomendaciones.push(
+                    { titulo: 'KINESIOLOGÍA/TERAPIA FÍSICA', texto: 'Preventiva. Mantener un programa de actividad física regular (caminatas, Tai Chi) que incluya fortalecimiento y estiramientos.', color: 'success' },
+                    { titulo: 'TERAPIA OCUPACIONAL', texto: 'Chequeo anual de riesgos ergonómicos y de caídas. Mantener los objetos de uso diario a la altura accesible.', color: 'success' },
+                    { titulo: 'CONTROL MÉDICO', texto: 'Control anual para revisión de audición y visión. Fomentar vacunación anual contra la influenza y neumococo.', color: 'success' },
+                    { titulo: 'NUTRICIÓN', texto: 'Dieta balanceada rica en calcio y Vitamina D. Ingesta adecuada de líquidos.', color: 'success' },
+                    { titulo: 'AUTOCUIDADO', texto: 'Uso de calzado firme y cerrado. Evitar el sedentarismo y fomentar la participación social activa.', color: 'success' },
+                    { titulo: 'REVISIÓN EXÁMENES CLÍNICOS', texto: 'De rutina. Revisar Perfil Lipídico y Glicemia anualmente. Considerar Densitometría Ósea según edad y factores de riesgo.', color: 'success' },
+                    { titulo: 'FECHA DE CONTROL PRÓXIMO', texto: 'Reevaluación de Tinetti, IRAT y Norton de manera anual o ante cualquier cambio de salud significativo.', color: 'success' }
+                );
             }
             
+            // Asignar el nivel de riesgo final y su color (si no fue CRÍTICO inicialmente)
+            if (recomendaciones.some(r => r.color === 'danger')) {
+                colorGlobal = 'danger';
+                if (nivelRiesgoGlobal !== 'CRÍTICO') nivelRiesgoGlobal = 'ALTO';
+            } else if (recomendaciones.some(r => r.color === 'warning')) {
+                colorGlobal = 'warning';
+                if (nivelRiesgoGlobal === 'BAJO') nivelRiesgoGlobal = 'MODERADO';
+            } else {
+                colorGlobal = 'success';
+            }
+
+
             return { 
                 nivelRiesgoGlobal: nivelRiesgoGlobal, 
                 colorGlobal: colorGlobal.toUpperCase(), 
@@ -782,18 +837,18 @@ const firebaseConfig = {
             let iratRiesgoClase;
             if (iratScore <= 6) {
                 iratRiesgoTexto = 'Riesgo Bajo';
-                iratRiesgoClase = 'risk-low';
+                iratRiesgoClase = 'risk-success';
             } else if (iratScore >= 7 && iratScore <= 10) {
                 iratRiesgoTexto = 'Riesgo Moderado';
-                iratRiesgoClase = 'risk-moderate';
+                iratRiesgoClase = 'risk-warning';
             } else {
                 iratRiesgoTexto = 'Riesgo Alto';
-                iratRiesgoClase = 'risk-high';
+                iratRiesgoClase = 'risk-danger';
             }
 
             // 3. Determinar Riesgo Norton
             const nortonRiesgoTexto = nortonScore <= 14 ? 'Riesgo Alto de Úlcera' : 'Riesgo Bajo de Úlcera';
-            const nortonRiesgoClase = nortonScore <= 14 ? 'risk-high' : 'risk-low';
+            const nortonRiesgoClase = nortonScore <= 14 ? 'risk-danger' : 'risk-success';
 
             // 4. Actualizar Resumen de Puntajes
             document.getElementById('res-nombre').textContent = document.getElementById('nombre').value || 'Sin nombre';
@@ -808,7 +863,7 @@ const firebaseConfig = {
 
             // 5. Actualizar Resumen Global
             document.getElementById('res-global-riesgo').textContent = clasificacion.nivelRiesgoGlobal;
-            document.getElementById('res-global-riesgo').className = `resultado-valor risk-${clasificacion.colorGlobal}`;
+            document.getElementById('res-global-riesgo').className = `resultado-valor risk-${clasificacion.colorGlobal.toLowerCase()}`;
 
             // 6. Mostrar las tarjetas de recomendación en la UI
             const recContainer = document.getElementById('recomendaciones-irat');
@@ -1012,7 +1067,6 @@ const firebaseConfig = {
             try {
                 const batch = db.batch();
                 // Firestore solo permite eliminar 500 documentos por lote (batch).
-                // Para colecciones grandes, se debe hacer un loop hasta que no queden documentos.
                 let deletedCount = 0;
                 let batchLimit = 500;
                 let snapshot;
@@ -1028,9 +1082,10 @@ const firebaseConfig = {
                     await batch.commit();
                     deletedCount += snapshot.size;
                     
-                    // Si hay más documentos (tamaño del snapshot igual al límite), creamos un nuevo batch
+                    // Si hay más documentos (tamaño del snapshot igual al límite), hacemos un nuevo query y batch
                     if (snapshot.size === batchLimit) {
-                         snapshot = await db.collection('evaluaciones').limit(batchLimit).get();
+                         // Para asegurar que tomamos los siguientes documentos, volvemos a hacer la query
+                         continue; 
                     }
 
                 } while (snapshot.size > 0);
@@ -1143,7 +1198,7 @@ const firebaseConfig = {
             y += sectionMargin;
 
             // Sección de Recomendaciones
-            drawSectionTitle("RECOMENDACIONES CLAVE Y AYUDAS TÉCNICAS", [114, 153, 192]); // Azul claro
+            drawSectionTitle("RECOMENDACIONES CLAVE Y PLAN INTERDISCIPLINAR", [114, 153, 192]); // Azul claro
             doc.setFont('helvetica', 'normal');
 
             lastReportData.recomendaciones.forEach(rec => {
