@@ -1,623 +1,934 @@
-Evaluador Clínico Integrado - Versión Alfa
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evaluador Clínico Integrado - Sistema Profesional</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Evaluador Clínico Integrado | Sistema Profesional</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* ===== VARIABLES Y RESET ===== */
+        /* ===== VARIABLES GLOBALES ===== */
         :root {
-            --primary-color: #1e3c72;
-            --secondary-color: #2a5298;
-            --accent-color: #4CAF50;
-            --warning-color: #FF9800;
-            --danger-color: #F44336;
-            --light-color: #f8f9fa;
-            --dark-color: #333333;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --border-radius: 10px;
-            --transition: all 0.3s ease;
+            --primary: #1a237e;
+            --primary-light: #534bae;
+            --primary-dark: #000051;
+            --secondary: #00acc1;
+            --secondary-light: #5ddef4;
+            --secondary-dark: #007c91;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --critical: #d32f2f;
+            --light: #f5f5f5;
+            --gray: #757575;
+            --dark: #212121;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.15);
+            --radius: 12px;
+            --radius-lg: 20px;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --glass: rgba(255, 255, 255, 0.95);
+            --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            --gradient-success: linear-gradient(135deg, var(--success) 0%, #66bb6a 100%);
+            --gradient-warning: linear-gradient(135deg, var(--warning) 0%, #ffb74d 100%);
+            --gradient-danger: linear-gradient(135deg, var(--danger) 0%, #ef5350 100%);
         }
-        
+
+        /* ===== RESET Y BASE ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
-            background: linear-gradient(135deg, #f5f7ff 0%, #e8ecff 100%);
-            color: var(--dark-color);
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f8f9ff 0%, #eef2ff 100%);
+            color: var(--dark);
             line-height: 1.6;
             min-height: 100vh;
             padding: 20px;
+            background-attachment: fixed;
         }
-        
-        /* ===== CONTENEDOR PRINCIPAL ===== */
+
+        /* ===== CONTAINER PRINCIPAL ===== */
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
+            background: var(--glass);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
             overflow: hidden;
-            animation: fadeIn 0.5s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeIn 0.8s ease-out;
         }
-        
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
-        /* ===== HEADER MEJORADO ===== */
+
+        /* ===== HEADER ELEGANTE ===== */
         .header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: var(--gradient-primary);
             color: white;
-            padding: 30px;
-            text-align: center;
+            padding: 40px 50px;
             position: relative;
             overflow: hidden;
         }
-        
+
         .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: float 20s linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(-50px, -50px) rotate(360deg); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            background: rgba(255, 255, 255, 0.2);
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .header h1 span {
+            font-weight: 600;
+            background: linear-gradient(45deg, #ffffff, #e3f2fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        /* ===== SECCIÓN AUTENTICACIÓN ===== */
+        .auth-section {
+            padding: 60px 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 50px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(26, 35, 126, 0.1);
+            animation: slideUp 0.6s ease-out 0.2s both;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .auth-icon {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .auth-title {
+            font-size: 2rem;
+            color: var(--primary);
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+
+        .auth-subtitle {
+            color: var(--gray);
+            font-size: 1rem;
+        }
+
+        /* ===== FORMULARIOS ELEGANTES ===== */
+        .form-group {
+            margin-bottom: 28px;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-weight: 500;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background: #fafafa;
+            color: var(--dark);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 172, 193, 0.15);
+        }
+
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select-wrapper::after {
+            content: '▼';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            pointer-events: none;
+            font-size: 0.8rem;
+        }
+
+        .form-control.select {
+            appearance: none;
+            padding-right: 50px;
+            cursor: pointer;
+            background-image: none;
+        }
+
+        /* ===== SECCIONES DE EVALUACIÓN ===== */
+        .main-content {
+            padding: 40px;
+        }
+
+        .section-header {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid rgba(26, 35, 126, 0.1);
+            position: relative;
+        }
+
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 100px;
+            height: 3px;
+            background: var(--gradient-primary);
+            border-radius: 3px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            font-weight: 300;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .section-title i {
+            background: var(--gradient-primary);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .section-subtitle {
+            color: var(--gray);
+            font-size: 1.1rem;
+            font-weight: 300;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        /* ===== GRID DE FORMULARIOS ===== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        /* ===== EVALUATION CARD ELEGANTE ===== */
+        .evaluation-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .evaluation-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
-            opacity: 0.1;
+            width: 6px;
+            height: 100%;
+            background: var(--gradient-primary);
         }
-        
-        .header h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-            font-weight: 600;
-            position: relative;
-            display: inline-block;
+
+        .evaluation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
         }
-        
-        .header h1::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 25%;
-            width: 50%;
-            height: 3px;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 2px;
-        }
-        
-        .header p {
-            opacity: 0.9;
-            font-size: 1rem;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        /* ===== SECCIÓN DE AUTENTICACIÓN ===== */
-        .auth-section {
-            padding: 40px;
-            background: white;
+
+        .evaluation-card-header {
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 400px;
+            font-size: 24px;
+            color: white;
+            flex-shrink: 0;
         }
-        
-        .auth-box {
-            background: var(--light-color);
-            padding: 40px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            width: 100%;
-            max-width: 400px;
-            animation: slideUp 0.5s ease;
+
+        .card-icon.irat { background: var(--gradient-primary); }
+        .card-icon.tinetti { background: var(--gradient-warning); }
+        .card-icon.norton { background: var(--gradient-success); }
+
+        .card-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            font-weight: 400;
+            margin-bottom: 5px;
         }
-        
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .auth-title {
-            color: var(--primary-color);
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 1.8rem;
-        }
-        
-        .auth-title i {
-            margin-right: 10px;
-        }
-        
-        /* ===== FORMULARIOS ===== */
-        .form-section {
-            padding: 30px;
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--primary-color);
+
+        .card-subtitle {
+            color: var(--gray);
             font-size: 0.95rem;
+            font-weight: 300;
         }
-        
-        .form-control {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1rem;
+
+        /* ===== QUESTION ROW ELEGANTE ===== */
+        .question-row {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: #fafafa;
+            border-radius: var(--radius);
             transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+
+        .question-row:hover {
             background: white;
+            border-left-color: var(--secondary);
+            transform: translateX(10px);
         }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+
+        .question-label {
+            flex: 1;
+            color: var(--dark);
+            font-weight: 500;
+            font-size: 1.05rem;
+            line-height: 1.5;
+            padding-right: 20px;
         }
-        
-        /* ===== EVALUACIÓN GRUPOS ===== */
-        .evaluation-group {
-            background: var(--light-color);
+
+        .question-label .required {
+            color: var(--danger);
+            margin-left: 4px;
+        }
+
+        .question-input {
+            width: 350px;
+            min-width: 350px;
+        }
+
+        /* ===== SCORE DISPLAY ===== */
+        .score-display {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 30px;
+            border-radius: var(--radius);
+            text-align: center;
+            margin: 30px 0;
+            box-shadow: 0 8px 32px rgba(26, 35, 126, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .score-display::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.3;
+        }
+
+        .score-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .score-value {
+            font-size: 4.5rem;
+            font-weight: 700;
+            line-height: 1;
+            margin: 15px 0;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .score-description {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* ===== TINETTI COMPLETO ===== */
+        .tinetti-section {
+            background: linear-gradient(135deg, #fff8e1 0%, #fff3e0 100%);
+            border: 2px solid #ffe0b2;
+        }
+
+        .tinetti-section::before {
+            background: var(--gradient-warning);
+        }
+
+        .tinetti-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .tinetti-category {
+            background: white;
             padding: 25px;
-            border-radius: var(--border-radius);
-            margin-bottom: 25px;
-            border-left: 5px solid var(--primary-color);
-            box-shadow: var(--shadow);
-            transition: var(--transition);
+            border-radius: var(--radius);
+            border: 2px solid #ffe0b2;
         }
-        
-        .evaluation-group:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .evaluation-group h3 {
-            color: var(--primary-color);
+
+        .tinetti-category h4 {
+            color: var(--warning);
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 2px solid rgba(30, 60, 114, 0.1);
-            font-size: 1.4rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .evaluation-group h3 i {
-            color: var(--secondary-color);
-        }
-        
-        /* ===== ITEM ROWS ===== */
-        .item-row {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            transition: var(--transition);
-            background: white;
-            border-radius: 6px;
-            margin-bottom: 10px;
-        }
-        
-        .item-row:hover {
-            background: #f8faff;
-            transform: translateX(5px);
-        }
-        
-        .item-label {
-            flex: 1;
+            border-bottom: 2px solid #ffe0b2;
             font-weight: 500;
-            color: #555;
-            margin-right: 15px;
+            font-size: 1.2rem;
         }
-        
-        .item-score {
-            min-width: 100px;
-            text-align: center;
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--primary-color);
-            padding: 8px 15px;
-            background: rgba(30, 60, 114, 0.1);
-            border-radius: 6px;
-        }
-        
-        /* ===== TINETTI SCORE OPTIONS ===== */
-        .tinetti-row {
-            display: flex;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px dashed #e0e0e0;
-        }
-        
-        .tinetti-score-options {
-            display: flex;
-            gap: 15px;
-            margin-left: auto;
-        }
-        
-        .tinetti-score-options label {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 6px;
-            transition: var(--transition);
-            font-weight: normal;
-        }
-        
-        .tinetti-score-options input[type="radio"] {
-            display: none;
-        }
-        
-        .tinetti-score-options input[type="radio"] + span {
-            padding: 6px 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            min-width: 40px;
-            text-align: center;
-            transition: var(--transition);
-        }
-        
-        .tinetti-score-options input[type="radio"]:checked + span {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-            font-weight: 600;
-        }
-        
-        /* ===== RESULTADOS SECTION ===== */
+
+        /* ===== RESULTS SECTION ===== */
         .results-section {
-            background: linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%);
-            padding: 30px;
-            border-radius: var(--border-radius);
-            margin-top: 30px;
-            border: 2px solid var(--primary-color);
+            background: linear-gradient(135deg, #e8f5e9 0%, #e0f2e1 100%);
+            border: 2px solid #c8e6c9;
+            margin-top: 50px;
+            animation: fadeIn 0.8s ease-out;
         }
-        
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #c8e6c9;
+        }
+
         .results-summary {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
         }
-        
-        .result-box {
+
+        .summary-card {
             background: white;
-            padding: 20px;
-            border-radius: var(--border-radius);
+            padding: 25px;
+            border-radius: var(--radius);
             text-align: center;
             box-shadow: var(--shadow);
             transition: var(--transition);
-            border-top: 4px solid transparent;
+            border-top: 5px solid transparent;
         }
-        
-        .result-box:hover {
-            transform: translateY(-5px);
+
+        .summary-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
         }
-        
-        .result-box strong {
-            display: block;
-            color: var(--primary-color);
+
+        .summary-card.irat { border-top-color: var(--primary); }
+        .summary-card.tinetti { border-top-color: var(--warning); }
+        .summary-card.norton { border-top-color: var(--success); }
+        .summary-card.global { border-top-color: var(--danger); }
+
+        .summary-title {
             font-size: 0.9rem;
-            margin-bottom: 10px;
+            color: var(--gray);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
         }
-        
-        .resultado-valor {
-            font-size: 2.2rem;
+
+        .summary-value {
+            font-size: 2.8rem;
             font-weight: 700;
             margin: 10px 0;
-            display: block;
+            line-height: 1;
         }
-        
-        /* ===== COLORS FOR RISK LEVELS ===== */
-        .risk-success {
-            color: #4CAF50;
+
+        .summary-risk {
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 8px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 10px;
         }
-        
-        .risk-warning {
-            color: #FF9800;
+
+        .risk-low { background: #e8f5e9; color: #2e7d32; }
+        .risk-moderate { background: #fff3e0; color: #ef6c00; }
+        .risk-high { background: #ffebee; color: #c62828; }
+        .risk-critical { background: #f3e5f5; color: #7b1fa2; }
+
+        /* ===== RECOMMENDATIONS ===== */
+        .recommendations-grid {
+            display: grid;
+            gap: 20px;
+            margin-top: 30px;
         }
-        
-        .risk-danger {
-            color: #F44336;
-        }
-        
-        .risk-critical {
-            color: #9C27B0;
-        }
-        
-        /* ===== RECOMMENDATION CARDS ===== */
+
         .recommendation-card {
             background: white;
-            padding: 20px;
-            border-radius: var(--border-radius);
-            margin-bottom: 15px;
-            border-left: 6px solid;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            border-radius: var(--radius);
+            border-left: 8px solid;
+            box-shadow: var(--shadow);
             transition: var(--transition);
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
         }
-        
+
         .recommendation-card:hover {
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transform: translateX(10px);
+            box-shadow: var(--shadow-lg);
         }
-        
-        .recommendation-card strong {
-            font-size: 1.1rem;
+
+        .recommendation-card.danger { border-left-color: var(--danger); }
+        .recommendation-card.warning { border-left-color: var(--warning); }
+        .recommendation-card.success { border-left-color: var(--success); }
+        .recommendation-card.info { border-left-color: var(--primary); }
+
+        .recommendation-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .recommendation-content h4 {
+            color: var(--dark);
             margin-bottom: 10px;
-            display: block;
+            font-size: 1.1rem;
+            font-weight: 500;
         }
-        
-        .recommendation-card p {
-            color: #666;
-            line-height: 1.5;
+
+        .recommendation-content p {
+            color: var(--gray);
+            line-height: 1.6;
         }
-        
+
         /* ===== HISTORIAL ===== */
-        #historial-list {
+        .history-section {
+            background: #f5f5f5;
+            padding: 40px;
+            border-radius: var(--radius);
+            margin-top: 50px;
+        }
+
+        .history-list {
             list-style: none;
             padding: 0;
         }
-        
-        #historial-list li {
+
+        .history-item {
             background: white;
-            padding: 20px;
-            border-radius: var(--border-radius);
+            padding: 25px;
+            border-radius: var(--radius);
             margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: var(--shadow);
             transition: var(--transition);
+            border-left: 5px solid var(--primary);
         }
-        
-        #historial-list li:hover {
-            transform: translateX(5px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+
+        .history-item:hover {
+            transform: translateX(10px);
+            box-shadow: var(--shadow-lg);
         }
-        
-        /* ===== BOTONES ===== */
+
+        /* ===== BOTONES ELEGANTES ===== */
         .btn {
-            padding: 14px 28px;
+            padding: 16px 32px;
             border: none;
-            border-radius: 8px;
+            border-radius: var(--radius);
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
             transition: var(--transition);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            text-decoration: none;
+            gap: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
         }
-        
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        .btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(0, 0); opacity: 0.5; }
+            100% { transform: scale(20, 20); opacity: 0; }
+        }
+
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: var(--gradient-primary);
             color: white;
+            box-shadow: 0 4px 20px rgba(26, 35, 126, 0.3);
         }
-        
+
         .btn-primary:hover {
-            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(30, 60, 114, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(26, 35, 126, 0.4);
         }
-        
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background: #5a6268;
-            transform: translateY(-2px);
-        }
-        
+
         .btn-success {
-            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            background: var(--gradient-success);
             color: white;
         }
-        
-        .btn-success:hover {
-            background: linear-gradient(135deg, #2E7D32, #4CAF50);
-            transform: translateY(-2px);
+
+        .btn-warning {
+            background: var(--gradient-warning);
+            color: white;
         }
-        
+
         .btn-danger {
-            background: linear-gradient(135deg, #F44336, #C62828);
+            background: var(--gradient-danger);
             color: white;
         }
-        
-        .btn-danger:hover {
-            background: linear-gradient(135deg, #C62828, #F44336);
-            transform: translateY(-2px);
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: var(--dark);
         }
-        
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 0.9rem;
+
+        .btn-lg {
+            padding: 20px 40px;
+            font-size: 1.1rem;
         }
-        
+
+        .btn-block {
+            width: 100%;
+        }
+
+        /* ===== ACTION BAR ===== */
+        .action-bar {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 40px 0;
+            padding: 30px;
+            background: rgba(26, 35, 126, 0.03);
+            border-radius: var(--radius);
+        }
+
         /* ===== NOTIFICACIONES ===== */
-        .notification-bar {
+        .notification {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            border-radius: var(--border-radius);
+            top: 30px;
+            right: 30px;
+            padding: 20px 30px;
+            border-radius: var(--radius);
             color: white;
             font-weight: 500;
-            z-index: 1000;
+            z-index: 10000;
             display: none;
-            animation: slideInRight 0.3s ease;
-            max-width: 350px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideInRight 0.4s ease-out, fadeOut 0.4s ease-out 3.6s forwards;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            min-width: 300px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
+
         @keyframes slideInRight {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
-        
-        .notification-success {
-            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateX(100%); }
         }
-        
-        .notification-error {
-            background: linear-gradient(135deg, #F44336, #C62828);
-        }
-        
-        .notification-warning {
-            background: linear-gradient(135deg, #FF9800, #EF6C00);
-        }
-        
-        .notification-info {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        }
-        
+
+        .notification-success { background: rgba(76, 175, 80, 0.95); }
+        .notification-error { background: rgba(244, 67, 54, 0.95); }
+        .notification-warning { background: rgba(255, 152, 0, 0.95); }
+        .notification-info { background: rgba(26, 35, 126, 0.95); }
+
         /* ===== USER DISPLAY ===== */
         .user-display {
+            position: absolute;
+            top: 30px;
+            right: 30px;
             display: flex;
             align-items: center;
             gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .user-info {
             background: rgba(255, 255, 255, 0.2);
-            padding: 8px 15px;
-            border-radius: 20px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-email {
             font-size: 0.9rem;
+            opacity: 0.9;
         }
-        
-        /* ===== ANIMACIONES Y EFECTOS ===== */
-        .fade-in {
-            animation: fadeIn 0.5s ease;
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
         }
-        
-        .pulse {
-            animation: pulse 2s infinite;
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
-        
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(30, 60, 114, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(30, 60, 114, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(30, 60, 114, 0); }
-        }
-        
+
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
+        @media (max-width: 1200px) {
             .container {
-                padding: 10px;
-                margin: 10px auto;
+                margin: 10px;
+            }
+            
+            .main-content {
+                padding: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 30px 20px;
             }
             
             .header h1 {
-                font-size: 1.8rem;
+                font-size: 2.2rem;
             }
             
-            .form-section,
-            .auth-section {
-                padding: 20px;
-            }
-            
-            .results-summary {
-                grid-template-columns: 1fr;
-            }
-            
-            .item-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            
-            .tinetti-row {
+            .question-row {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 15px;
             }
             
-            .tinetti-score-options {
-                margin-left: 0;
+            .question-input {
                 width: 100%;
-                justify-content: space-between;
+                min-width: unset;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-bar {
+                flex-direction: column;
             }
             
             .btn {
                 width: 100%;
-                margin-bottom: 10px;
             }
         }
-        
+
         /* ===== LOADER ===== */
         .loader {
             display: inline-block;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             border: 3px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top-color: white;
             animation: spin 1s ease-in-out infinite;
         }
-        
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
+    <!-- NOTIFICACIÓN -->
+    <div id="notification" class="notification"></div>
+
+    <!-- CONTENEDOR PRINCIPAL -->
     <div class="container">
-        <!-- HEADER MEJORADO -->
+        <!-- HEADER ELEGANTE -->
         <div class="header">
-            <h1><i class="fas fa-stethoscope"></i> Evaluador Clínico Integrado</h1>
-            <p>Sistema profesional para evaluación de riesgo de caídas, movilidad y úlceras por presión</p>
-            
-            <div id="user-display" style="display: none;">
-                <div class="user-info">
+            <div class="user-display" id="user-display" style="display: none;">
+                <div class="user-avatar">
                     <i class="fas fa-user-md"></i>
-                    <span id="current-user-email">Modo Desconectado</span>
                 </div>
-                <button class="btn btn-danger btn-sm" onclick="logout()" id="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                <div class="user-info">
+                    <div class="user-email" id="current-user-email"></div>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Salir
                 </button>
+            </div>
+            
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                </div>
+                <h1>Evaluador <span>Clínico Integrado</span></h1>
+                <p>Sistema profesional para evaluación de riesgo de caídas, movilidad y prevención de úlceras por presión. Herramienta validada para uso clínico.</p>
             </div>
         </div>
 
         <!-- SECCIÓN DE AUTENTICACIÓN -->
         <section id="auth-section" class="auth-section">
-            <div class="auth-box">
-                <h2 class="auth-title" id="auth-title">
-                    <i class="fas fa-lock"></i> Iniciar Sesión
-                </h2>
+            <div class="auth-card">
+                <div class="auth-header">
+                    <div class="auth-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h2 class="auth-title" id="auth-title">Acceso Profesional</h2>
+                    <p class="auth-subtitle" id="auth-subtitle">Ingrese sus credenciales para acceder al sistema</p>
+                </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Correo Electrónico</label>
-                    <input type="email" id="auth-email" class="form-control" placeholder="usuario@ejemplo.com" required>
+                    <label class="form-label">Correo Institucional</label>
+                    <input type="email" id="auth-email" class="form-control" placeholder="profesional@institucion.cl" required>
                 </div>
                 
                 <div class="form-group">
@@ -626,317 +937,526 @@ Evaluador Clínico Integrado - Versión Alfa
                 </div>
                 
                 <button class="btn btn-primary btn-block" onclick="handleAuth()" id="auth-button">
-                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    <i class="fas fa-sign-in-alt"></i> <span id="auth-button-text">Iniciar Sesión</span>
                 </button>
                 
-                <p style="text-align: center; margin-top: 20px;">
-                    <a href="#" id="toggle-auth-mode" onclick="toggleAuthModeFunc()" 
-                       style="color: var(--primary-color); text-decoration: none; font-weight: 500;">
-                        <i class="fas fa-user-plus"></i> Regístrate aquí
+                <p style="text-align: center; margin-top: 25px; color: var(--gray);">
+                    <a href="#" id="toggle-auth-mode" onclick="toggleAuthModeFunc()" style="color: var(--primary); text-decoration: none;">
+                        <i class="fas fa-user-plus"></i> <span id="toggle-auth-text">Crear nueva cuenta</span>
                     </a>
                 </p>
             </div>
         </section>
 
-        <!-- APLICACIÓN PRINCIPAL (OCULTA INICIALMENTE) -->
-        <section id="main-app" class="form-section" style="display: none;">
+        <!-- APLICACIÓN PRINCIPAL -->
+        <section id="main-app" class="main-content" style="display: none;">
             <!-- DATOS DEL PACIENTE -->
-            <div class="evaluation-group">
-                <h3><i class="fas fa-user-circle"></i> Datos Generales del Paciente</h3>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Nombre del Paciente *</label>
-                        <input type="text" id="nombre" class="form-control" placeholder="Nombre completo">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Fecha de Evaluación *</label>
-                        <input type="date" id="fecha" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Nombre del Evaluador *</label>
-                        <input type="text" id="evaluador" class="form-control" placeholder="Profesional evaluador">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Edad del Paciente</label>
-                        <input type="number" id="edad" class="form-control" placeholder="Años">
-                    </div>
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-user-injured"></i> Datos del Paciente
+                </h2>
+                <p class="section-subtitle">Complete la información básica del paciente para iniciar la evaluación integral</p>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Nombre Completo *</label>
+                    <input type="text" id="nombre" class="form-control" placeholder="Nombre y apellidos">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">RUT / Identificación</label>
+                    <input type="text" id="rut" class="form-control" placeholder="12.345.678-9">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Fecha de Evaluación *</label>
+                    <input type="date" id="fecha" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Edad</label>
+                    <input type="number" id="edad" class="form-control" placeholder="Años">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Evaluador *</label>
+                    <input type="text" id="evaluador" class="form-control" placeholder="Nombre del profesional">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Institución</label>
+                    <input type="text" id="institucion" class="form-control" placeholder="Hospital/Clínica/Centro">
                 </div>
             </div>
 
-            <!-- IRAT-5 MODIFICADO CON NUEVAS PREGUNTAS -->
-            <div class="evaluation-group" id="irat-section">
-                <h3><i class="fas fa-walking"></i> IRAT-5 Modificado (Riesgo de Amputación y Caída)</h3>
-                
-                <div class="item-row">
-                    <div class="item-label">1. Equilibrio Unipodal (máximo tiempo sostenido)</div>
-                    <select id="equilibrio" class="form-control" style="width: 300px;" onchange="calcularIRAT()">
-                        <option value="0">≥ 30 segundos (0 pts)</option>
-                        <option value="1">15-29 segundos (1 pts)</option>
-                        <option value="2">5-14 segundos (2 pts)</option>
-                        <option value="3">< 5 segundos (3 pts)</option>
-                        <option value="4">No puede mantenerse (4 pts)</option>
-                    </select>
-                </div>
-                
-                <div class="item-row">
-                    <div class="item-label">2. Tipo de Amputación</div>
-                    <select id="amputacion" class="form-control" style="width: 300px;" onchange="calcularIRAT()">
-                        <option value="0">Sin amputaciones (0 pts)</option>
-                        <option value="1">Amputación transmetatarsiana (1 pts)</option>
-                        <option value="3">Unilateral infracondílea (3 pts + 1 riesgo caídas)</option>
-                        <option value="4">Bilateral infracondílea (4 pts + 1 riesgo caídas)</option>
-                        <option value="5">Supracondílea unilateral (5 pts + 1 riesgo caídas)</option>
-                        <option value="6">Supracondílea bilateral (6 pts + 1 riesgo caídas)</option>
-                    </select>
-                </div>
-                
-                <div class="item-row">
-                    <div class="item-label">3. Función de Brazos</div>
-                    <select id="brazos" class="form-control" style="width: 300px;" onchange="calcularIRAT()">
-                        <option value="0">Ambos brazos normales o fuerza ≥3 (0 pts)</option>
-                        <option value="1">Problemas en un brazo/fuerza <3 (1 pts)</option>
-                        <option value="2">Problemas en ambos brazos (2 pts)</option>
-                    </select>
-                </div>
-                
-                <div class="item-row">
-                    <div class="item-label">4. Situación Social</div>
-                    <select id="social" class="form-control" style="width: 300px;" onchange="calcularIRAT()">
-                        <option value="0">Cuidador profesional (0 pts)</option>
-                        <option value="1">Cuidador informal (1 pts)</option>
-                        <option value="2">Vive solo o sin cuidador (2 pts)</option>
-                        <option value="3">Es cuidador de persona frágil (3 pts)</option>
-                    </select>
-                </div>
-                
-                <div class="item-row">
-                    <div class="item-label">5. Nivel de Cooperación</div>
-                    <select id="cooperacion" class="form-control" style="width: 300px;" onchange="calcularIRAT()">
-                        <option value="0">Excelente - Sigue todas las instrucciones (0 pts)</option>
-                        <option value="1">Buena - Sigue mayoría de instrucciones (1 pts)</option>
-                        <option value="2">Moderada - Requiere motivación constante (2 pts)</option>
-                        <option value="3">Mala - Se resiste o rechaza instrucciones (3 pts)</option>
-                    </select>
-                </div>
-                
-                <div class="item-row" style="background: linear-gradient(135deg, rgba(30,60,114,0.1), rgba(42,82,152,0.1));">
-                    <div class="item-label" style="font-weight: 700; color: var(--primary-color);">
-                        PUNTAJE TOTAL IRAT-5
+            <!-- IRAT-5 MODIFICADO -->
+            <div class="evaluation-card irat">
+                <div class="evaluation-card-header">
+                    <div class="card-icon irat">
+                        <i class="fas fa-walking"></i>
                     </div>
-                    <div class="item-score" id="puntaje-irat" style="font-size: 1.3rem; color: var(--primary-color);">0</div>
-                </div>
-            </div>
-
-            <!-- TINETTI -->
-            <div class="evaluation-group" id="tinetti-section">
-                <h3><i class="fas fa-walking"></i> Test de Tinetti (Marcha y Equilibrio)</h3>
-                <p style="color: #666; margin-bottom: 20px; font-style: italic;">
-                    Indique el puntaje para cada componente (0, 1 o 2). Máximo 28 puntos.
-                </p>
-
-                <h4 style="color: var(--secondary-color); margin: 20px 0 15px 0;">I. Equilibrio (Máx. 16)</h4>
-                <!-- Solo mostré las primeras 3 preguntas por brevedad, incluye todas -->
-                <div class="tinetti-row">
-                    <div class="item-label">1. Equilibrio sentado</div>
-                    <div class="tinetti-score-options">
-                        <input type="radio" name="e1" value="0" id="e1_0" checked onclick="calcularTinetti(true)">
-                        <label for="e1_0"><span>0</span></label>
-                        <input type="radio" name="e1" value="1" id="e1_1" onclick="calcularTinetti(true)">
-                        <label for="e1_1"><span>1</span></label>
+                    <div>
+                        <h3 class="card-title">IRAT-5 Modificado</h3>
+                        <p class="card-subtitle">Evaluación de riesgo de amputación y caídas (Puntaje máximo: 18)</p>
                     </div>
                 </div>
                 
-                <div class="tinetti-row">
-                    <div class="item-label">2. Levantarse</div>
-                    <div class="tinetti-score-options">
-                        <input type="radio" name="e2" value="0" id="e2_0" onclick="calcularTinetti(true)">
-                        <label for="e2_0"><span>0</span></label>
-                        <input type="radio" name="e2" value="1" id="e2_1" onclick="calcularTinetti(true)">
-                        <label for="e2_1"><span>1</span></label>
-                        <input type="radio" name="e2" value="2" id="e2_2" onclick="calcularTinetti(true)">
-                        <label for="e2_2"><span>2</span></label>
-                    </div>
-                </div>
-
-                <h4 style="color: var(--secondary-color); margin: 25px 0 15px 0;">II. Marcha (Máx. 12)</h4>
-                <!-- Solo mostré las primeras 2 preguntas por brevedad -->
-                <div class="tinetti-row">
-                    <div class="item-label">10. Inicio de la marcha</div>
-                    <div class="tinetti-score-options">
-                        <input type="radio" name="m1" value="0" id="m1_0" checked onclick="calcularTinetti(true)">
-                        <label for="m1_0"><span>0</span></label>
-                        <input type="radio" name="m1" value="1" id="m1_1" onclick="calcularTinetti(true)">
-                        <label for="m1_1"><span>1</span></label>
-                    </div>
-                </div>
-
-                <div class="item-row" style="background: linear-gradient(135deg, rgba(30,60,114,0.1), rgba(42,82,152,0.1)); margin-top: 20px;">
-                    <div class="item-label" style="font-weight: 700; color: var(--primary-color);">
-                        PUNTAJE TOTAL TINETTI (Máx 28)
-                    </div>
-                    <div class="item-score" id="puntaje-tinetti" style="font-size: 1.3rem; color: var(--primary-color);">0</div>
-                </div>
-            </div>
-
-            <!-- NORTON -->
-            <div class="evaluation-group" id="norton-section">
-                <h3><i class="fas fa-bed"></i> Escala Norton (Riesgo de Úlcera por Presión)</h3>
-                
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Condición física</label>
-                        <select id="norton-fisica" class="form-control" onchange="calcularNorton()">
-                            <option value="4">4. Buena</option>
-                            <option value="3">3. Regular</option>
-                            <option value="2">2. Pobre</option>
-                            <option value="1">1. Muy Pobre</option>
+                <!-- Pregunta 1: Equilibrio Unipodal -->
+                <div class="question-row">
+                    <div class="question-label">1. Equilibrio Unipodal (máximo tiempo sostenido)<span class="required">*</span></div>
+                    <div class="select-wrapper question-input">
+                        <select id="equilibrio" class="form-control select" onchange="calcularIRAT()" required>
+                            <option value="">Seleccione una opción</option>
+                            <option value="0">≥ 30 segundos (0 puntos)</option>
+                            <option value="1">15-29 segundos (1 punto)</option>
+                            <option value="2">5-14 segundos (2 puntos)</option>
+                            <option value="3">< 5 segundos (3 puntos)</option>
+                            <option value="4">No puede mantenerse (4 puntos)</option>
                         </select>
+                    </div>
+                </div>
+                
+                <!-- Pregunta 2: Tipo de Amputación -->
+                <div class="question-row">
+                    <div class="question-label">2. Tipo de Amputación<span class="required">*</span></div>
+                    <div class="select-wrapper question-input">
+                        <select id="amputacion" class="form-control select" onchange="calcularIRAT()" required>
+                            <option value="">Seleccione una opción</option>
+                            <option value="0">Sin amputaciones (0 puntos)</option>
+                            <option value="1">Amputación transmetatarsiana (1 punto)</option>
+                            <option value="3">Unilateral infracondílea (3 puntos + riesgo caídas)</option>
+                            <option value="4">Bilateral infracondílea (4 puntos + riesgo caídas)</option>
+                            <option value="5">Supracondílea unilateral (5 puntos + riesgo caídas)</option>
+                            <option value="6">Supracondílea bilateral (6 puntos + riesgo caídas)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Pregunta 3: Función de Brazos -->
+                <div class="question-row">
+                    <div class="question-label">3. Función de Brazos<span class="required">*</span></div>
+                    <div class="select-wrapper question-input">
+                        <select id="brazos" class="form-control select" onchange="calcularIRAT()" required>
+                            <option value="">Seleccione una opción</option>
+                            <option value="0">Ambos brazos normales o fuerza ≥3 (0 puntos)</option>
+                            <option value="1">Problemas en un brazo/fuerza <3 (1 punto)</option>
+                            <option value="2">Problemas en ambos brazos (2 puntos)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Pregunta 4: Situación Social -->
+                <div class="question-row">
+                    <div class="question-label">4. Situación Social<span class="required">*</span></div>
+                    <div class="select-wrapper question-input">
+                        <select id="social" class="form-control select" onchange="calcularIRAT()" required>
+                            <option value="">Seleccione una opción</option>
+                            <option value="0">Cuidador profesional (0 puntos)</option>
+                            <option value="1">Cuidador informal (1 punto)</option>
+                            <option value="2">Vive solo o sin cuidador (2 puntos)</option>
+                            <option value="3">Es cuidador de persona frágil (3 puntos)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Pregunta 5: Nivel de Cooperación -->
+                <div class="question-row">
+                    <div class="question-label">5. Nivel de Cooperación<span class="required">*</span></div>
+                    <div class="select-wrapper question-input">
+                        <select id="cooperacion" class="form-control select" onchange="calcularIRAT()" required>
+                            <option value="">Seleccione una opción</option>
+                            <option value="0">Excelente - Sigue todas las instrucciones (0 puntos)</option>
+                            <option value="1">Buena - Sigue mayoría de instrucciones (1 punto)</option>
+                            <option value="2">Moderada - Requiere motivación constante (2 puntos)</option>
+                            <option value="3">Mala - Se resiste o rechaza instrucciones (3 puntos)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Puntaje IRAT-5 -->
+                <div class="score-display">
+                    <div class="score-label">Puntaje Total IRAT-5</div>
+                    <div class="score-value" id="puntaje-irat">0</div>
+                    <div class="score-description">0-6: Bajo riesgo | 7-9: Riesgo moderado | 10-12: Alto riesgo | ≥13: Muy alto riesgo</div>
+                </div>
+            </div>
+
+            <!-- TEST DE TINETTI COMPLETO -->
+            <div class="evaluation-card tinetti">
+                <div class="evaluation-card-header">
+                    <div class="card-icon tinetti">
+                        <i class="fas fa-person-walking"></i>
+                    </div>
+                    <div>
+                        <h3 class="card-title">Test de Tinetti Completo</h3>
+                        <p class="card-subtitle">Evaluación de marcha y equilibrio (Puntaje máximo: 28 puntos)</p>
+                    </div>
+                </div>
+                
+                <div class="tinetti-grid">
+                    <!-- Equilibrio -->
+                    <div class="tinetti-category">
+                        <h4><i class="fas fa-balance-scale"></i> I. EQUILIBRIO (Máx. 16 pts)</h4>
+                        
+                        <div class="question-row">
+                            <div class="question-label">1. Sentado sin apoyo</div>
+                            <div class="select-wrapper question-input">
+                                <select class="form-control select tinetti-option" data-category="balance" data-question="1" onchange="calcularTinetti()">
+                                    <option value="1">1 - Estable, seguro</option>
+                                    <option value="0">0 - Se cae o se desliza</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="question-row">
+                            <div class="question-label">2. Levantarse</div>
+                            <div class="select-wrapper question-input">
+                                <select class="form-control select tinetti-option" data-category="balance" data-question="2" onchange="calcularTinetti()">
+                                    <option value="2">2 - Capaz sin usar brazos</option>
+                                    <option value="1">1 - Capaz, usa brazos para ayudarse</option>
+                                    <option value="0">0 - Incapaz sin ayuda</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="question-row">
+                            <div class="question-label">3. Intentos de levantarse</div>
+                            <div class="select-wrapper question-input">
+                                <select class="form-control select tinetti-option" data-category="balance" data-question="3" onchange="calcularTinetti()">
+                                    <option value="2">2 - Capaz, se levanta con un intento</option>
+                                    <option value="1">1 - Capaz, requiere más de un intento</option>
+                                    <option value="0">0 - Incapaz sin ayuda</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="question-row">
+                            <div class="question-label">4. Equilibrio inmediato al levantarse</div>
+                            <div class="select-wrapper question-input">
+                                <select class="form-control select tinetti-option" data-category="balance" data-question="4" onchange="calcularTinetti()">
+                                    <option value="2">2 - Estable sin apoyo</option>
+                                    <option value="1">1 - Estable pero usa bastón/andador</option>
+                                    <option value="0">0 - Inestable (se tambalea, mueve pies)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="question-row">
+                            <div class="question-label">5. Equilibrio de pie</div>
+                            <div class="select-wrapper question-input">
+                                <select class="form-control select tinetti-option" data-category="balance" data-question="5" onchange="calcularTinetti()">
+                                    <option value="2">2 - Estable sin apoyo estrecho</option>
+                                    <option value="1">1 - Estable con apoyo amplio o usa bastón/andador</option>
+                                    <option value="0">0 - Inestable</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="question-row">
+                            <div class="question-label">6. Equilibrio con ojos cerrados</div>
+                            <div class="select-wrapper question-input">
+                                <select class="form-control select tinetti-option" data-category="balance" data-question="6" onchange="calcularTinetti()">
+                                    <option value="1">1 - Estable</option>
+                                    <option value="0">0 - Inestable</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="question-row">
+                            <div class="question-label">7. Girar 360 grados</div>
+                            <div class="select-wrapper question-input">
+                                <select class="form-control select tinetti-option" data-category="balance" data-question="7" onchange="calcularTinetti()">
+                                    <option value="2">2 - Continuo y estable</option>
+                                    <option value="1">1 - Pasos continuos</option>
+                                    <option value="0">0 - Pasos discontinuos</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="question-row">
+                            <div class="question-label">8. Sentarse</div>
+                            <div class="select-wrapper question-input">
+                                <select class="form-control select tinetti-option" data-category="balance" data-question="8" onchange="calcularTinetti()">
+                                    <option value="2">2 - Seguro, movimientos suaves</option>
+                                    <option value="1">1 - Usa brazos o no es suave</option>
+                                    <option value="0">0 - Inseguro (mal alineamiento, distancia)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Marcha -->
+                    <div class="tinetti-category">
+                        <h4><i class="fas fa-shoe-prints"></i> II. MARCHA (Máx. 12 pts)</h4>
+                        
+                        <div class="question-row">
+                            <div class="question-label">9. Inicio de la marcha</div>
+                            <div class="select-wrapper question-input">
+                                <select class="form-control select tinetti-option" data-category="gait" data-question="9" onchange="calcularTinetti()">
+                                    <option value="1">1 - Sin vacilación</option>
+                                    <option value="0">0 - Cualquier vacilación o múltiples intentos</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="question-row">
+                            <div class="question-label">10. Longitud y altura del paso (pie derecho)</div>
+                            <div class="select-wrapper question-input">
+                                <select class="form-control select tinetti-option" data-category="gait" data-question="10" onchange="calcularTinetti()">
+                                    <option value="1">1 - Pasa al derecho</option>
+                                    <option value="0">0 - Pie izquierdo no pasa al derecho</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="question-row">
+                            <div class="question-label">11. Longitud y altura del paso (pie izquierdo)</div>
+                            <div class="select-wrapper question-input">
+                                <select class="form-control select tinetti-option" data-category="gait" data-question="11" onchange="calcularTinetti()">
+                                    <option value="1">1 - Pasa al izquierdo</option>
+                                    <option value="0">0 - Pie derecho no pasa al izquierdo</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="question-row">
+                            <div class="question-label">12. Simetría del paso</div>
+                            <div class="select-wrapper question-input">
+                                <select class="form-control select tinetti-option" data-category="gait" data-question="12" onchange="calcularTinetti()">
+                                    <option value="1">1 - Simétrico</option>
+                                    <option value="0">0 - Asimétrico</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="question-row">
+                            <div class="question-label">13. Continuidad del paso</div>
+                            <div class="select-wrapper question-input">
+                                <select class="form-control select tinetti-option" data-category="gait" data-question="13" onchange="calcularTinetti()">
+                                    <option value="1">1 - Continuo</option>
+                                    <option value="0">0 - Interrumpido o discontinuo</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="question-row">
+                            <div class="question-label">14. Desviación de la marcha</div>
+                            <div class="select-wrapper question-input">
+                                <select class="form-control select tinetti-option" data-category="gait" data-question="14" onchange="calcularTinetti()">
+                                    <option value="2">2 - Sin desviación</option>
+                                    <option value="1">1 - Se desvía levemente/usa dispositivo</option>
+                                    <option value="0">0 - Se desvía marcadamente</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="question-row">
+                            <div class="question-label">15. Tronco</div>
+                            <div class="select-wrapper question-input">
+                                <select class="form-control select tinetti-option" data-category="gait" data-question="15" onchange="calcularTinetti()">
+                                    <option value="2">2 - Sin oscilación, sin flexión</option>
+                                    <option value="1">1 - Sin oscilación pero flexión rodillas/espalda</option>
+                                    <option value="0">0 - Marcada oscilación o usa dispositivo</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="question-row">
+                            <div class="question-label">16. Base de sustentación</div>
+                            <div class="select-wrapper question-input">
+                                <select class="form-control select tinetti-option" data-category="gait" data-question="16" onchange="calcularTinetti()">
+                                    <option value="1">1 - Talones casi juntos al caminar</option>
+                                    <option value="0">0 - Talones separados al caminar</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Puntaje Tinetti -->
+                <div class="score-display" style="background: var(--gradient-warning);">
+                    <div class="score-label">Puntaje Total Tinetti</div>
+                    <div class="score-value" id="puntaje-tinetti">0</div>
+                    <div class="score-description">Interpretación: ≥25 (Bajo riesgo) | 19-24 (Riesgo moderado) | ≤18 (Alto riesgo)</div>
+                </div>
+            </div>
+
+            <!-- ESCALA NORTON -->
+            <div class="evaluation-card norton">
+                <div class="evaluation-card-header">
+                    <div class="card-icon norton">
+                        <i class="fas fa-bed"></i>
+                    </div>
+                    <div>
+                        <h3 class="card-title">Escala Norton Modificada</h3>
+                        <p class="card-subtitle">Evaluación de riesgo de úlceras por presión (Puntaje máximo: 20 puntos)</p>
+                    </div>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Estado Físico General</label>
+                        <div class="select-wrapper">
+                            <select id="norton-fisica" class="form-control select" onchange="calcularNorton()">
+                                <option value="4">4 - Bueno (4 puntos)</option>
+                                <option value="3">3 - Regular (3 puntos)</option>
+                                <option value="2">2 - Malo (2 puntos)</option>
+                                <option value="1">1 - Muy malo (1 punto)</option>
+                            </select>
+                        </div>
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Estado mental</label>
-                        <select id="norton-mental" class="form-control" onchange="calcularNorton()">
-                            <option value="4">4. Alerta</option>
-                            <option value="3">3. Apático</option>
-                            <option value="2">2. Confuso</option>
-                            <option value="1">1. Estuporoso/Coma</option>
-                        </select>
+                        <label class="form-label">Estado Mental</label>
+                        <div class="select-wrapper">
+                            <select id="norton-mental" class="form-control select" onchange="calcularNorton()">
+                                <option value="4">4 - Alerta y orientado (4 puntos)</option>
+                                <option value="3">3 - Apatía o confusión leve (3 puntos)</option>
+                                <option value="2">2 - Confuso o desorientado (2 puntos)</option>
+                                <option value="1">1 - Estuporoso o comatoso (1 punto)</option>
+                            </select>
+                        </div>
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Actividad</label>
-                        <select id="norton-actividad" class="form-control" onchange="calcularNorton()">
-                            <option value="4">4. Ambulante</option>
-                            <option value="3">3. Camina con ayuda</option>
-                            <option value="2">2. En silla</option>
-                            <option value="1">1. En cama</option>
-                        </select>
+                        <div class="select-wrapper">
+                            <select id="norton-actividad" class="form-control select" onchange="calcularNorton()">
+                                <option value="4">4 - Deambula solo (4 puntos)</option>
+                                <option value="3">3 - Deambula con ayuda (3 puntos)</option>
+                                <option value="2">2 - Sentado en silla (2 puntos)</option>
+                                <option value="1">1 - Encamado (1 punto)</option>
+                            </select>
+                        </div>
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Movilidad</label>
-                        <select id="norton-movilidad" class="form-control" onchange="calcularNorton()">
-                            <option value="4">4. Completa</option>
-                            <option value="3">3. Disminuida</option>
-                            <option value="2">2. Muy Limitada</option>
-                            <option value="1">1. Inmóvil</option>
-                        </select>
+                        <div class="select-wrapper">
+                            <select id="norton-movilidad" class="form-control select" onchange="calcularNorton()">
+                                <option value="4">4 - Completa e independiente (4 puntos)</option>
+                                <option value="3">3 - Ligeramente limitada (3 puntos)</option>
+                                <option value="2">2 - Muy limitada (2 puntos)</option>
+                                <option value="1">1 - Inmóvil (1 punto)</option>
+                            </select>
+                        </div>
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Incontinencia</label>
-                        <select id="norton-incontinencia" class="form-control" onchange="calcularNorton()">
-                            <option value="4">4. No</option>
-                            <option value="3">3. Ocasional</option>
-                            <option value="2">2. Urinaria</option>
-                            <option value="1">1. Fecal y Urinaria</option>
-                        </select>
+                        <div class="select-wrapper">
+                            <select id="norton-incontinencia" class="form-control select" onchange="calcularNorton()">
+                                <option value="4">4 - Ninguna (4 puntos)</option>
+                                <option value="3">3 - Ocasional (3 puntos)</option>
+                                <option value="2">2 - Urinaria (2 puntos)</option>
+                                <option value="1">1 - Urinaria y fecal (1 punto)</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="item-row" style="background: linear-gradient(135deg, rgba(30,60,114,0.1), rgba(42,82,152,0.1));">
-                    <div class="item-label" style="font-weight: 700; color: var(--primary-color);">
-                        PUNTAJE TOTAL NORTON (Máx 20)
-                    </div>
-                    <div class="item-score" id="puntaje-norton" style="font-size: 1.3rem; color: var(--primary-color);">20</div>
+                <!-- Puntaje Norton -->
+                <div class="score-display" style="background: var(--gradient-success);">
+                    <div class="score-label">Puntaje Total Norton</div>
+                    <div class="score-value" id="puntaje-norton">20</div>
+                    <div class="score-description">Interpretación: 20-16 (Bajo riesgo) | 15-12 (Riesgo) | ≤11 (Alto riesgo)</div>
                 </div>
             </div>
 
             <!-- BOTONES DE ACCIÓN -->
-            <div style="text-align: center; margin: 40px 0;">
-                <button class="btn btn-success pulse" onclick="generarResultados()" style="padding: 16px 40px; font-size: 1.1rem;">
-                    <i class="fas fa-calculator"></i> Generar Resultados Integrales
+            <div class="action-bar">
+                <button class="btn btn-success btn-lg" onclick="generarResultados()">
+                    <i class="fas fa-calculator"></i> Calcular Resultados Integrales
                 </button>
-                <button class="btn btn-secondary" onclick="resetForm()" style="margin-left: 15px;">
-                    <i class="fas fa-undo"></i> Limpiar Formulario
+                <button class="btn btn-secondary btn-lg" onclick="resetForm()">
+                    <i class="fas fa-eraser"></i> Limpiar Formulario
                 </button>
             </div>
 
             <!-- SECCIÓN DE RESULTADOS -->
             <div class="results-section" id="results-section" style="display: none;">
-                <h2 style="color: var(--primary-color); text-align: center; margin-bottom: 30px;">
-                    <i class="fas fa-chart-line"></i> Análisis Clínico y Recomendaciones
-                </h2>
+                <div class="results-header">
+                    <div>
+                        <h2 class="section-title">
+                            <i class="fas fa-chart-line"></i> Resultados Clínicos Integrales
+                        </h2>
+                        <p class="section-subtitle">Análisis combinado y recomendaciones personalizadas basadas en las tres escalas</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="generatePDF()">
+                        <i class="fas fa-file-pdf"></i> Exportar PDF
+                    </button>
+                </div>
                 
+                <!-- RESUMEN DE PUNTAJES -->
                 <div class="results-summary">
-                    <div class="result-box" style="border-top-color: #4CAF50;">
-                        <strong>Paciente</strong>
-                        <span id="res-nombre" style="font-size: 1.2rem; font-weight: 600;">N/A</span>
+                    <div class="summary-card irat">
+                        <div class="summary-title">IRAT-5 Modificado</div>
+                        <div class="summary-value" id="res-irat-total">0</div>
+                        <div class="summary-risk" id="res-irat-riesgo">Riesgo</div>
                     </div>
                     
-                    <div class="result-box" style="border-top-color: #2196F3;">
-                        <strong>Fecha</strong>
-                        <span id="res-fecha" style="font-size: 1.1rem; font-weight: 500;">N/A</span>
+                    <div class="summary-card tinetti">
+                        <div class="summary-title">Test de Tinetti</div>
+                        <div class="summary-value" id="res-tinetti-total">0/28</div>
+                        <div class="summary-risk" id="res-tinetti-riesgo">Riesgo</div>
                     </div>
                     
-                    <div class="result-box" style="border-top-color: var(--primary-color);">
-                        <strong>IRAT-5</strong>
-                        <span id="res-irat-total" class="resultado-valor">0</span>
-                        <span id="res-irat-riesgo" class="risk-success">Riesgo Bajo</span>
+                    <div class="summary-card norton">
+                        <div class="summary-title">Escala Norton</div>
+                        <div class="summary-value" id="res-norton-total">20/20</div>
+                        <div class="summary-risk" id="res-norton-riesgo">Riesgo</div>
                     </div>
                     
-                    <div class="result-box" style="border-top-color: #FF9800;">
-                        <strong>Tinetti</strong>
-                        <span id="res-tinetti-total" class="resultado-valor">0 / 28</span>
-                        <span>Marcha y Equilibrio</span>
-                    </div>
-                    
-                    <div class="result-box" style="border-top-color: #9C27B0;">
-                        <strong>Norton</strong>
-                        <span id="res-norton-total" class="resultado-valor">20 / 20</span>
-                        <span id="res-norton-riesgo" class="risk-success">Riesgo Bajo</span>
-                    </div>
-                    
-                    <div class="result-box" style="border-top-color: var(--danger-color); background: linear-gradient(135deg, #fff9f9, #ffeaea);">
-                        <strong>CLASIFICACIÓN GLOBAL</strong>
-                        <span id="res-global-riesgo" class="resultado-valor risk-success" style="font-size: 1.8rem;">BAJO</span>
-                        <span style="color: #666; font-size: 0.9rem;">Recomendaciones personalizadas</span>
+                    <div class="summary-card global">
+                        <div class="summary-title">Clasificación Global</div>
+                        <div class="summary-value" id="res-global-riesgo">BAJO</div>
+                        <div class="summary-risk" id="res-global-desc">Evaluación</div>
                     </div>
                 </div>
                 
-                <h3 style="color: var(--primary-color); margin: 30px 0 20px 0;">
-                    <i class="fas fa-clipboard-list"></i> Recomendaciones Interdisciplinarias
-                </h3>
-                
-                <div id="recomendaciones-irat">
+                <!-- RECOMENDACIONES -->
+                <div class="recommendations-grid" id="recomendaciones-container">
                     <!-- Las recomendaciones se generan dinámicamente aquí -->
                 </div>
                 
-                <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee;">
+                <!-- BOTONES DE ACCIÓN FINALES -->
+                <div style="text-align: center; margin-top: 40px;">
                     <button class="btn btn-success" onclick="saveReport()">
-                        <i class="fas fa-save"></i> Guardar Evaluación
+                        <i class="fas fa-cloud-upload-alt"></i> Guardar en la Nube
                     </button>
-                    <button class="btn btn-primary" onclick="generatePDF()" style="margin-left: 15px;">
-                        <i class="fas fa-file-pdf"></i> Generar PDF Profesional
+                    <button class="btn btn-primary" onclick="shareResults()" style="margin-left: 15px;">
+                        <i class="fas fa-share-alt"></i> Compartir Resultados
                     </button>
-                    <button class="btn btn-secondary" onclick="shareResults()" style="margin-left: 15px;">
-                        <i class="fas fa-share-alt"></i> Compartir
+                    <button class="btn btn-secondary" onclick="newEvaluation()" style="margin-left: 15px;">
+                        <i class="fas fa-plus-circle"></i> Nueva Evaluación
                     </button>
                 </div>
             </div>
 
             <!-- HISTORIAL -->
-            <div class="evaluation-group" style="margin-top: 40px;">
-                <h3><i class="fas fa-history"></i> Historial de Evaluaciones</h3>
+            <div class="history-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-history"></i> Historial de Evaluaciones
+                    </h2>
+                    <p class="section-subtitle">Acceda a evaluaciones anteriores y realice seguimiento de pacientes</p>
+                </div>
                 
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div style="text-align: right; margin-bottom: 20px;">
                     <button class="btn btn-primary" onclick="loadHistorial(true)">
-                        <i class="fas fa-sync-alt"></i> Actualizar Historial
+                        <i class="fas fa-sync-alt"></i> Actualizar
                     </button>
-                    
-                    <button class="btn btn-danger" id="limpiar-historial-btn" style="display: none;">
-                        <i class="fas fa-eraser"></i> Limpiar Historial (Admin)
+                    <button class="btn btn-danger" id="limpiar-historial-btn" style="display: none; margin-left: 10px;">
+                        <i class="fas fa-trash-alt"></i> Limpiar Historial
                     </button>
                 </div>
                 
-                <ul id="historial-list">
-                    <li id="loading-history-msg">Cargando historial...</li>
+                <ul class="history-list" id="historial-list">
+                    <li>Cargando historial...</li>
                 </ul>
             </div>
         </section>
-        
-        <!-- NOTIFICACIÓN FLOTANTE -->
-        <div id="notification-bar" class="notification-bar"></div>
     </div>
 
     <!-- SCRIPTS -->
@@ -974,83 +1494,88 @@ Evaluador Clínico Integrado - Versión Alfa
                 app = firebase.initializeApp(firebaseConfig);
                 auth = firebase.auth();
                 db = firebase.firestore();
-                console.log("Firebase inicializado correctamente.");
+                console.log("✅ Firebase inicializado correctamente");
                 setupAuthStateListener();
+                // Configurar fecha actual
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('fecha').value = today;
             } catch (e) {
-                console.error("Error al inicializar Firebase:", e);
-                showNotification(`Error de conexión con Firebase`, 'error', 10000);
+                console.error("❌ Error al inicializar Firebase:", e);
+                showNotification('Error de conexión con el servidor', 'error', 5000);
             }
         }
         
-        window.onload = function() {
-            initFirebase();
-            // Configurar fecha actual
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('fecha').value = today;
-        };
+        window.onload = initFirebase;
         
         // ============================================
-        // AUTENTICACIÓN
+        // SISTEMA DE AUTENTICACIÓN
         // ============================================
         function toggleAuthModeFunc() {
+            const authTitle = document.getElementById('auth-title');
+            const authSubtitle = document.getElementById('auth-subtitle');
+            const authButtonText = document.getElementById('auth-button-text');
+            const toggleAuthText = document.getElementById('toggle-auth-text');
+            
             if (authMode === 'login') {
                 authMode = 'register';
-                document.getElementById('auth-title').innerHTML = '<i class="fas fa-user-plus"></i> Registrar Nuevo Usuario';
-                document.getElementById('auth-button').innerHTML = '<i class="fas fa-user-plus"></i> Registrar';
-                document.getElementById('toggle-auth-mode').innerHTML = '<i class="fas fa-sign-in-alt"></i> Volver a Iniciar Sesión';
+                authTitle.textContent = 'Crear Nueva Cuenta';
+                authSubtitle.textContent = 'Registre una nueva cuenta profesional';
+                authButtonText.textContent = 'Registrarse';
+                toggleAuthText.textContent = 'Ya tengo una cuenta';
             } else {
                 authMode = 'login';
-                document.getElementById('auth-title').innerHTML = '<i class="fas fa-lock"></i> Iniciar Sesión';
-                document.getElementById('auth-button').innerHTML = '<i class="fas fa-sign-in-alt"></i> Iniciar Sesión';
-                document.getElementById('toggle-auth-mode').innerHTML = '<i class="fas fa-user-plus"></i> Regístrate aquí';
+                authTitle.textContent = 'Acceso Profesional';
+                authSubtitle.textContent = 'Ingrese sus credenciales para acceder al sistema';
+                authButtonText.textContent = 'Iniciar Sesión';
+                toggleAuthText.textContent = 'Crear nueva cuenta';
             }
         }
         
         async function handleAuth() {
-            const email = document.getElementById('auth-email').value;
+            const email = document.getElementById('auth-email').value.trim();
             const password = document.getElementById('auth-password').value;
-        
+            
             if (!email || !password) {
-                showNotification('Ingrese correo y contraseña.', 'warning');
+                showNotification('Ingrese correo y contraseña', 'warning');
                 return;
             }
-        
+            
+            const button = document.getElementById('auth-button');
+            const originalContent = button.innerHTML;
+            button.innerHTML = '<div class="loader"></div>';
+            button.disabled = true;
+            
             try {
                 if (authMode === 'register') {
                     await auth.createUserWithEmailAndPassword(email, password);
-                    showNotification('Usuario registrado exitosamente.', 'success');
+                    showNotification('✅ Cuenta creada exitosamente', 'success');
                 } else {
                     await auth.signInWithEmailAndPassword(email, password);
                 }
             } catch (error) {
-                console.error("Error de autenticación:", error);
-                showNotification(`Error: ${error.message}`, 'error');
+                console.error("❌ Error de autenticación:", error);
+                let message = 'Error de autenticación';
+                switch(error.code) {
+                    case 'auth/user-not-found': message = 'Usuario no encontrado'; break;
+                    case 'auth/wrong-password': message = 'Contraseña incorrecta'; break;
+                    case 'auth/email-already-in-use': message = 'El correo ya está registrado'; break;
+                    case 'auth/weak-password': message = 'La contraseña es muy débil'; break;
+                    case 'auth/invalid-email': message = 'Correo electrónico inválido'; break;
+                }
+                showNotification(`❌ ${message}`, 'error');
+                button.innerHTML = originalContent;
+                button.disabled = false;
             }
         }
         
         function logout() {
-            auth.signOut().then(() => {
-                showNotification('Sesión cerrada correctamente.', 'info');
-            }).catch((error) => {
-                console.error("Error al cerrar sesión:", error);
-                showNotification(`Error al cerrar sesión: ${error.message}`, 'error');
-            });
-        }
-        
-        async function checkAdminStatus(uid) {
-            if (!db) return false;
-            try {
-                const doc = await db.collection('roles').doc(uid).get();
-                return doc.exists && doc.data().role === 'admin';
-            } catch (error) {
-                console.error("Error al verificar rol:", error);
-                return false;
-            }
+            auth.signOut();
         }
         
         function setupAuthStateListener() {
             auth.onAuthStateChanged(user => {
                 if (user) {
+                    // Usuario autenticado
                     currentUser = user;
                     currentUserId = user.uid;
                     
@@ -1060,40 +1585,57 @@ Evaluador Clínico Integrado - Versión Alfa
                     document.getElementById('user-display').style.display = 'flex';
                     document.getElementById('current-user-email').textContent = user.email;
                     
-                    // Verificar rol de admin
-                    checkAdminStatus(user.uid).then(isAdmin => {
-                        if (isAdmin) {
-                            document.getElementById('limpiar-historial-btn').style.display = 'inline-flex';
-                            document.getElementById('limpiar-historial-btn').onclick = confirmAndClearHistorial;
-                            showNotification('Acceso de administrador activado', 'warning');
-                        }
-                    });
+                    // Verificar si es administrador
+                    checkAdminStatus(user.uid);
                     
+                    // Cargar historial
                     loadHistorial();
-                    showNotification(`Bienvenido ${user.email}`, 'success');
+                    
+                    showNotification(`👋 Bienvenido/a ${user.email}`, 'success');
                     
                 } else {
+                    // Usuario no autenticado
                     currentUser = null;
                     currentUserId = null;
+                    
+                    // Actualizar UI
                     document.getElementById('auth-section').style.display = 'flex';
                     document.getElementById('main-app').style.display = 'none';
                     document.getElementById('user-display').style.display = 'none';
-                    document.getElementById('limpiar-historial-btn').style.display = 'none';
+                    
+                    // Restaurar modo login
+                    authMode = 'login';
+                    document.getElementById('auth-title').textContent = 'Acceso Profesional';
+                    document.getElementById('auth-button-text').textContent = 'Iniciar Sesión';
+                    document.getElementById('toggle-auth-text').textContent = 'Crear nueva cuenta';
                 }
             });
         }
         
+        async function checkAdminStatus(uid) {
+            try {
+                const doc = await db.collection('adminUsers').doc(uid).get();
+                if (doc.exists) {
+                    document.getElementById('limpiar-historial-btn').style.display = 'inline-flex';
+                }
+            } catch (error) {
+                console.error("Error al verificar admin:", error);
+            }
+        }
+        
         // ============================================
-        // CÁLCULOS DE EVALUACIÓN
+        // CÁLCULO DE PUNTAJES
         // ============================================
         function calcularIRAT() {
-            const items = ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'];
+            const campos = ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'];
             let total = 0;
-            items.forEach(id => {
-                total += parseInt(document.getElementById(id).value) || 0;
+            
+            campos.forEach(id => {
+                const valor = parseInt(document.getElementById(id).value) || 0;
+                total += valor;
             });
             
-            // Agregar punto extra por riesgo de caída en amputaciones mayores
+            // Agregar punto extra por riesgo de caída en amputaciones
             const amputacion = parseInt(document.getElementById('amputacion').value) || 0;
             if (amputacion >= 3) total += 1;
             
@@ -1101,138 +1643,186 @@ Evaluador Clínico Integrado - Versión Alfa
             return total;
         }
         
-        function getIratAmputacionValue() {
-            return parseInt(document.getElementById('amputacion').value) || 0;
-        }
-        
-        function calcularTinetti(updateUI = true) {
+        function calcularTinetti() {
             let total = 0;
-            for (let i = 1; i <= 9; i++) {
-                const radios = document.getElementsByName(`e${i}`);
-                radios.forEach(radio => {
-                    if (radio.checked) total += parseInt(radio.value);
-                });
-            }
-            for (let i = 1; i <= 6; i++) {
-                const radios = document.getElementsByName(`m${i}`);
-                radios.forEach(radio => {
-                    if (radio.checked) total += parseInt(radio.value);
-                });
-            }
-            if (updateUI) document.getElementById('puntaje-tinetti').textContent = total;
+            const selects = document.querySelectorAll('.tinetti-option');
+            
+            selects.forEach(select => {
+                total += parseInt(select.value) || 0;
+            });
+            
+            document.getElementById('puntaje-tinetti').textContent = total;
             return total;
         }
         
         function calcularNorton() {
-            const items = ['norton-fisica', 'norton-mental', 'norton-actividad', 'norton-movilidad', 'norton-incontinencia'];
+            const campos = ['norton-fisica', 'norton-mental', 'norton-actividad', 'norton-movilidad', 'norton-incontinencia'];
             let total = 0;
-            items.forEach(id => {
+            
+            campos.forEach(id => {
                 total += parseInt(document.getElementById(id).value) || 0;
             });
+            
             document.getElementById('puntaje-norton').textContent = total;
             return total;
         }
         
         // ============================================
-        // CLASIFICACIÓN COMBINADA (ACTUALIZADA)
+        // CLASIFICACIÓN Y RECOMENDACIONES
         // ============================================
         function getCombinedClinicalClassification(iratScore, tinettiScore, nortonScore) {
-            const iratAmputacion = getIratAmputacionValue();
             let recomendaciones = [];
             let nivelRiesgoGlobal = 'BAJO';
+            let colorGlobal = 'success';
             
-            // 1. Lógica por Amputación
-            if (iratAmputacion >= 3) {
+            // Evaluar IRAT-5
+            let iratRiesgo = '';
+            if (iratScore <= 6) {
+                iratRiesgo = 'BAJO';
                 recomendaciones.push({
-                    titulo: '🚨 Consideración: Amputación Presente',
-                    texto: 'Requiere evaluación y manejo protésico urgente. Enseñar técnicas de cuidado del muñón para prevenir infecciones.',
-                    color: 'danger',
-                    tipo: 'Amputacion'
+                    titulo: '📊 IRAT-5: Riesgo Bajo',
+                    texto: 'El paciente presenta bajo riesgo de caídas según la evaluación IRAT-5. Mantener actividades preventivas y seguimiento regular.',
+                    tipo: 'info',
+                    color: 'success'
                 });
-                
-                if (iratAmputacion === 4 || iratAmputacion === 6) {
-                    recomendaciones.unshift({
-                        titulo: "♿ Ayuda Técnica Principal: Silla de Ruedas",
-                        texto: "Amputación Bilateral. La ayuda principal de movilidad es la Silla de Ruedas.",
-                        color: 'danger',
-                        tipo: 'Movilidad Principal'
-                    });
-                    nivelRiesgoGlobal = 'CRÍTICO';
-                }
-            }
-            
-            // 2. Clasificación por Movilidad (Tinetti)
-            let ayudaPrincipalAsignada = recomendaciones.some(r => r.tipo === 'Movilidad Principal');
-            if (!ayudaPrincipalAsignada) {
-                if (tinettiScore <= 18) {
-                    recomendaciones.push({ 
-                        titulo: "🚶 Ayuda Técnica Principal: Andador",
-                        texto: "Tinetti Severo (Riesgo de Caída ALTO). Se recomienda Andador Fijo o de 2 ruedas.",
-                        color: 'danger',
-                        tipo: 'Movilidad Principal'
-                    });
-                    if (nivelRiesgoGlobal !== 'CRÍTICO') nivelRiesgoGlobal = 'ALTO';
-                } else if (tinettiScore <= 24) {
-                    recomendaciones.push({ 
-                        titulo: "🦯 Ayuda Técnica Principal: Bastón de 4 Apoyos",
-                        texto: "Tinetti Moderado. Se recomienda Bastón de 4 Apoyos.",
-                        color: 'warning',
-                        tipo: 'Movilidad Principal'
-                    });
-                    if (nivelRiesgoGlobal === 'BAJO') nivelRiesgoGlobal = 'MODERADO';
-                } else {
-                    recomendaciones.push({ 
-                        titulo: "🟢 Ayuda Técnica Principal: Preventiva",
-                        texto: "Tinetti Óptimo. No se requiere ayuda técnica principal.",
-                        color: 'success',
-                        tipo: 'Movilidad Principal'
-                    });
-                }
-            }
-            
-            // 3. Riesgo de Úlcera (Norton)
-            if (nortonScore <= 14) {
-                recomendaciones.push({ 
-                    titulo: '🚨 Riesgo de Úlcera por Presión ALTO', 
-                    texto: 'Protocolo estricto de cambios posturales cada 2-3 horas.', 
-                    color: 'danger', 
-                    tipo: 'Ulcera' 
+            } else if (iratScore <= 9) {
+                iratRiesgo = 'MODERADO';
+                recomendaciones.push({
+                    titulo: '⚠️ IRAT-5: Riesgo Moderado',
+                    texto: 'Se recomienda evaluación por kinesiología para fortalecimiento muscular y equilibrio. Considerar uso de bastón en exteriores.',
+                    tipo: 'warning',
+                    color: 'warning'
                 });
-                if (nivelRiesgoGlobal !== 'CRÍTICO' && nivelRiesgoGlobal !== 'ALTO') {
-                    nivelRiesgoGlobal = 'ALTO';
-                }
-            }
-            
-            // 4. Recomendaciones Interdisciplinarias según nivel de riesgo
-            if (nivelRiesgoGlobal === 'CRÍTICO') {
-                recomendaciones.push(
-                    { titulo: 'KINESIOLOGÍA', texto: 'Inmediata. Transferencias cama-silla, fortalecimiento MMSS.', color: 'danger' },
-                    { titulo: 'TERAPIA OCUPACIONAL', texto: 'Adaptación del hogar para silla de ruedas.', color: 'danger' },
-                    { titulo: 'NUTRICIÓN', texto: 'Urgente. Evaluar ingesta proteica para cicatrización.', color: 'danger' }
-                );
-            } else if (nivelRiesgoGlobal === 'ALTO') {
-                recomendaciones.push(
-                    { titulo: 'KINESIOLOGÍA', texto: 'Intensiva. Reeducación de marcha con andador.', color: 'danger' },
-                    { titulo: 'TERAPIA OCUPACIONAL', texto: 'Barras de apoyo en baño, eliminación de alfombras.', color: 'warning' }
-                );
-            } else if (nivelRiesgoGlobal === 'MODERADO') {
-                recomendaciones.push(
-                    { titulo: 'KINESIOLOGÍA', texto: 'Moderada. Ejercicios en casa (programa Otago).', color: 'warning' },
-                    { titulo: 'CONTROL MÉDICO', texto: 'Revisión de polifarmacia.', color: 'info' }
-                );
+                nivelRiesgoGlobal = 'MODERADO';
+                colorGlobal = 'warning';
+            } else if (iratScore <= 12) {
+                iratRiesgo = 'ALTO';
+                recomendaciones.push({
+                    titulo: '🚨 IRAT-5: Riesgo Alto',
+                    texto: 'Requiere intervención inmediata. Evaluar necesidad de andador, adaptaciones domiciliarias y supervisión.',
+                    tipo: 'danger',
+                    color: 'danger'
+                });
+                nivelRiesgoGlobal = 'ALTO';
+                colorGlobal = 'danger';
             } else {
-                recomendaciones.push(
-                    { titulo: 'KINESIOLOGÍA', texto: 'Preventiva. Actividad física regular.', color: 'success' },
-                    { titulo: 'CONTROL ANUAL', texto: 'Revisión de audición y visión.', color: 'success' }
-                );
+                iratRiesgo = 'MUY ALTO';
+                recomendaciones.push({
+                    titulo: '🔥 IRAT-5: Riesgo Muy Alto',
+                    texto: 'Paciente crítico. Requiere evaluación multidisciplinaria urgente, posible ingreso hospitalario y medidas de contención.',
+                    tipo: 'critical',
+                    color: 'danger'
+                });
+                nivelRiesgoGlobal = 'CRÍTICO';
+                colorGlobal = 'danger';
             }
             
-            return { 
-                nivelRiesgoGlobal: nivelRiesgoGlobal, 
-                colorGlobal: nivelRiesgoGlobal === 'CRÍTICO' ? 'critical' : 
-                            nivelRiesgoGlobal === 'ALTO' ? 'danger' :
-                            nivelRiesgoGlobal === 'MODERADO' ? 'warning' : 'success',
-                recomendaciones: recomendaciones 
+            // Evaluar Tinetti
+            let tinettiRiesgo = '';
+            if (tinettiScore >= 25) {
+                tinettiRiesgo = 'BAJO';
+                recomendaciones.push({
+                    titulo: '✅ Tinetti: Marcha Adecuada',
+                    texto: 'La marcha y equilibrio son adecuados. Mantener actividad física regular y evaluar anualmente.',
+                    tipo: 'success',
+                    color: 'success'
+                });
+            } else if (tinettiScore >= 19) {
+                tinettiRiesgo = 'MODERADO';
+                recomendaciones.push({
+                    titulo: '📈 Tinetti: Riesgo Moderado',
+                    texto: 'Requiere programa de ejercicios de equilibrio y fortalecimiento. Considerar terapia física.',
+                    tipo: 'warning',
+                    color: 'warning'
+                });
+                if (nivelRiesgoGlobal === 'BAJO') {
+                    nivelRiesgoGlobal = 'MODERADO';
+                    colorGlobal = 'warning';
+                }
+            } else {
+                tinettiRiesgo = 'ALTO';
+                recomendaciones.push({
+                    titulo: '❗ Tinetti: Riesgo Alto de Caídas',
+                    texto: 'Alto riesgo de caídas. Necesita dispositivo de apoyo (bastón/andador) y supervisión constante.',
+                    tipo: 'danger',
+                    color: 'danger'
+                });
+                if (nivelRiesgoGlobal !== 'CRÍTICO') {
+                    nivelRiesgoGlobal = 'ALTO';
+                    colorGlobal = 'danger';
+                }
+            }
+            
+            // Evaluar Norton
+            let nortonRiesgo = '';
+            if (nortonScore >= 16) {
+                nortonRiesgo = 'BAJO';
+                recomendaciones.push({
+                    titulo: '🛌 Norton: Bajo Riesgo Úlceras',
+                    texto: 'Riesgo bajo de úlceras por presión. Mantener movilización activa y cuidados básicos de piel.',
+                    tipo: 'success',
+                    color: 'success'
+                });
+            } else if (nortonScore >= 12) {
+                nortonRiesgo = 'MODERADO';
+                recomendaciones.push({
+                    titulo: '🔄 Norton: Riesgo Moderado',
+                    texto: 'Implementar cambios posturales cada 4 horas. Usar superficies de apoyo adecuadas.',
+                    tipo: 'warning',
+                    color: 'warning'
+                });
+            } else {
+                nortonRiesgo = 'ALTO';
+                recomendaciones.push({
+                    titulo: '💊 Norton: Alto Riesgo Úlceras',
+                    texto: 'Protocolo estricto de cambios posturales cada 2 horas. Uso de colchón antiescaras obligatorio.',
+                    tipo: 'danger',
+                    color: 'danger'
+                });
+                if (nivelRiesgoGlobal === 'BAJO' || nivelRiesgoGlobal === 'MODERADO') {
+                    nivelRiesgoGlobal = 'ALTO';
+                    colorGlobal = 'danger';
+                }
+            }
+            
+            // Recomendaciones específicas por combinación
+            if (nivelRiesgoGlobal === 'CRÍTICO') {
+                recomendaciones.push({
+                    titulo: '🏥 Intervención Multidisciplinaria Urgente',
+                    texto: 'Derivar a: Geriatría, Kinesiología, Terapia Ocupacional, Nutrición. Considerar ingreso hospitalario.',
+                    tipo: 'critical',
+                    color: 'danger'
+                });
+            } else if (nivelRiesgoGlobal === 'ALTO') {
+                recomendaciones.push({
+                    titulo: '👥 Evaluación Interdisciplinaria',
+                    texto: 'Coordinar con: Kinesiología, Terapia Ocupacional. Revisar polifarmacia y adaptaciones domiciliarias.',
+                    tipo: 'danger',
+                    color: 'danger'
+                });
+            } else if (nivelRiesgoGlobal === 'MODERADO') {
+                recomendaciones.push({
+                    titulo: '📋 Plan de Seguimiento Estructurado',
+                    texto: 'Control mensual. Programa de ejercicios domiciliarios. Educación a paciente y familiares.',
+                    tipo: 'warning',
+                    color: 'warning'
+                });
+            } else {
+                recomendaciones.push({
+                    titulo: '🌿 Mantenimiento Preventivo',
+                    texto: 'Control semestral. Programa de actividad física regular. Educación en prevención de caídas.',
+                    tipo: 'success',
+                    color: 'success'
+                });
+            }
+            
+            return {
+                iratRiesgo: iratRiesgo,
+                tinettiRiesgo: tinettiRiesgo,
+                nortonRiesgo: nortonRiesgo,
+                nivelRiesgoGlobal: nivelRiesgoGlobal,
+                colorGlobal: colorGlobal,
+                recomendaciones: recomendaciones
             };
         }
         
@@ -1240,149 +1830,161 @@ Evaluador Clínico Integrado - Versión Alfa
         // GENERACIÓN DE RESULTADOS
         // ============================================
         function generarResultados() {
-            // Validar campos requeridos
+            // Validar datos básicos
             if (!document.getElementById('nombre').value || !document.getElementById('fecha').value || !document.getElementById('evaluador').value) {
-                showNotification('Complete los datos del paciente antes de generar resultados.', 'warning');
+                showNotification('Complete los datos del paciente antes de generar resultados', 'warning');
                 return;
             }
             
-            const tinettiScore = calcularTinetti(false);
-            const nortonScore = calcularNorton();
+            // Calcular puntajes
             const iratScore = calcularIRAT();
+            const tinettiScore = calcularTinetti();
+            const nortonScore = calcularNorton();
             
-            // Clasificación combinada
+            // Obtener clasificación
             const clasificacion = getCombinedClinicalClassification(iratScore, tinettiScore, nortonScore);
             
-            // Determinar riesgos individuales
-            let iratRiesgoTexto, iratRiesgoClase;
-            if (iratScore <= 6) {
-                iratRiesgoTexto = 'Riesgo Bajo';
-                iratRiesgoClase = 'risk-success';
-            } else if (iratScore <= 10) {
-                iratRiesgoTexto = 'Riesgo Moderado';
-                iratRiesgoClase = 'risk-warning';
-            } else {
-                iratRiesgoTexto = 'Riesgo Alto';
-                iratRiesgoClase = 'risk-danger';
-            }
-            
-            const nortonRiesgoTexto = nortonScore <= 14 ? 'Riesgo Alto' : 'Riesgo Bajo';
-            const nortonRiesgoClase = nortonScore <= 14 ? 'risk-danger' : 'risk-success';
-            
-            // Actualizar UI
-            document.getElementById('res-nombre').textContent = document.getElementById('nombre').value;
-            document.getElementById('res-fecha').textContent = document.getElementById('fecha').value;
+            // Actualizar UI de resultados
             document.getElementById('res-irat-total').textContent = iratScore;
-            document.getElementById('res-irat-riesgo').textContent = iratRiesgoTexto;
-            document.getElementById('res-irat-riesgo').className = `resultado-valor ${iratRiesgoClase}`;
-            document.getElementById('res-tinetti-total').textContent = `${tinettiScore} / 28`;
-            document.getElementById('res-norton-total').textContent = `${nortonScore} / 20`;
-            document.getElementById('res-norton-riesgo').textContent = nortonRiesgoTexto;
-            document.getElementById('res-norton-riesgo').className = `resultado-valor ${nortonRiesgoClase}`;
+            document.getElementById('res-irat-riesgo').textContent = clasificacion.iratRiesgo;
+            document.getElementById('res-irat-riesgo').className = `summary-risk risk-${clasificacion.iratRiesgo.toLowerCase().replace(' ', '-')}`;
+            
+            document.getElementById('res-tinetti-total').textContent = `${tinettiScore}/28`;
+            document.getElementById('res-tinetti-riesgo').textContent = clasificacion.tinettiRiesgo;
+            document.getElementById('res-tinetti-riesgo').className = `summary-risk risk-${clasificacion.tinettiRiesgo.toLowerCase().replace(' ', '-')}`;
+            
+            document.getElementById('res-norton-total').textContent = `${nortonScore}/20`;
+            document.getElementById('res-norton-riesgo').textContent = clasificacion.nortonRiesgo;
+            document.getElementById('res-norton-riesgo').className = `summary-risk risk-${clasificacion.nortonRiesgo.toLowerCase().replace(' ', '-')}`;
+            
             document.getElementById('res-global-riesgo').textContent = clasificacion.nivelRiesgoGlobal;
-            document.getElementById('res-global-riesgo').className = `resultado-valor risk-${clasificacion.colorGlobal}`;
+            document.getElementById('res-global-desc').textContent = 'Clasificación';
+            document.getElementById('res-global-desc').className = `summary-risk risk-${clasificacion.colorGlobal}`;
             
             // Mostrar recomendaciones
-            const recContainer = document.getElementById('recomendaciones-irat');
-            recContainer.innerHTML = '';
+            const container = document.getElementById('recomendaciones-container');
+            container.innerHTML = '';
             
             clasificacion.recomendaciones.forEach(rec => {
                 const card = document.createElement('div');
-                card.className = 'recommendation-card';
-                let colorCode = '#6c757d';
-                if (rec.color === 'danger') colorCode = '#F44336';
-                if (rec.color === 'warning') colorCode = '#FF9800';
-                if (rec.color === 'success') colorCode = '#4CAF50';
-                
-                card.style.borderLeftColor = colorCode;
-                card.innerHTML = `<strong>${rec.titulo}</strong><p>${rec.texto}</p>`;
-                recContainer.appendChild(card);
+                card.className = `recommendation-card ${rec.color}`;
+                card.innerHTML = `
+                    <div class="recommendation-icon" style="background: var(--${rec.color});">
+                        <i class="fas fa-${rec.tipo === 'critical' ? 'exclamation-triangle' : 
+                                         rec.tipo === 'danger' ? 'exclamation-circle' : 
+                                         rec.tipo === 'warning' ? 'exclamation' : 
+                                         rec.tipo === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                    </div>
+                    <div class="recommendation-content">
+                        <h4>${rec.titulo}</h4>
+                        <p>${rec.texto}</p>
+                    </div>
+                `;
+                container.appendChild(card);
             });
             
-            // Mostrar sección de resultados
-            document.getElementById('results-section').style.display = 'block';
-            
-            // Guardar datos para Firebase/PDF
+            // Guardar datos para PDF/historial
             lastReportData = {
-                nombre: document.getElementById('nombre').value,
-                fecha: document.getElementById('fecha').value,
-                evaluador: document.getElementById('evaluador').value,
-                edad: document.getElementById('edad').value,
-                iratScore: iratScore,
-                iratRiesgo: iratRiesgoTexto,
-                tinettiScore: tinettiScore,
-                nortonScore: nortonScore,
-                nortonRiesgo: nortonRiesgoTexto,
-                clasificacionGlobal: clasificacion.nivelRiesgoGlobal,
+                paciente: {
+                    nombre: document.getElementById('nombre').value,
+                    rut: document.getElementById('rut').value,
+                    fecha: document.getElementById('fecha').value,
+                    edad: document.getElementById('edad').value,
+                    evaluador: document.getElementById('evaluador').value,
+                    institucion: document.getElementById('institucion').value,
+                    fechaEvaluacion: new Date().toISOString()
+                },
+                puntajes: {
+                    irat: iratScore,
+                    tinetti: tinettiScore,
+                    norton: nortonScore,
+                    iratRiesgo: clasificacion.iratRiesgo,
+                    tinettiRiesgo: clasificacion.tinettiRiesgo,
+                    nortonRiesgo: clasificacion.nortonRiesgo,
+                    riesgoGlobal: clasificacion.nivelRiesgoGlobal
+                },
                 recomendaciones: clasificacion.recomendaciones,
                 timestamp: new Date().toISOString()
             };
             
-            showNotification('Resultados generados correctamente.', 'success');
+            // Mostrar sección de resultados
+            document.getElementById('results-section').style.display = 'block';
+            document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
+            
+            showNotification('✅ Resultados generados exitosamente', 'success');
         }
         
         // ============================================
-        // FIRESTORE OPERATIONS
+        // OPERACIONES CON FIRESTORE
         // ============================================
         async function saveReport() {
             if (!currentUser) {
-                showNotification('Debe iniciar sesión para guardar.', 'error');
+                showNotification('Debe iniciar sesión para guardar', 'error');
                 return;
             }
-            if (!lastReportData.nombre) {
-                showNotification('Primero genere los resultados.', 'warning');
+            
+            if (!lastReportData.paciente || !lastReportData.paciente.nombre) {
+                showNotification('Primero genere los resultados', 'warning');
                 return;
             }
             
             try {
-                await db.collection('evaluaciones').add({
-                    userId: currentUserId,
+                const report = {
                     ...lastReportData,
-                    firebaseTimestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                showNotification('Evaluación guardada exitosamente.', 'success');
+                    userId: currentUserId,
+                    userEmail: currentUser.email,
+                    firestoreTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                await db.collection('evaluaciones').add(report);
+                showNotification('✅ Evaluación guardada en la nube', 'success');
                 loadHistorial();
             } catch (error) {
-                console.error("Error al guardar:", error);
-                showNotification(`Error: ${error.message}`, 'error');
+                console.error("❌ Error al guardar:", error);
+                showNotification('Error al guardar la evaluación', 'error');
             }
         }
         
-        async function loadHistorial(forceRefresh = false) {
+        async function loadHistorial(force = false) {
             if (!currentUserId) return;
+            
             const historialList = document.getElementById('historial-list');
-            historialList.innerHTML = '<li id="loading-history-msg">Cargando historial...</li>';
+            historialList.innerHTML = '<li>Cargando historial...</li>';
             
             try {
                 const snapshot = await db.collection('evaluaciones')
                     .where('userId', '==', currentUserId)
-                    .orderBy('firebaseTimestamp', 'desc')
+                    .orderBy('firestoreTimestamp', 'desc')
                     .limit(20)
                     .get();
                 
-                historialList.innerHTML = '';
                 if (snapshot.empty) {
-                    historialList.innerHTML = '<li style="text-align: center; color: #666; padding: 40px;">No hay evaluaciones guardadas.</li>';
+                    historialList.innerHTML = '<li style="text-align: center; color: #666; padding: 30px;">No hay evaluaciones guardadas</li>';
                     return;
                 }
                 
+                historialList.innerHTML = '';
                 snapshot.docs.forEach(doc => {
                     const data = doc.data();
-                    const li = document.createElement('li');
-                    const fecha = data.fecha || 'Sin fecha';
+                    const fecha = new Date(data.paciente.fecha).toLocaleDateString('es-ES');
                     
+                    const li = document.createElement('li');
+                    li.className = 'history-item';
                     li.innerHTML = `
                         <div>
-                            <strong style="color: var(--primary-color);">${data.nombre || 'Sin nombre'}</strong>
-                            <div style="font-size: 0.9rem; color: #666; margin-top: 5px;">
-                                ${fecha} | IRAT: ${data.iratScore || 0} | Tinetti: ${data.tinettiScore || 0}
+                            <strong style="display: block; margin-bottom: 5px;">${data.paciente.nombre}</strong>
+                            <div style="font-size: 0.9em; color: #666;">
+                                <span>${fecha}</span> | 
+                                <span>IRAT: ${data.puntajes.irat}</span> | 
+                                <span>Tinetti: ${data.puntajes.tinetti}</span> | 
+                                <span>Norton: ${data.puntajes.norton}</span>
                             </div>
                         </div>
                         <div>
-                            <button class="btn btn-primary btn-sm" onclick="viewReport('${doc.id}')">
-                                <i class="fas fa-eye"></i> Ver
+                            <button class="btn btn-primary btn-sm" onclick="viewHistoryItem('${doc.id}')">
+                                <i class="fas fa-eye"></i>
                             </button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteReport('${doc.id}')" style="margin-left: 5px;">
+                            <button class="btn btn-danger btn-sm" onclick="deleteHistoryItem('${doc.id}')" style="margin-left: 5px;">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -1390,139 +1992,122 @@ Evaluador Clínico Integrado - Versión Alfa
                     historialList.appendChild(li);
                 });
             } catch (error) {
-                console.error("Error al cargar historial:", error);
-                historialList.innerHTML = `<li>Error al cargar: ${error.message}</li>`;
+                console.error("❌ Error cargando historial:", error);
+                historialList.innerHTML = '<li>Error al cargar el historial</li>';
             }
         }
         
-        async function viewReport(docId) {
+        async function viewHistoryItem(docId) {
             try {
                 const doc = await db.collection('evaluaciones').doc(docId).get();
                 if (!doc.exists) {
-                    showNotification('Reporte no encontrado.', 'error');
+                    showNotification('Evaluación no encontrada', 'error');
                     return;
                 }
+                
                 const data = doc.data();
+                lastReportData = data;
                 
-                // Cargar datos en el formulario
-                document.getElementById('nombre').value = data.nombre || '';
-                document.getElementById('fecha').value = data.fecha || '';
-                document.getElementById('evaluador').value = data.evaluador || '';
-                document.getElementById('edad').value = data.edad || '';
+                // Cargar datos en formulario
+                document.getElementById('nombre').value = data.paciente.nombre || '';
+                document.getElementById('rut').value = data.paciente.rut || '';
+                document.getElementById('fecha').value = data.paciente.fecha || '';
+                document.getElementById('edad').value = data.paciente.edad || '';
+                document.getElementById('evaluador').value = data.paciente.evaluador || '';
+                document.getElementById('institucion').value = data.paciente.institucion || '';
                 
-                // Recalcular resultados
+                // Generar resultados para mostrar
                 generarResultados();
-                showNotification(`Evaluación de ${data.nombre} cargada.`, 'info');
+                showNotification('✅ Evaluación cargada', 'success');
                 
             } catch (error) {
-                console.error("Error al cargar reporte:", error);
-                showNotification(`Error: ${error.message}`, 'error');
+                console.error("❌ Error cargando evaluación:", error);
+                showNotification('Error al cargar la evaluación', 'error');
             }
         }
         
-        async function deleteReport(docId) {
-            if (!confirm('¿Eliminar esta evaluación?')) return;
+        async function deleteHistoryItem(docId) {
+            if (!confirm('¿Está seguro de eliminar esta evaluación?')) return;
             
             try {
                 await db.collection('evaluaciones').doc(docId).delete();
-                showNotification('Evaluación eliminada.', 'success');
+                showNotification('✅ Evaluación eliminada', 'success');
                 loadHistorial();
             } catch (error) {
-                console.error("Error al eliminar:", error);
-                showNotification(`Error: ${error.message}`, 'error');
-            }
-        }
-        
-        async function confirmAndClearHistorial() {
-            if (confirm("⚠️ ADVERTENCIA: Esta acción eliminará TODAS las evaluaciones. ¿Continuar?")) {
-                clearAllHistorial();
-            }
-        }
-        
-        async function clearAllHistorial() {
-            if (!currentUser) {
-                showNotification('Debe iniciar sesión.', 'error');
-                return;
-            }
-            
-            const isAdmin = await checkAdminStatus(currentUser.uid);
-            if (!isAdmin) {
-                showNotification('Solo administradores pueden limpiar el historial.', 'error');
-                return;
-            }
-            
-            showNotification('Limpiando historial...', 'warning', 5000);
-            
-            try {
-                const snapshot = await db.collection('evaluaciones').limit(100).get();
-                const batch = db.batch();
-                snapshot.docs.forEach(doc => {
-                    batch.delete(doc.ref);
-                });
-                await batch.commit();
-                showNotification(`Se eliminaron ${snapshot.size} evaluaciones.`, 'success');
-                loadHistorial();
-            } catch (error) {
-                console.error("Error al limpiar historial:", error);
-                showNotification(`Error: ${error.message}`, 'error');
+                console.error("❌ Error eliminando evaluación:", error);
+                showNotification('Error al eliminar la evaluación', 'error');
             }
         }
         
         // ============================================
         // UTILIDADES
         // ============================================
-        function showNotification(message, type = 'info', duration = 3000) {
-            const bar = document.getElementById('notification-bar');
-            bar.textContent = message;
-            bar.className = `notification-bar notification-${type}`;
-            bar.style.display = 'block';
+        function showNotification(message, type, duration = 4000) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification notification-${type}`;
+            notification.style.display = 'block';
             
             setTimeout(() => {
-                bar.style.display = 'none';
+                notification.style.display = 'none';
             }, duration);
         }
         
         function resetForm() {
-            document.getElementById('nombre').value = '';
+            // Limpiar formulario
+            document.querySelectorAll('input').forEach(input => {
+                if (input.type !== 'date') input.value = '';
+            });
+            
+            // Restaurar fecha actual
             document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
-            document.getElementById('evaluador').value = '';
-            document.getElementById('edad').value = '';
             
-            // Reset IRAT
-            ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'].forEach(id => {
-                document.getElementById(id).selectedIndex = 0;
+            // Restaurar selects a valores por defecto
+            document.querySelectorAll('select').forEach(select => {
+                select.selectedIndex = 0;
             });
             
-            // Reset Tinetti
-            document.querySelectorAll('#tinetti-section input[type="radio"]').forEach(radio => {
-                if (radio.value === '0') radio.checked = true;
-            });
+            // Restaurar Norton a valores por defecto
+            document.getElementById('norton-fisica').selectedIndex = 0;
+            document.getElementById('norton-mental').selectedIndex = 0;
+            document.getElementById('norton-actividad').selectedIndex = 0;
+            document.getElementById('norton-movilidad').selectedIndex = 0;
+            document.getElementById('norton-incontinencia').selectedIndex = 0;
             
-            // Reset Norton
-            ['norton-fisica', 'norton-mental', 'norton-actividad', 'norton-movilidad', 'norton-incontinencia'].forEach(id => {
-                document.getElementById(id).selectedIndex = 0;
-            });
-            
+            // Recalcular puntajes
             calcularIRAT();
             calcularTinetti();
             calcularNorton();
             
+            // Ocultar resultados
             document.getElementById('results-section').style.display = 'none';
-            showNotification('Formulario reiniciado.', 'info');
+            
+            showNotification('✅ Formulario reiniciado', 'success');
+        }
+        
+        function newEvaluation() {
+            if (confirm('¿Comenzar una nueva evaluación? Los datos no guardados se perderán.')) {
+                resetForm();
+                document.getElementById('results-section').style.display = 'none';
+            }
         }
         
         function shareResults() {
-            if (!lastReportData.nombre) {
-                showNotification('Primero genere los resultados.', 'warning');
+            if (!lastReportData.paciente) {
+                showNotification('Primero genere los resultados', 'warning');
                 return;
             }
             
-            const text = `Evaluación Clínica - ${lastReportData.nombre}\n` +
-                        `Fecha: ${lastReportData.fecha}\n` +
-                        `IRAT-5: ${lastReportData.iratScore} (${lastReportData.iratRiesgo})\n` +
-                        `Tinetti: ${lastReportData.tinettiScore}/28\n` +
-                        `Norton: ${lastReportData.nortonScore}/20 (${lastReportData.nortonRiesgo})\n` +
-                        `Riesgo Global: ${lastReportData.clasificacionGlobal}`;
+            const text = `📋 EVALUACIÓN CLÍNICA\n\n` +
+                        `Paciente: ${lastReportData.paciente.nombre}\n` +
+                        `Fecha: ${lastReportData.paciente.fecha}\n` +
+                        `Evaluador: ${lastReportData.paciente.evaluador}\n\n` +
+                        `📊 RESULTADOS:\n` +
+                        `• IRAT-5: ${lastReportData.puntajes.irat} (${lastReportData.puntajes.iratRiesgo})\n` +
+                        `• Tinetti: ${lastReportData.puntajes.tinetti}/28 (${lastReportData.puntajes.tinettiRiesgo})\n` +
+                        `• Norton: ${lastReportData.puntajes.norton}/20 (${lastReportData.puntajes.nortonRiesgo})\n` +
+                        `• Riesgo Global: ${lastReportData.puntajes.riesgoGlobal}\n\n` +
+                        `💡 Recomendaciones disponibles en el sistema completo.`;
             
             if (navigator.share) {
                 navigator.share({
@@ -1532,135 +2117,124 @@ Evaluador Clínico Integrado - Versión Alfa
                 });
             } else if (navigator.clipboard) {
                 navigator.clipboard.writeText(text)
-                    .then(() => showNotification('Resultados copiados al portapapeles.', 'success'))
+                    .then(() => showNotification('✅ Resultados copiados al portapapeles', 'success'))
                     .catch(() => {
+                        // Fallback para navegadores antiguos
                         const textarea = document.createElement('textarea');
                         textarea.value = text;
                         document.body.appendChild(textarea);
                         textarea.select();
                         document.execCommand('copy');
                         document.body.removeChild(textarea);
-                        showNotification('Resultados copiados.', 'success');
+                        showNotification('✅ Resultados copiados', 'success');
                     });
             }
         }
         
         function generatePDF() {
-            if (!lastReportData.nombre) {
-                showNotification('Primero genere los resultados.', 'warning');
+            if (!lastReportData.paciente) {
+                showNotification('Primero genere los resultados', 'warning');
                 return;
             }
             
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
+            
+            // Configurar
+            doc.setProperties({
+                title: `Evaluación - ${lastReportData.paciente.nombre}`,
+                subject: 'Evaluación Clínica Integral',
+                author: lastReportData.paciente.evaluador
+            });
+            
             let y = 20;
             const margin = 20;
             const pageWidth = doc.internal.pageSize.width;
             
-            // Título
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(18);
-            doc.setTextColor(30, 60, 114);
-            doc.text("INFORME DE EVALUACIÓN CLÍNICA", pageWidth / 2, y, { align: 'center' });
+            // Encabezado
+            doc.setFontSize(20);
+            doc.setTextColor(26, 35, 126);
+            doc.text('EVALUACIÓN CLÍNICA INTEGRAL', pageWidth / 2, y, { align: 'center' });
             y += 15;
             
-            // Datos
-            doc.setFontSize(11);
-            doc.setTextColor(51, 51, 51);
-            doc.text(`Paciente: ${lastReportData.nombre}`, margin, y);
-            doc.text(`Fecha: ${lastReportData.fecha}`, pageWidth - margin, y, { align: 'right' });
+            doc.setFontSize(12);
+            doc.setTextColor(100, 100, 100);
+            doc.text('Sistema IRAT-5 + Tinetti + Norton', pageWidth / 2, y, { align: 'center' });
+            y += 25;
+            
+            // Datos del paciente
+            doc.setFontSize(14);
+            doc.setTextColor(26, 35, 126);
+            doc.text('DATOS DEL PACIENTE', margin, y);
             y += 10;
-            doc.text(`Evaluador: ${lastReportData.evaluador || 'N/A'}`, margin, y);
+            
+            doc.setFontSize(10);
+            doc.setTextColor(50, 50, 50);
+            doc.text(`Nombre: ${lastReportData.paciente.nombre}`, margin, y);
+            doc.text(`Fecha: ${lastReportData.paciente.fecha}`, pageWidth - margin, y, { align: 'right' });
+            y += 7;
+            doc.text(`Edad: ${lastReportData.paciente.edad || 'N/A'}`, margin, y);
+            doc.text(`Evaluador: ${lastReportData.paciente.evaluador}`, pageWidth - margin, y, { align: 'right' });
+            y += 7;
+            doc.text(`Institución: ${lastReportData.paciente.institucion || 'N/A'}`, margin, y);
             y += 15;
             
             // Resultados
-            doc.setFont('helvetica', 'bold');
-            doc.text("RESULTADOS:", margin, y);
-            y += 8;
-            doc.setFont('helvetica', 'normal');
-            doc.text(`• IRAT-5: ${lastReportData.iratScore} puntos - ${lastReportData.iratRiesgo}`, margin + 5, y);
-            y += 7;
-            doc.text(`• Tinetti: ${lastReportData.tinettiScore}/28 puntos`, margin + 5, y);
-            y += 7;
-            doc.text(`• Norton: ${lastReportData.nortonScore}/20 puntos - ${lastReportData.nortonRiesgo}`, margin + 5, y);
+            doc.setFontSize(14);
+            doc.setTextColor(26, 35, 126);
+            doc.text('RESULTADOS DE EVALUACIÓN', margin, y);
             y += 10;
-            doc.setFont('helvetica', 'bold');
-            doc.text(`RIESGO GLOBAL: ${lastReportData.clasificacionGlobal}`, margin, y);
+            
+            doc.setFontSize(10);
+            doc.text(`IRAT-5: ${lastReportData.puntajes.irat} puntos (${lastReportData.puntajes.iratRiesgo})`, margin + 5, y);
+            y += 7;
+            doc.text(`Test de Tinetti: ${lastReportData.puntajes.tinetti}/28 puntos (${lastReportData.puntajes.tinettiRiesgo})`, margin + 5, y);
+            y += 7;
+            doc.text(`Escala Norton: ${lastReportData.puntajes.norton}/20 puntos (${lastReportData.puntajes.nortonRiesgo})`, margin + 5, y);
+            y += 7;
+            
+            doc.setFontSize(12);
+            doc.setTextColor(244, 67, 54);
+            doc.text(`Clasificación Global: ${lastReportData.puntajes.riesgoGlobal}`, margin, y);
             y += 15;
             
             // Recomendaciones
-            doc.setFont('helvetica', 'bold');
-            doc.text("RECOMENDACIONES:", margin, y);
-            y += 8;
-            doc.setFont('helvetica', 'normal');
-            lastReportData.recomendaciones.forEach((rec, i) => {
-                if (y > 270) {
+            doc.setFontSize(14);
+            doc.setTextColor(26, 35, 126);
+            doc.text('RECOMENDACIONES', margin, y);
+            y += 10;
+            
+            doc.setFontSize(10);
+            doc.setTextColor(50, 50, 50);
+            lastReportData.recomendaciones.forEach((rec, index) => {
+                if (y > 250) {
                     doc.addPage();
                     y = 20;
                 }
-                doc.text(`${i + 1}. ${rec.titulo}`, margin, y);
+                doc.text(`${index + 1}. ${rec.titulo}`, margin + 5, y);
                 y += 5;
-                doc.text(rec.texto, margin + 5, y, { maxWidth: pageWidth - margin * 2 - 5 });
-                y += 12;
+                const lines = doc.splitTextToSize(rec.texto, pageWidth - margin * 2 - 10);
+                doc.text(lines, margin + 10, y);
+                y += lines.length * 6 + 5;
             });
             
             // Pie de página
-            const fechaGen = new Date().toLocaleDateString('es-ES');
-            doc.setFontSize(9);
-            doc.setTextColor(150, 150, 150);
-            doc.text(`Generado el ${fechaGen} - Sistema Evaluador Clínico Integrado`, pageWidth / 2, 285, { align: 'center' });
+            const fechaGen = new Date().toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
             
-            doc.save(`Evaluacion_${lastReportData.nombre.replace(/\s/g, '_')}_${lastReportData.fecha}.pdf`);
-            showNotification('PDF generado correctamente.', 'success');
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text(`Documento generado el ${fechaGen} - Sistema Evaluador Clínico Integrado`, pageWidth / 2, 285, { align: 'center' });
+            
+            // Guardar
+            const fileName = `Evaluacion_${lastReportData.paciente.nombre.replace(/\s/g, '_')}_${lastReportData.paciente.fecha}.pdf`;
+            doc.save(fileName);
+            
+            showNotification('✅ PDF generado exitosamente', 'success');
         }
     </script>
 </body>
-</html>
-```
-
-Principales Mejoras Implementadas:
-
-1. Interfaz Elegante y Moderna:
-
-· Gradientes profesionales y sombras suaves
-· Animaciones fluidas (fadeIn, slideUp)
-· Diseño responsive con grid flexible
-· Iconografía Font Awesome integrada
-· Colores profesionales (azul corporativo, indicadores de riesgo)
-
-2. IRAT-5 Actualizado:
-
-He reemplazado las preguntas originales con las nuevas que me indicaste:
-
-1. Equilibrio Unipodal (0-4 puntos)
-2. Tipo de Amputación (0-6 puntos + riesgo adicional)
-3. Función de Brazos (0-2 puntos)
-4. Situación Social (0-3 puntos)
-5. Nivel de Cooperación (0-3 puntos)
-
-3. Mejoras de UX:
-
-· Botones con efectos hover y animaciones
-· Tarjetas de recomendaciones con bordes de colores según prioridad
-· Notificaciones flotantes elegantes
-· Loader visual para operaciones
-· Efectos de transición en todos los elementos interactivos
-
-4. Organización Visual:
-
-· Header con gradiente y patrón sutil
-· Grupos de evaluación con bordes izquierdos de color
-· Grids responsivos para formularios
-· Resultados en tarjetas organizadas
-· Espaciado consistente y tipografía legible
-
-5. Funcionalidades Mantenidas:
-
-· Autenticación Firebase completa
-· CRUD completo con Firestore
-· Historial con vista/eliminación
-· Generación de PDF profesional
-· Sistema de roles (admin/usuario)
-· Compartir resultados
-
-El sistema mantiene toda la funcionalidad original pero con una interfaz mucho más profesional y amigable para uso clínico diario.
+                </html>
