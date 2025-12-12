@@ -753,24 +753,18 @@
 
 <script>
     // ====================================
-    // ========== CONFIGURACIÓN FIREBASE ==========
+    // ========== CONFIGURACIÓN FIREBASE (TUS DATOS CORREGIDOS) ==========
     // ====================================
     
-    // ====================================
-// ========== CONFIGURACIÓN FIREBASE CORREGIDA ==========
-// ====================================
-
-const firebaseConfig = {
-  // CLAVES NECESARIAS:
-  apiKey: "AIzaSyDJbtRuEwWVAsC1Nz6LbeF5a99LcUfAz4g",
-  authDomain: "irat-5-evaluaciones.firebaseapp.com",
-  projectId: "irat-5-evaluaciones",
-  storageBucket: "irat-5-evaluaciones.firebasestorage.app",
-  messagingSenderId: "487279274410",
-  appId: "1:487279274410:web:146e9c35a0bf795c5423d3"
-  // SE HAN ELIMINADO databaseURL y measurementId
-};
-
+    // Configuración proporcionada por el usuario (simplificada para compatibilidad con SDK v8)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDJbtRuEwWVAsC1Nz6LbeF5a99LcUfAz4g",
+      authDomain: "irat-5-evaluaciones.firebaseapp.com",
+      projectId: "irat-5-evaluaciones",
+      storageBucket: "irat-5-evaluaciones.firebasestorage.app",
+      messagingSenderId: "487279274410",
+      appId: "1:487279274410:web:146e9c35a0bf795c5423d3"
+    };
 
     // ====================================
     // ========== VARIABLES GLOBALES ==========
@@ -883,6 +877,7 @@ const firebaseConfig = {
     // ====================================
     
     document.addEventListener('DOMContentLoaded', function() {
+        // Esta es la primera línea de ejecución del script, y ocurre después de cargar todo el HTML.
         inicializarFirebase();
         configurarAutenticacion();
         configurarApp();
@@ -894,14 +889,13 @@ const firebaseConfig = {
         document.getElementById('fecha').value = today;
         
         inicializarNavegacion();
-        // CUIDADO: Usamos las funciones de configuración que generan SELECTS
         configurarIRAT5(); 
         configurarTinetti();
         calcularNorton(); 
         configurarHistorial();
         configurarValidaciones();
         
-        // Eventos de botones (Igual que antes)
+        // Eventos de botones
         document.getElementById('siguiente-irat').addEventListener('click', () => {
             if(validarIdentificacion()) cambiarSeccion('evaluacion');
         });
@@ -916,27 +910,26 @@ const firebaseConfig = {
         document.getElementById('btn-whatsapp').addEventListener('click', compartirWhatsApp);
         document.getElementById('btn-logout').addEventListener('click', cerrarSesion);
 
-        // Eventos de Norton (Igual que antes, usa selects)
+        // Eventos de Norton
         ['norton-fisico', 'norton-mental', 'norton-actividad', 'norton-movilidad', 'norton-incontinencia'].forEach(id => {
             document.getElementById(id).addEventListener('change', calcularNorton);
         });
     }
 
     // ====================================
-    // ========== FIREBASE & AUTHENTICATION (SIN CAMBIOS) ==========
+    // ========== FIREBASE & AUTHENTICATION ==========
     // ====================================
     
     function inicializarFirebase() {
         try {
+            // Este es el punto crítico: si firebase-app.js no se cargó, fallará aquí.
             firebaseApp = firebase.initializeApp(firebaseConfig);
             db = firebase.firestore();
-            auth = firebase.auth(); // Inicializar Auth
+            auth = firebase.auth(); 
             actualizarEstadoFirebase('Conectado a Firestore', 'firebase-connected');
         } catch (error) {
             console.error('Error inicializando Firebase:', error);
             actualizarEstadoFirebase('Error de conexión', 'firebase-disconnected');
-            // NO TOCAR la notificación de abajo si no es para el usuario.
-            // mostrarNotificacion('Error conectando a Firebase. Revisa tus credenciales.', 'error'); 
         }
     }
     
@@ -1010,6 +1003,8 @@ const firebaseConfig = {
                 msg = 'La contraseña debe tener al menos 6 caracteres.';
             } else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
                 msg = 'Correo o contraseña incorrectos.';
+            } else if (error.code === 'auth/operation-not-allowed') {
+                 msg = 'Error de Configuración: La autenticación por Email/Contraseña NO está habilitada en Firebase. Habilítala en la consola de Firebase.';
             }
             errorElement.textContent = msg;
             errorElement.style.display = 'block';
@@ -1032,7 +1027,7 @@ const firebaseConfig = {
     }
     
     // ====================================
-    // ========== FIREBASE DATA STORAGE (SIN CAMBIOS) ==========
+    // ========== FIREBASE DATA STORAGE ==========
     // ====================================
     
     async function guardarEnFirebase() {
@@ -1178,7 +1173,6 @@ const firebaseConfig = {
 
         itemsToShow.forEach(evaluacion => {
             const item = document.createElement('div');
-            // Nota: La data.userId y currentUser.uid son las que se comparan para propiedad
             const isOwner = evaluacion.userId === currentUser.uid;
             const ownerText = isOwner ? ' (Creada por mí)' : ` (Creada por: ${evaluacion.userEmail})`;
             
@@ -1207,14 +1201,14 @@ const firebaseConfig = {
         const nextBtn = document.getElementById('btn-next');
         const pageInfo = document.getElementById('page-info');
         
-        document.getElementById('pagination-container').style.display = totalPages > 1 ? 'flex' : 'none'; // Cambiado a 'flex' para mostrar
+        document.getElementById('pagination-container').style.display = totalPages > 1 ? 'flex' : 'none'; 
         
         prevBtn.disabled = currentPage === 1;
         nextBtn.disabled = currentPage === totalPages || historialFirebase.length === 0;
         pageInfo.textContent = `Página ${currentPage} de ${totalPages}`;
     }
     
-    // Manejadores de Paginación y Filtros (Sin cambios)
+    // Manejadores de Paginación y Filtros
     document.getElementById('btn-prev').addEventListener('click', () => {
         if (currentPage > 1) {
             currentPage--;
@@ -1270,7 +1264,6 @@ const firebaseConfig = {
 
             // Cargar respuestas de las escalas (IRAT, Tinetti, Norton)
             cargarRespuestasSelect(data.respuestas.irat, 'irat-form');
-            // Las respuestas de Tinetti están combinadas en el objeto tinetti
             cargarRespuestasSelect(data.respuestas.tinetti, 'tinetti-equilibrio-form'); 
             cargarRespuestasSelect(data.respuestas.tinetti, 'tinetti-marcha-form'); 
             
@@ -1286,7 +1279,7 @@ const firebaseConfig = {
             tinettiNoEvaluable = data.respuestas.tinetti.not_evaluable || false;
             const tinettiCheck = document.getElementById('tinetti-no-evaluable');
             tinettiCheck.checked = tinettiNoEvaluable;
-            tinettiCheck.dispatchEvent(new Event('change')); // Dispara el evento para deshabilitar los selects si es necesario
+            tinettiCheck.dispatchEvent(new Event('change')); 
 
             calcularResultadosCompletos(true);
             cambiarSeccion('resultados');
@@ -1301,7 +1294,6 @@ const firebaseConfig = {
     function cargarRespuestasSelect(respuestas, containerId) {
         const container = document.getElementById(containerId);
         for (const key in respuestas) {
-            // Se usa String() para asegurar la compatibilidad de valores
             const select = container.querySelector(`select[name="${key}"]`);
             if (select) {
                 select.value = String(respuestas[key]);
@@ -1341,7 +1333,7 @@ const firebaseConfig = {
     }
 
     // ====================================
-    // ========== NAVEGACIÓN Y VALIDACIÓN (SIN CAMBIOS) ==========
+    // ========== NAVEGACIÓN Y VALIDACIÓN ==========
     // ====================================
     
     function inicializarNavegacion() {
@@ -1429,7 +1421,6 @@ const firebaseConfig = {
     // Función genérica para generar selects
     function generateSelects(definitions, containerId, changeHandler) {
         const container = document.getElementById(containerId);
-        // Mantiene el título si existe
         const titleHtml = container.querySelector('h3') ? container.querySelector('h3').outerHTML : '';
         container.innerHTML = titleHtml; 
         
@@ -1451,7 +1442,6 @@ const firebaseConfig = {
 
             item.options.forEach(option => {
                 const opt = document.createElement('option');
-                // Almacenar el valor como String en el select para evitar problemas de casting
                 opt.value = String(option.value); 
                 opt.textContent = `${option.label} (${option.value} pts)`;
                 select.appendChild(opt);
@@ -1463,7 +1453,7 @@ const firebaseConfig = {
             container.appendChild(group);
         });
         
-        changeHandler(); // Llamada inicial
+        changeHandler(); 
     }
 
     // --- IRAT-5 ---
@@ -1499,7 +1489,6 @@ const firebaseConfig = {
     
     // --- TINETTI ---
     function configurarTinetti() {
-        // Inicializar Equilibrium y Marcha
         generateSelects(TINETTI_DEFINITIONS_EQUILIBRIO, 'tinetti-equilibrio-form', calcularTinetti);
         generateSelects(TINETTI_DEFINITIONS_MARCHA, 'tinetti-marcha-form', calcularTinetti);
 
@@ -1512,14 +1501,13 @@ const firebaseConfig = {
             containers.forEach(c => {
                 c.querySelectorAll('select').forEach(select => {
                     select.disabled = disableState;
-                    // Opcional: Limpiar la selección si se deshabilita
                     if (disableState) select.value = ""; 
                 });
             });
             calcularTinetti();
         });
 
-        calcularTinetti(); // Cargar estado inicial
+        calcularTinetti(); 
     }
 
     function calcularTinetti() {
@@ -1535,7 +1523,6 @@ const firebaseConfig = {
         const processScale = (definitions) => {
             definitions.forEach((def) => {
                 const select = document.querySelector(`select[name="${def.name}"]`);
-                // Usamos select? para manejar el caso donde el elemento no exista (aunque debería existir)
                 const value = parseInt(select ? select.value : NaN); 
 
                 if (!isNaN(value)) {
@@ -1549,7 +1536,7 @@ const firebaseConfig = {
         processScale(TINETTI_DEFINITIONS_MARCHA);
     }
 
-    // --- NORTON (Sin cambios en lógica, ya usa selects) ---
+    // --- NORTON ---
     function calcularNorton() {
         puntajeNorton = 0;
         respuestasNorton = {};
@@ -1557,7 +1544,7 @@ const firebaseConfig = {
 
         factores.forEach(factor => {
             const select = document.getElementById(`norton-${factor}`);
-            const value = parseInt(select ? select.value : 0); // Asume 0 si el select no existe (debería existir)
+            const value = parseInt(select ? select.value : 0); 
             
             if (!isNaN(value)) {
                 puntajeNorton += value;
@@ -1582,7 +1569,7 @@ const firebaseConfig = {
 
 
     // ====================================
-    // ========== RESULTADOS Y PDF (LÓGICA DE CÁLCULO MANTENIDA) ==========
+    // ========== RESULTADOS Y PDF ==========
     // ====================================
     
     function calcularResultadosCompletos(shouldNotify) {
@@ -1644,7 +1631,6 @@ const firebaseConfig = {
         } else if (puntajeTotalIRAT >= 3) {
             recomendaciones.push("IRAT-5 (Riesgo Medio): Monitorización activa y planes de intervención específicos en las áreas de mayor puntaje.");
         }
-        // Usamos el check de respuesta irat-q1 si tiene puntaje > 0
         if (respuestasIRAT['irat-q1'] > 0) recomendaciones.push("Movilidad/Traslado: Planificar asistencia en la movilización y fomentar la independencia segura (factor amputación/inmovilización).");
         if (respuestasIRAT['irat-q5'] > 0) recomendaciones.push("Piel: Realizar revisión cutánea diaria. Considerar superficies especiales para alivio de presión.");
 
@@ -1725,7 +1711,7 @@ const firebaseConfig = {
         }
     }
     
-    // --- PDF Generation (SIN CAMBIOS) ---
+    // --- PDF Generation ---
     function generarPDF() {
         if (!datosCompletos) {
             mostrarNotificacion('Primero debe calcular los resultados.', 'error');
@@ -1795,7 +1781,6 @@ const firebaseConfig = {
                 doc.addPage();
                 y = 15;
             }
-            // Agregamos un número a la recomendación para orden
             doc.text(`- ${rec}`, margin, y);
             y += lineHeight;
         });
@@ -1804,7 +1789,7 @@ const firebaseConfig = {
         mostrarNotificacion('PDF generado correctamente.', 'success');
     }
 
-    // --- WhatsApp Share (SIN CAMBIOS) ---
+    // --- WhatsApp Share ---
     function compartirWhatsApp() {
         if (!datosCompletos) {
             mostrarNotificacion('Primero debe calcular los resultados.', 'error');
