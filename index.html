@@ -786,7 +786,7 @@
             line-height: 1.6;
         }
 
-        /* ===== AYUDA TÉCNICA DISPLAY ===== */
+        /* ===== AYUDA TÉCNICA DISPLAY - MODIFICADO ===== */
         .ayuda-tecnica-display {
             background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
             border: 3px solid var(--primary);
@@ -832,15 +832,32 @@
             align-items: center;
             margin-top: 30px;
             position: relative;
-            height: 60px;
+            height: 80px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .ayuda-tecnica-progression::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .ayuda-tecnica-progression::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .ayuda-tecnica-progression::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
         }
 
         .ayuda-step {
             flex: 1;
             text-align: center;
             position: relative;
-            padding: 10px;
-            opacity: 0.5;
+            padding: 10px 5px;
+            min-width: 100px;
+            opacity: 0.4;
             transition: var(--transition);
         }
 
@@ -858,7 +875,7 @@
             align-items: center;
             justify-content: center;
             margin: 0 auto 10px;
-            font-size: 18px;
+            font-size: 16px;
             color: var(--gray);
         }
 
@@ -869,14 +886,56 @@
         }
 
         .ayuda-step-label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--gray);
             font-weight: 500;
+            line-height: 1.2;
+            margin-top: 5px;
         }
 
         .ayuda-step.active .ayuda-step-label {
             color: var(--primary);
             font-weight: 600;
+        }
+
+        /* ===== COMBINACIÓN DE AYUDAS ===== */
+        .ayuda-combinada-container {
+            background: #fff8e1;
+            border: 2px solid #ffd54f;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .ayuda-combinada-title {
+            color: var(--warning);
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ayuda-combinada-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .ayuda-combinada-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ayuda-combinada-item i {
+            color: var(--primary);
         }
 
         /* ===== BOTONES ELEGANTES ===== */
@@ -1065,6 +1124,16 @@
             .main-content {
                 padding: 30px;
             }
+            
+            .ayuda-tecnica-progression {
+                overflow-x: auto;
+                justify-content: flex-start;
+                padding-bottom: 15px;
+            }
+            
+            .ayuda-step {
+                min-width: 90px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -1098,6 +1167,16 @@
             .btn {
                 width: 100%;
             }
+            
+            .ayuda-tecnica-progression {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                padding: 0 10px 15px;
+            }
+            
+            .ayuda-step {
+                min-width: 85px;
+            }
         }
 
         /* ===== LOADER ===== */
@@ -1130,6 +1209,43 @@
             background: var(--gradient-primary);
             border-radius: 5px;
             transition: width 1s ease-out;
+        }
+
+        /* ===== HISTORIAL ===== */
+        .history-section {
+            margin-top: 50px;
+        }
+
+        .history-list {
+            list-style: none;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #fafafa;
+            border-radius: var(--radius);
+            border-left: 4px solid var(--primary);
+            transition: var(--transition);
+        }
+
+        .history-item:hover {
+            background: #e3f2fd;
+            transform: translateX(5px);
+        }
+
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 0.9rem;
         }
     </style>
 </head>
@@ -2036,7 +2152,7 @@
                     </div>
                 </div>
                 
-                <!-- AYUDA TÉCNICA RECOMENDADA -->
+                <!-- AYUDA TÉCNICA RECOMENDADA - MODIFICADA -->
                 <div class="ayuda-tecnica-display">
                     <div class="ayuda-tecnica-icon">
                         <i class="fas fa-wheelchair" id="ayuda-icon"></i>
@@ -2049,34 +2165,69 @@
                     </div>
                     
                     <div class="ayuda-tecnica-progression">
-                        <div class="ayuda-step" id="step-baston">
+                        <div class="ayuda-step" id="step-baston-simple">
                             <div class="ayuda-step-icon">
                                 <i class="fas fa-cane"></i>
                             </div>
-                            <div class="ayuda-step-label">Bastón</div>
+                            <div class="ayuda-step-label">Bastón Simple</div>
                         </div>
-                        <div class="ayuda-step" id="step-andador">
+                        <div class="ayuda-step" id="step-baston-3-apoyos">
                             <div class="ayuda-step-icon">
-                                <i class="fas fa-person-walking-with-cane"></i>
+                                <i class="fas fa-cane"></i>
                             </div>
-                            <div class="ayuda-step-label">Andador</div>
+                            <div class="ayuda-step-label">Bastón 3 Apoyos</div>
                         </div>
-                        <div class="ayuda-step" id="step-silla-manual">
+                        <div class="ayuda-step" id="step-andador-2-ruedas">
+                            <div class="ayuda-step-icon">
+                                <i class="fas fa-walking"></i>
+                            </div>
+                            <div class="ayuda-step-label">Andador 2 Ruedas</div>
+                        </div>
+                        <div class="ayuda-step" id="step-andador-4-ruedas">
+                            <div class="ayuda-step-icon">
+                                <i class="fas fa-walking"></i>
+                            </div>
+                            <div class="ayuda-step-label">Andador 4 Ruedas</div>
+                        </div>
+                        <div class="ayuda-step" id="step-andador-fijo">
+                            <div class="ayuda-step-icon">
+                                <i class="fas fa-walking"></i>
+                            </div>
+                            <div class="ayuda-step-label">Andador Fijo</div>
+                        </div>
+                        <div class="ayuda-step" id="step-silla-ruedas">
                             <div class="ayuda-step-icon">
                                 <i class="fas fa-wheelchair"></i>
                             </div>
-                            <div class="ayuda-step-label">Silla Manual</div>
+                            <div class="ayuda-step-label">Silla de Ruedas</div>
                         </div>
-                        <div class="ayuda-step" id="step-silla-electrica">
+                        <div class="ayuda-step" id="step-cojin-antiescaras">
                             <div class="ayuda-step-icon">
-                                <i class="fas fa-chair"></i>
+                                <i class="fas fa-bed"></i>
                             </div>
-                            <div class="ayuda-step-label">Silla Eléctrica</div>
+                            <div class="ayuda-step-label">Cojín Antiescaras</div>
+                        </div>
+                        <div class="ayuda-step" id="step-colchon-antiescaras">
+                            <div class="ayuda-step-icon">
+                                <i class="fas fa-bed"></i>
+                            </div>
+                            <div class="ayuda-step-label">Colchón Antiescaras</div>
+                        </div>
+                    </div>
+                    
+                    <!-- COMBINACIÓN DE AYUDAS -->
+                    <div class="ayuda-combinada-container" id="ayuda-combinada-container" style="display: none;">
+                        <h4 class="ayuda-combinada-title">
+                            <i class="fas fa-layer-group"></i> Combinación Recomendada
+                        </h4>
+                        <p id="ayuda-combinada-desc">Según la evaluación integral, se recomienda:</p>
+                        <div class="ayuda-combinada-grid" id="ayuda-combinada-grid">
+                            <!-- Se llenará dinámicamente -->
                         </div>
                     </div>
                 </div>
                 
-                <!-- RECOMENDACIONES -->
+                <!-- RECOMENDACIONES (AL MENOS 6) -->
                 <div class="recommendations-grid" id="recomendaciones-container">
                     <!-- Las recomendaciones se generan dinámicamente aquí -->
                 </div>
@@ -2148,7 +2299,7 @@
         let lastReportData = {};
         
         // ============================================
-        // SISTEMA INTEGRADO IRAT+TINETTI+NORTON
+        // SISTEMA INTEGRADO IRAT+TINETTI+NORTON - MODIFICADO
         // ============================================
         const SistemaIntegrado = {
             // Configuración de escalas
@@ -2165,14 +2316,68 @@
                 NORTON: 0.2
             },
             
-            // Clasificación por IIM
+            // NUEVO: Progresión de ayudas técnicas actualizada
+            ayudasTecnicas: [
+                { id: "baston-simple", nombre: "Bastón Simple", icono: "fas fa-cane", nivel: 1 },
+                { id: "baston-3-apoyos", nombre: "Bastón de 3 Apoyos", icono: "fas fa-cane", nivel: 2 },
+                { id: "andador-2-ruedas", nombre: "Andador de 2 Ruedas", icono: "fas fa-walking", nivel: 3 },
+                { id: "andador-4-ruedas", nombre: "Andador de 4 Ruedas", icono: "fas fa-walking", nivel: 4 },
+                { id: "andador-fijo", nombre: "Andador Fijo", icono: "fas fa-walking", nivel: 5 },
+                { id: "silla-ruedas", nombre: "Silla de Ruedas", icono: "fas fa-wheelchair", nivel: 6 },
+                { id: "cojin-antiescaras", nombre: "Cojín Antiescaras", icono: "fas fa-bed", nivel: 7 },
+                { id: "colchon-antiescaras", nombre: "Colchón Antiescaras", icono: "fas fa-bed", nivel: 8 }
+            ],
+            
+            // Clasificación por IIM con nuevas combinaciones
             clasificacionIIM: [
-                { rango: [0, 2.5], riesgo: "MÍNIMO", color: "minimo", ayuda: "Ninguna o bastón ocasional", icono: "fas fa-walking" },
-                { rango: [2.6, 4.0], riesgo: "LEVE", color: "leve", ayuda: "Bastón simple", icono: "fas fa-cane" },
-                { rango: [4.1, 5.5], riesgo: "MODERADO", color: "moderado", ayuda: "Bastón de 3/4 puntos o andador fijo", icono: "fas fa-person-walking-with-cane" },
-                { rango: [5.6, 7.0], riesgo: "ALTO", color: "alto", ayuda: "Andador con ruedas (rollator)", icono: "fas fa-person-walking-with-cane" },
-                { rango: [7.1, 8.5], riesgo: "MUY ALTO", color: "muy-alto", ayuda: "Silla de ruedas manual", icono: "fas fa-wheelchair" },
-                { rango: [8.6, 10], riesgo: "EXTREMO", color: "extremo", ayuda: "Silla de ruedas eléctrica", icono: "fas fa-chair" }
+                { 
+                    rango: [0, 2.5], 
+                    riesgo: "MÍNIMO", 
+                    color: "minimo", 
+                    ayudaPrincipal: "Ninguna o bastón ocasional",
+                    combinaciones: ["baston-simple"],
+                    nivel: 1
+                },
+                { 
+                    rango: [2.6, 4.0], 
+                    riesgo: "LEVE", 
+                    color: "leve", 
+                    ayudaPrincipal: "Bastón simple o bastón de 3 apoyos",
+                    combinaciones: ["baston-simple", "baston-3-apoyos"],
+                    nivel: 2
+                },
+                { 
+                    rango: [4.1, 5.5], 
+                    riesgo: "MODERADO", 
+                    color: "moderado", 
+                    ayudaPrincipal: "Andador de 2 o 4 ruedas",
+                    combinaciones: ["andador-2-ruedas", "andador-4-ruedas"],
+                    nivel: 3
+                },
+                { 
+                    rango: [5.6, 7.0], 
+                    riesgo: "ALTO", 
+                    color: "alto", 
+                    ayudaPrincipal: "Andador fijo o andador con ruedas + cojín antiescaras",
+                    combinaciones: ["andador-fijo", "cojin-antiescaras"],
+                    nivel: 4
+                },
+                { 
+                    rango: [7.1, 8.5], 
+                    riesgo: "MUY ALTO", 
+                    color: "muy-alto", 
+                    ayudaPrincipal: "Silla de ruedas manual + colchón antiescaras",
+                    combinaciones: ["silla-ruedas", "colchon-antiescaras"],
+                    nivel: 5
+                },
+                { 
+                    rango: [8.6, 10], 
+                    riesgo: "EXTREMO", 
+                    color: "extremo", 
+                    ayudaPrincipal: "Silla de ruedas eléctrica + colchón antiescaras + andador adaptado",
+                    combinaciones: ["silla-ruedas", "colchon-antiescaras", "andador-fijo"],
+                    nivel: 6
+                }
             ],
             
             // Cálculo de Tinetti con items NE
@@ -2241,38 +2446,103 @@
                 
                 let clasificacionFinal = { ...clasificacionBase };
                 
-                // Aplicar factores críticos
-                // 1. Si Tinetti tiene ≥3 items NE
-                if (factoresCriticos.tinettiNE >= 3) {
-                    clasificacionFinal = { ...this.clasificacionIIM[4] }; // Muy Alto
-                }
-                // 2. Si Norton ≤ 12 (alto riesgo de úlceras)
-                else if (factoresCriticos.nortonScore <= 12) {
-                    if (this.getNivelIndex(clasificacionFinal.riesgo) < this.getNivelIndex("ALTO")) {
-                        clasificacionFinal = { ...this.clasificacionIIM[3] }; // Alto
+                // NUEVO: Ajustar combinaciones según factores críticos
+                const combinacionesAjustadas = [...clasificacionBase.combinaciones];
+                
+                // 1. Si Norton ≤ 12 (alto riesgo de úlceras)
+                if (factoresCriticos.nortonScore <= 12) {
+                    if (!combinacionesAjustadas.includes("cojin-antiescaras")) {
+                        combinacionesAjustadas.push("cojin-antiescaras");
+                    }
+                    
+                    if (factoresCriticos.nortonScore <= 10 && !combinacionesAjustadas.includes("colchon-antiescaras")) {
+                        combinacionesAjustadas.push("colchon-antiescaras");
                     }
                 }
+                
+                // 2. Si Tinetti tiene ≥3 items NE
+                if (factoresCriticos.tinettiNE >= 3) {
+                    if (!combinacionesAjustadas.includes("silla-ruedas")) {
+                        combinacionesAjustadas.push("silla-ruedas");
+                    }
+                    if (clasificacionBase.nivel < 4) {
+                        clasificacionFinal = { ...this.clasificacionIIM[4] }; // Muy Alto
+                    }
+                }
+                
                 // 3. Si tiene ≥2 caídas recientes
-                else if (factoresCriticos.caidasRecientes) {
-                    const nivelActual = this.getNivelIndex(clasificacionFinal.riesgo);
-                    if (nivelActual < this.clasificacionIIM.length - 1) {
-                        clasificacionFinal = { ...this.clasificacionIIM[nivelActual + 1] };
+                if (factoresCriticos.caidasRecientes) {
+                    if (!combinacionesAjustadas.includes("andador-fijo")) {
+                        combinacionesAjustadas.push("andador-fijo");
+                    }
+                    
+                    // Subir un nivel si hay caídas recientes
+                    if (clasificacionBase.nivel < this.clasificacionIIM.length) {
+                        const nextLevel = Math.min(clasificacionBase.nivel + 1, this.clasificacionIIM.length - 1);
+                        clasificacionFinal = { ...this.clasificacionIIM[nextLevel] };
                     }
                 }
                 
                 // 4. Considerar contexto ambiental
                 if (factoresCriticos.viveSolo) {
-                    if (clasificacionFinal.riesgo === "LEVE") {
-                        clasificacionFinal.ayuda = "Bastón de 3/4 puntos";
-                    } else if (clasificacionFinal.riesgo === "MODERADO") {
-                        clasificacionFinal.ayuda = "Andador fijo o con ruedas";
+                    // Personas que viven solas necesitan ayudas más seguras
+                    if (combinacionesAjustadas.includes("baston-simple")) {
+                        const index = combinacionesAjustadas.indexOf("baston-simple");
+                        combinacionesAjustadas[index] = "baston-3-apoyos";
+                    }
+                    
+                    if (combinacionesAjustadas.includes("andador-2-ruedas")) {
+                        const index = combinacionesAjustadas.indexOf("andador-2-ruedas");
+                        combinacionesAjustadas[index] = "andador-4-ruedas";
                     }
                 }
                 
                 // 5. Alteración cognitiva
-                if (factoresCriticos.alteracionCognitiva && clasificacionFinal.riesgo === "MODERADO") {
-                    clasificacionFinal.ayuda = "Andador fijo (evitar bastón simple)";
+                if (factoresCriticos.alteracionCognitiva) {
+                    // Evitar bastones simples en pacientes con alteración cognitiva
+                    if (combinacionesAjustadas.includes("baston-simple")) {
+                        combinacionesAjustadas.splice(combinacionesAjustadas.indexOf("baston-simple"), 1);
+                        if (!combinacionesAjustadas.includes("andador-fijo")) {
+                            combinacionesAjustadas.push("andador-fijo");
+                        }
+                    }
+                    
+                    // Priorizar estabilidad sobre movilidad
+                    if (!combinacionesAjustadas.includes("andador-fijo")) {
+                        combinacionesAjustadas.push("andador-fijo");
+                    }
                 }
+                
+                // 6. Entorno con obstáculos
+                if (factoresCriticos.entornoObstaculos) {
+                    if (!combinacionesAjustadas.includes("silla-ruedas") && clasificacionBase.nivel >= 3) {
+                        combinacionesAjustadas.push("silla-ruedas");
+                    }
+                }
+                
+                // 7. Si fuerza superior está preservada, mantener ayudas que la utilicen
+                if (!factoresCriticos.fuerzaSuperior) {
+                    // Si no tiene fuerza superior, evitar bastones
+                    if (combinacionesAjustadas.includes("baston-simple")) {
+                        combinacionesAjustadas.splice(combinacionesAjustadas.indexOf("baston-simple"), 1);
+                    }
+                    if (combinacionesAjustadas.includes("baston-3-apoyos")) {
+                        combinacionesAjustadas.splice(combinacionesAjustadas.indexOf("baston-3-apoyos"), 1);
+                    }
+                    if (!combinacionesAjustadas.includes("andador-fijo")) {
+                        combinacionesAjustadas.push("andador-fijo");
+                    }
+                }
+                
+                // Actualizar combinaciones finales
+                clasificacionFinal.combinaciones = [...new Set(combinacionesAjustadas)]; // Eliminar duplicados
+                
+                // Actualizar ayuda principal basada en combinaciones
+                const ayudaPrincipalNombres = clasificacionFinal.combinaciones.map(id => {
+                    const ayuda = this.ayudasTecnicas.find(a => a.id === id);
+                    return ayuda ? ayuda.nombre : id;
+                });
+                clasificacionFinal.ayudaPrincipal = ayudaPrincipalNombres.join(" + ");
                 
                 return clasificacionFinal;
             },
@@ -2283,66 +2553,190 @@
                 return niveles.indexOf(nivel);
             },
             
-            // Generar recomendaciones
-            generarRecomendaciones: function(clasificacion, puntajes) {
+            // NUEVO: Obtener ayuda técnica por ID
+            getAyudaById: function(id) {
+                return this.ayudasTecnicas.find(ayuda => ayuda.id === id);
+            },
+            
+            // NUEVO: Generar recomendaciones específicas (al menos 6)
+            generarRecomendaciones: function(clasificacion, puntajes, factoresCriticos) {
                 const recomendaciones = [];
                 
-                // Recomendaciones por nivel de IIM
+                // 1. Recomendación por clasificación global
                 recomendaciones.push({
                     titulo: `📊 Clasificación Global: ${clasificacion.riesgo}`,
-                    texto: `Índice Integrado de Movilidad (IIM): ${puntajes.iim.toFixed(2)}/10. ${clasificacion.riesgo === "EXTREMO" ? "Requiere intervención inmediata." : "Seguir recomendaciones específicas."}`,
+                    texto: `Índice Integrado de Movilidad (IIM): ${puntajes.iim.toFixed(2)}/10. ` +
+                          `Esta clasificación indica un nivel de riesgo ${clasificacion.riesgo.toLowerCase()} que requiere ${clasificacion.riesgo === "EXTREMO" ? "intervención inmediata y supervisión constante" : "seguimiento especializado y adaptaciones específicas"}.`,
                     tipo: clasificacion.riesgo === "EXTREMO" || clasificacion.riesgo === "MUY ALTO" ? "danger" : 
-                          clasificacion.riesgo === "ALTO" ? "warning" : "info"
+                          clasificacion.riesgo === "ALTO" ? "warning" : "info",
+                    icono: clasificacion.riesgo === "EXTREMO" ? "fas fa-exclamation-triangle" : "fas fa-chart-bar"
                 });
                 
-                // Recomendación de ayuda técnica
+                // 2. Recomendación de ayuda técnica combinada
+                const ayudaItems = clasificacion.combinaciones.map(id => {
+                    const ayuda = this.getAyudaById(id);
+                    return ayuda ? `<strong>${ayuda.nombre}</strong>` : id;
+                }).join(", ");
+                
                 recomendaciones.push({
-                    titulo: `🦽 Ayuda Técnica Principal Recomendada`,
-                    texto: clasificacion.ayuda,
-                    tipo: "info"
+                    titulo: `🦽 Ayudas Técnicas Recomendadas`,
+                    texto: `Combinación optimizada: ${ayudaItems}. Esta combinación se ha determinado considerando: ` +
+                          `${factoresCriticos.caidasRecientes ? 'Caídas recientes, ' : ''}` +
+                          `${factoresCriticos.alteracionCognitiva ? 'Alteración cognitiva, ' : ''}` +
+                          `${factoresCriticos.viveSolo ? 'Vive solo, ' : ''}` +
+                          `${factoresCriticos.entornoObstaculos ? 'Entorno con obstáculos, ' : ''}` +
+                          `${factoresCriticos.nortonScore <= 12 ? 'Riesgo de úlceras, ' : ''}` +
+                          `${!factoresCriticos.fuerzaSuperior ? 'Fuerza superior limitada, ' : ''}` +
+                          (clasificacion.combinaciones.length === 1 ? 'Evaluación específica.' : 'Combinación de factores.'),
+                    tipo: "info",
+                    icono: "fas fa-layer-group"
                 });
                 
-                // Recomendaciones específicas por escala
+                // 3. Recomendación específica por IRAT
                 if (puntajes.iratNorm >= 7) {
                     recomendaciones.push({
-                        titulo: "⚠️ Alto Riesgo IRAT-5",
-                        texto: "Evaluar necesidad de adaptaciones domiciliarias y supervisión constante.",
-                        tipo: "warning"
+                        titulo: "⚠️ Alto Riesgo de Caídas (IRAT-5)",
+                        texto: "Puntaje IRAT-5 elevado indica alto riesgo de caídas. Recomendaciones: " +
+                              "1. Evaluación domiciliaria por terapia ocupacional. " +
+                              "2. Eliminación de barreras arquitectónicas. " +
+                              "3. Programa de fortalecimiento muscular específico. " +
+                              "4. Uso de calzado antideslizante.",
+                        tipo: "warning",
+                        icono: "fas fa-exclamation"
+                    });
+                } else if (puntajes.iratNorm >= 4) {
+                    recomendaciones.push({
+                        titulo: "⚠️ Riesgo Moderado de Caídas (IRAT-5)",
+                        texto: "Puntaje IRAT-5 moderado sugiere riesgo de caídas. Recomendaciones: " +
+                              "1. Ejercicios de equilibrio diarios. " +
+                              "2. Revisión de medicamentos que puedan afectar el equilibrio. " +
+                              "3. Educación sobre prevención de caídas. " +
+                              "4. Evaluación visual periódica.",
+                        tipo: "warning",
+                        icono: "fas fa-exclamation"
                     });
                 }
                 
+                // 4. Recomendación específica por Tinetti
                 if (puntajes.tinettiNorm <= 5) {
                     recomendaciones.push({
-                        titulo: "🚨 Deterioro Significativo de Marcha",
-                        texto: "Requiere evaluación por kinesiología especializada. Alto riesgo de caídas.",
-                        tipo: "danger"
+                        titulo: "🚨 Deterioro Significativo de Marcha y Equilibrio",
+                        texto: "Puntaje Tinetti bajo indica severo compromiso de movilidad. Recomendaciones: " +
+                              "1. Derivación urgente a kinesiología especializada. " +
+                              "2. Programa de rehabilitación integral. " +
+                              "3. Adaptaciones domiciliarias inmediatas. " +
+                              "4. Considerar evaluación neurológica complementaria.",
+                        tipo: "danger",
+                        icono: "fas fa-running"
+                    });
+                } else if (puntajes.tinettiNorm <= 7) {
+                    recomendaciones.push({
+                        titulo: "⚠️ Alteración Moderada de Marcha",
+                        texto: "Puntaje Tinetti moderado sugiere dificultades en la movilidad. Recomendaciones: " +
+                              "1. Terapia física para mejorar marcha y equilibrio. " +
+                              "2. Uso constante de ayuda técnica recomendada. " +
+                              "3. Ejercicios de fortalecimiento de miembros inferiores. " +
+                              "4. Evaluación podológica si corresponde.",
+                        tipo: "warning",
+                        icono: "fas fa-walking"
                     });
                 }
                 
+                // 5. Recomendación específica por Norton
                 if (puntajes.nortonNorm >= 6) {
                     recomendaciones.push({
-                        titulo: "🛌 Alto Riesgo de Úlceras",
-                        texto: "Implementar protocolo de cambios posturales. Considerar colchón antiescaras.",
-                        tipo: "warning"
+                        titulo: "🛌 Alto Riesgo de Úlceras por Presión",
+                        texto: "Puntaje Norton elevado indica alto riesgo de desarrollar úlceras. Recomendaciones: " +
+                              "1. Cambios posturales cada 2 horas si está encamado. " +
+                              "2. Uso de colchón y cojín antiescaras. " +
+                              "3. Cuidado meticuloso de la piel. " +
+                              "4. Nutrición adecuada rica en proteínas. " +
+                              "5. Hidratación adecuada de la piel.",
+                        tipo: "warning",
+                        icono: "fas fa-bed"
+                    });
+                } else if (puntajes.nortonNorm >= 4) {
+                    recomendaciones.push({
+                        titulo: "🛌 Riesgo de Úlceras por Presión",
+                        texto: "Puntaje Norton moderado sugiere riesgo de úlceras. Recomendaciones: " +
+                              "1. Cambios posturales regulares. " +
+                              "2. Evaluación de superficies de apoyo. " +
+                              "3. Educación sobre cuidado de la piel. " +
+                              "4. Movilización activa según tolerancia.",
+                        tipo: "info",
+                        icono: "fas fa-bed"
                     });
                 }
                 
-                // Recomendaciones complementarias
-                if (clasificacion.riesgo === "EXTREMO" || clasificacion.riesgo === "MUY ALTO") {
+                // 6. Recomendaciones por factores críticos
+                if (factoresCriticos.caidasRecientes) {
                     recomendaciones.push({
-                        titulo: "🏥 Derivación Urgente",
-                        texto: "Derivar a: Geriatría, Kinesiología, Terapia Ocupacional. Considerar ingreso hospitalario.",
-                        tipo: "danger"
-                    });
-                } else if (clasificacion.riesgo === "ALTO") {
-                    recomendaciones.push({
-                        titulo: "👥 Evaluación Interdisciplinaria",
-                        texto: "Coordinar con: Kinesiología, Terapia Ocupacional. Revisar polifarmacia.",
-                        tipo: "warning"
+                        titulo: "⚠️ Historia de Caídas Recientes",
+                        texto: "Paciente con antecedentes de ≥2 caídas recientes. Recomendaciones: " +
+                              "1. Análisis de causas de caídas. " +
+                              "2. Entrenamiento específico para levantarse del suelo. " +
+                              "3. Sistema de alerta para caídas. " +
+                              "4. Revisión de medicamentos con potencial sedante.",
+                        tipo: "danger",
+                        icono: "fas fa-exclamation-triangle"
                     });
                 }
                 
-                return recomendaciones;
+                if (factoresCriticos.alteracionCognitiva) {
+                    recomendaciones.push({
+                        titulo: "🧠 Alteración Cognitiva Identificada",
+                        texto: "Paciente con alteración cognitiva que afecta la seguridad. Recomendaciones: " +
+                              "1. Supervisión constante durante la deambulación. " +
+                              "2. Señalización clara en el domicilio. " +
+                              "3. Ayudas técnicas que no requieran aprendizaje complejo. " +
+                              "4. Evaluación por neurología/geriatría.",
+                        tipo: "warning",
+                        icono: "fas fa-brain"
+                    });
+                }
+                
+                if (factoresCriticos.viveSolo) {
+                    recomendaciones.push({
+                        titulo: "🏠 Paciente Vive Solo",
+                        texto: "Paciente que reside solo, aumentando el riesgo. Recomendaciones: " +
+                              "1. Sistema de teleasistencia o alerta. " +
+                              "2. Visitas regulares de servicios sociales. " +
+                              "3. Adaptaciones domiciliarias prioritarias. " +
+                              "4. Red de apoyo social estructurada.",
+                        tipo: "info",
+                        icono: "fas fa-home"
+                    });
+                }
+                
+                // 7. Recomendación de seguimiento
+                recomendaciones.push({
+                    titulo: "📅 Plan de Seguimiento Recomendado",
+                    texto: `Según clasificación ${clasificacion.riesgo}: ` +
+                          `${clasificacion.riesgo === "EXTREMO" ? "Reevaluación semanal, seguimiento interdisciplinario intensivo." : 
+                            clasificacion.riesgo === "MUY ALTO" ? "Reevaluación cada 15 días, seguimiento por múltiples especialistas." :
+                            clasificacion.riesgo === "ALTO" ? "Reevaluación mensual, seguimiento por kinesiología y terapia ocupacional." :
+                            clasificacion.riesgo === "MODERADO" ? "Reevaluación cada 3 meses, seguimiento por kinesiología." :
+                            "Reevaluación cada 6 meses, educación y monitoreo."}`,
+                    tipo: "success",
+                    icono: "fas fa-calendar-check"
+                });
+                
+                // 8. Recomendación de equipo interdisciplinario
+                if (clasificacion.riesgo === "EXTREMO" || clasificacion.riesgo === "MUY ALTO" || clasificacion.riesgo === "ALTO") {
+                    recomendaciones.push({
+                        titulo: "👥 Derivación Interdisciplinaria",
+                        texto: "Se recomienda derivación a: " +
+                              "1. Kinesiología especializada en geriatría. " +
+                              "2. Terapia ocupacional para adaptaciones. " +
+                              "3. Nutricionista si hay riesgo nutricional. " +
+                              "4. Trabajo social para apoyo comunitario. " +
+                              "5. Geriatría para manejo integral.",
+                        tipo: clasificacion.riesgo === "EXTREMO" ? "danger" : "warning",
+                        icono: "fas fa-users-medical"
+                    });
+                }
+                
+                return recomendaciones.slice(0, 8); // Máximo 8 recomendaciones
             }
         };
         
@@ -2559,7 +2953,7 @@
         }
         
         // ============================================
-        // GENERACIÓN DE RESULTADOS INTEGRADOS
+        // GENERACIÓN DE RESULTADOS INTEGRADOS - MODIFICADA
         // ============================================
         function generarResultadosIntegrados() {
             // Validar datos básicos
@@ -2597,16 +2991,20 @@
             // Determinar clasificación
             const clasificacion = SistemaIntegrado.determinarClasificacion(iim, factoresCriticos);
             
-            // Generar recomendaciones
-            const recomendaciones = SistemaIntegrado.generarRecomendaciones(clasificacion, {
-                iim: iim,
-                iratNorm: puntajesNormalizados.IRAT,
-                tinettiNorm: puntajesNormalizados.TINETTI,
-                nortonNorm: puntajesNormalizados.NORTON
-            });
+            // Generar recomendaciones (al menos 6)
+            const recomendaciones = SistemaIntegrado.generarRecomendaciones(
+                clasificacion, 
+                {
+                    iim: iim,
+                    iratNorm: puntajesNormalizados.IRAT,
+                    tinettiNorm: puntajesNormalizados.TINETTI,
+                    nortonNorm: puntajesNormalizados.NORTON
+                },
+                factoresCriticos
+            );
             
             // Actualizar UI
-            actualizarUIResultados(iratScore, tinettiResult, nortonScore, puntajesNormalizados, iim, clasificacion, recomendaciones);
+            actualizarUIResultados(iratScore, tinettiResult, nortonScore, puntajesNormalizados, iim, clasificacion, recomendaciones, factoresCriticos);
             
             // Guardar datos para PDF/historial
             lastReportData = {
@@ -2641,7 +3039,7 @@
             showNotification('✅ Resultados integrales generados exitosamente', 'success');
         }
         
-        function actualizarUIResultados(iratScore, tinettiResult, nortonScore, norm, iim, clasificacion, recomendaciones) {
+        function actualizarUIResultados(iratScore, tinettiResult, nortonScore, norm, iim, clasificacion, recomendaciones, factoresCriticos) {
             // Actualizar resumen de puntajes
             document.getElementById('res-irat-total').textContent = iratScore;
             document.getElementById('res-irat-norm').textContent = `${norm.IRAT.toFixed(2)}/10`;
@@ -2682,9 +3080,7 @@
                 card.className = `recommendation-card ${rec.tipo}`;
                 card.innerHTML = `
                     <div class="recommendation-icon" style="background: var(--${rec.tipo});">
-                        <i class="fas fa-${rec.tipo === 'danger' ? 'exclamation-circle' : 
-                                         rec.tipo === 'warning' ? 'exclamation' : 
-                                         rec.tipo === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                        <i class="${rec.icono || 'fas fa-info-circle'}"></i>
                     </div>
                     <div class="recommendation-content">
                         <h4>${rec.titulo}</h4>
@@ -2696,39 +3092,76 @@
         }
         
         function actualizarAyudaTecnicaUI(clasificacion) {
-            const iconMap = {
-                "MÍNIMO": "fas fa-walking",
-                "LEVE": "fas fa-cane",
-                "MODERADO": "fas fa-person-walking-with-cane",
-                "ALTO": "fas fa-person-walking-with-cane",
-                "MUY ALTO": "fas fa-wheelchair",
-                "EXTREMO": "fas fa-chair"
-            };
+            // Actualizar título y descripción
+            document.getElementById('ayuda-titulo').textContent = clasificacion.ayudaPrincipal;
+            document.getElementById('ayuda-descripcion').textContent = `Combinación para nivel de riesgo: ${clasificacion.riesgo}`;
             
-            document.getElementById('ayuda-icon').className = iconMap[clasificacion.riesgo] || "fas fa-wheelchair";
-            document.getElementById('ayuda-titulo').textContent = clasificacion.ayuda;
-            document.getElementById('ayuda-descripcion').textContent = `Recomendación para nivel de riesgo: ${clasificacion.riesgo}`;
+            // Actualizar progresión de pasos
+            const steps = SistemaIntegrado.ayudasTecnicas;
             
-            // Actualizar progresión
-            const steps = ['baston', 'andador', 'silla-manual', 'silla-electrica'];
-            steps.forEach(step => {
-                document.getElementById(`step-${step}`).classList.remove('active');
+            // Desactivar todos los pasos
+            steps.forEach(ayuda => {
+                const stepElement = document.getElementById(`step-${ayuda.id}`);
+                if (stepElement) {
+                    stepElement.classList.remove('active');
+                }
             });
             
-            // Activar el paso correspondiente
-            const nivelIndex = SistemaIntegrado.getNivelIndex(clasificacion.riesgo);
-            if (nivelIndex <= 1) { // MÍNIMO o LEVE
-                document.getElementById('step-baston').classList.add('active');
-                document.getElementById('ayuda-progress').style.width = '25%';
-            } else if (nivelIndex === 2) { // MODERADO
-                document.getElementById('step-andador').classList.add('active');
-                document.getElementById('ayuda-progress').style.width = '50%';
-            } else if (nivelIndex === 3 || nivelIndex === 4) { // ALTO o MUY ALTO
-                document.getElementById('step-silla-manual').classList.add('active');
-                document.getElementById('ayuda-progress').style.width = '75%';
-            } else { // EXTREMO
-                document.getElementById('step-silla-electrica').classList.add('active');
-                document.getElementById('ayuda-progress').style.width = '100%';
+            // Activar pasos según combinación
+            clasificacion.combinaciones.forEach(ayudaId => {
+                const stepElement = document.getElementById(`step-${ayudaId}`);
+                if (stepElement) {
+                    stepElement.classList.add('active');
+                }
+            });
+            
+            // Calcular y actualizar progreso
+            const nivelMaximo = Math.max(...clasificacion.combinaciones.map(id => {
+                const ayuda = SistemaIntegrado.getAyudaById(id);
+                return ayuda ? ayuda.nivel : 0;
+            }));
+            
+            const progressPercentage = (nivelMaximo / SistemaIntegrado.ayudasTecnicas.length) * 100;
+            document.getElementById('ayuda-progress').style.width = `${progressPercentage}%`;
+            
+            // Actualizar icono principal
+            const iconMap = {
+                "baston-simple": "fas fa-cane",
+                "baston-3-apoyos": "fas fa-cane",
+                "andador-2-ruedas": "fas fa-walking",
+                "andador-4-ruedas": "fas fa-walking",
+                "andador-fijo": "fas fa-walking",
+                "silla-ruedas": "fas fa-wheelchair",
+                "cojin-antiescaras": "fas fa-bed",
+                "colchon-antiescaras": "fas fa-bed"
+            };
+            
+            // Usar el icono de la ayuda principal o la de mayor nivel
+            const ayudaPrincipal = clasificacion.combinaciones[0] || "silla-ruedas";
+            document.getElementById('ayuda-icon').className = iconMap[ayudaPrincipal] || "fas fa-wheelchair";
+            
+            // Mostrar combinación de ayudas
+            const combinacionContainer = document.getElementById('ayuda-combinada-container');
+            const combinacionGrid = document.getElementById('ayuda-combinada-grid');
+            
+            if (clasificacion.combinaciones.length > 1) {
+                combinacionContainer.style.display = 'block';
+                combinacionGrid.innerHTML = '';
+                
+                clasificacion.combinaciones.forEach(ayudaId => {
+                    const ayuda = SistemaIntegrado.getAyudaById(ayudaId);
+                    if (ayuda) {
+                        const item = document.createElement('div');
+                        item.className = 'ayuda-combinada-item';
+                        item.innerHTML = `
+                            <i class="${ayuda.icono}"></i>
+                            <div>${ayuda.nombre}</div>
+                        `;
+                        combinacionGrid.appendChild(item);
+                    }
+                });
+            } else {
+                combinacionContainer.style.display = 'none';
             }
         }
         
@@ -2948,7 +3381,7 @@
                         `• Norton: ${lastReportData.puntajes.norton}/20\n` +
                         `• IIM: ${lastReportData.puntajes.iim?.toFixed(2) || 'N/A'}/10\n` +
                         `• Riesgo Global: ${lastReportData.clasificacion?.riesgo || 'N/A'}\n` +
-                        `• Ayuda Técnica: ${lastReportData.clasificacion?.ayuda || 'N/A'}\n\n` +
+                        `• Ayuda Técnica: ${lastReportData.clasificacion?.ayudaPrincipal || 'N/A'}\n\n` +
                         `💡 Recomendaciones disponibles en el sistema completo.`;
             
             if (navigator.share) {
@@ -3041,8 +3474,39 @@
             doc.setTextColor(244, 67, 54);
             doc.text(`Clasificación Global: ${lastReportData.clasificacion?.riesgo || 'N/A'}`, margin, y);
             y += 7;
-            doc.text(`Ayuda Técnica: ${lastReportData.clasificacion?.ayuda || 'N/A'}`, margin, y);
+            doc.text(`Ayuda Técnica: ${lastReportData.clasificacion?.ayudaPrincipal || 'N/A'}`, margin, y);
             y += 15;
+            
+            // Factores críticos
+            if (lastReportData.factoresCriticos) {
+                doc.setFontSize(14);
+                doc.setTextColor(26, 35, 126);
+                doc.text('FACTORES CRÍTICOS IDENTIFICADOS', margin, y);
+                y += 10;
+                
+                doc.setFontSize(10);
+                doc.setTextColor(50, 50, 50);
+                
+                const factores = [];
+                if (lastReportData.factoresCriticos.caidasRecientes) factores.push('≥2 Caídas recientes');
+                if (lastReportData.factoresCriticos.alteracionCognitiva) factores.push('Alteración cognitiva grave');
+                if (lastReportData.factoresCriticos.viveSolo) factores.push('Vive solo');
+                if (lastReportData.factoresCriticos.entornoObstaculos) factores.push('Entorno con obstáculos');
+                if (!lastReportData.factoresCriticos.fuerzaSuperior) factores.push('Fuerza superior limitada');
+                if (lastReportData.factoresCriticos.tinettiNE >= 3) factores.push(`Tinetti: ${lastReportData.factoresCriticos.tinettiNE} items no evaluables`);
+                if (lastReportData.factoresCriticos.nortonScore <= 12) factores.push(`Norton ≤ 12: Alto riesgo de úlceras`);
+                
+                if (factores.length > 0) {
+                    factores.forEach(factor => {
+                        doc.text(`• ${factor}`, margin + 5, y);
+                        y += 7;
+                    });
+                } else {
+                    doc.text('Ningún factor crítico identificado', margin + 5, y);
+                    y += 7;
+                }
+                y += 10;
+            }
             
             // Recomendaciones
             doc.setFontSize(14);
@@ -3083,4 +3547,4 @@
         }
     </script>
 </body>
-        </html>
+    </html>
