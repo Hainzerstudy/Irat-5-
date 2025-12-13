@@ -495,6 +495,38 @@
             flex-shrink: 0;
         }
 
+        .tinetti-ne-option {
+            background: #fff3e0;
+            border-color: #ffb74d;
+        }
+
+        /* ===== TINETTI GRID OPTIMIZADO PARA MÓVIL ===== */
+        .tinetti-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-top: 15px;
+        }
+
+        .tinetti-category {
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius);
+            border: 2px solid #ffe0b2;
+        }
+
+        .tinetti-category h4 {
+            color: var(--warning);
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #ffe0b2;
+            font-weight: 500;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         /* ===== SCORE DISPLAY OPTIMIZADO ===== */
         .score-display {
             background: var(--gradient-primary);
@@ -530,33 +562,6 @@
             line-height: 1.4;
         }
 
-        /* ===== TINETTI COMPLETO OPTIMIZADO ===== */
-        .tinetti-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-top: 15px;
-        }
-
-        .tinetti-category {
-            background: white;
-            padding: 20px;
-            border-radius: var(--radius);
-            border: 2px solid #ffe0b2;
-        }
-
-        .tinetti-category h4 {
-            color: var(--warning);
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #ffe0b2;
-            font-weight: 500;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
         /* ===== FACTORES CRÍTICOS OPTIMIZADO ===== */
         .critical-factors-grid {
             display: grid;
@@ -586,6 +591,32 @@
             color: var(--dark);
             font-size: 0.9rem;
             line-height: 1.3;
+        }
+
+        /* ===== RESTRICCIONES DE AYUDAS ===== */
+        .restricciones-display {
+            background: #fff3e0;
+            border: 2px solid #ffb74d;
+            border-radius: var(--radius);
+            padding: 15px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .restricciones-display.active {
+            display: block;
+        }
+
+        .restriccion-item {
+            background: white;
+            padding: 10px 15px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border-left: 4px solid #ff9800;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         /* ===== RESULTS SECTION OPTIMIZADO ===== */
@@ -1102,6 +1133,11 @@
                 justify-content: space-between;
                 align-items: center;
             }
+            
+            .tinetti-grid {
+                grid-template-columns: repeat(2, 1fr);
+                display: grid;
+            }
         }
 
         @media (min-width: 1024px) {
@@ -1109,34 +1145,9 @@
                 max-width: 900px;
             }
             
-            .tinetti-grid {
-                grid-template-columns: repeat(2, 1fr);
-                display: grid;
-            }
-            
             .critical-factors-grid {
                 grid-template-columns: repeat(5, 1fr);
             }
-        }
-
-        /* ===== MEJORAS ESPECÍFICAS PARA IOS ===== */
-        @supports (-webkit-touch-callout: none) {
-            body {
-                padding-bottom: env(safe-area-inset-bottom);
-            }
-            
-            .btn {
-                padding: 16px 24px;
-            }
-            
-            input, select, textarea {
-                font-size: 16px; /* Previene zoom en iOS */
-            }
-        }
-
-        /* ===== MEJORAS DE RENDIMIENTO ===== */
-        .will-change {
-            will-change: transform;
         }
 
         /* ===== SCROLL PERSONALIZADO ===== */
@@ -1308,7 +1319,7 @@
                 <div class="question-row">
                     <div class="question-label">2. Tipo de Amputación<span class="required">*</span></div>
                     <div class="select-wrapper question-input">
-                        <select id="amputacion" class="form-control select" onchange="calcularIRAT()" required>
+                        <select id="amputacion" class="form-control select" onchange="calcularIRAT(); actualizarRestricciones();" required>
                             <option value="">Seleccione una opción</option>
                             <option value="0">Sin amputaciones (0 puntos)</option>
                             <option value="1">Amputación transmetatarsiana (1 punto)</option>
@@ -1324,7 +1335,7 @@
                 <div class="question-row">
                     <div class="question-label">3. Función de Brazos<span class="required">*</span></div>
                     <div class="select-wrapper question-input">
-                        <select id="brazos" class="form-control select" onchange="calcularIRAT()" required>
+                        <select id="brazos" class="form-control select" onchange="calcularIRAT(); actualizarRestricciones();" required>
                             <option value="">Seleccione una opción</option>
                             <option value="0">Ambos brazos normales (0 puntos)</option>
                             <option value="1">Problemas en un brazo (1 punto)</option>
@@ -1381,54 +1392,490 @@
                     </div>
                 </div>
                 
-                <!-- Sección colapsable para móvil -->
-                <details>
-                    <summary style="padding: 15px; background: #fff3e0; border-radius: var(--radius); cursor: pointer; margin-bottom: 15px;">
-                        <strong>Ver todos los items del Tinetti</strong>
-                    </summary>
-                    
-                    <div class="tinetti-grid">
-                        <!-- Equilibrio - 16 ítems -->
-                        <div class="tinetti-category">
-                            <h4><i class="fas fa-balance-scale"></i> I. EQUILIBRIO (Máx. 16 pts)</h4>
-                            
-                            <!-- Solo mostramos 3 items como ejemplo, el resto está en el details -->
-                            <div class="tinetti-option-group">
-                                <div class="question-label">1. Sentado sin apoyo</div>
-                                <div class="tinetti-option-row">
-                                    <label class="tinetti-option-label">
-                                        <input type="radio" name="tinetti-balance-1" class="tinetti-option-radio" value="1" onchange="calcularTinetti()">
-                                        <span class="tinetti-option-value">1 pt</span>
-                                        Estable, seguro
-                                    </label>
-                                </div>
-                                <div class="tinetti-option-row">
-                                    <label class="tinetti-option-label">
-                                        <input type="radio" name="tinetti-balance-1" class="tinetti-option-radio" value="0" onchange="calcularTinetti()">
-                                        <span class="tinetti-option-value">0 pt</span>
-                                        Se cae o se desliza
-                                    </label>
-                                </div>
-                                <div class="tinetti-option-row" style="background: #fff3e0; border-color: #ffb74d;">
-                                    <label class="tinetti-option-label">
-                                        <input type="radio" name="tinetti-balance-1" class="tinetti-option-radio" value="NE" onchange="calcularTinetti()">
-                                        <span class="tinetti-option-value" style="color: var(--warning);">NE</span>
-                                        No Evaluable
-                                    </label>
-                                </div>
+                <!-- TINETTI COMPLETO - EQUILIBRIO (16 items) -->
+                <div class="tinetti-grid">
+                    <!-- Equilibrio - 16 ítems COMPLETOS -->
+                    <div class="tinetti-category">
+                        <h4><i class="fas fa-balance-scale"></i> I. EQUILIBRIO (Máx. 16 pts)</h4>
+                        
+                        <!-- Pregunta 1: Sentado sin apoyo -->
+                        <div class="tinetti-option-group">
+                            <div class="question-label">1. Sentado sin apoyo</div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-1" class="tinetti-option-radio" value="1" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">1 pt</span>
+                                    Estable, seguro
+                                </label>
                             </div>
-                            
-                            <!-- Más items del Tinetti... (se mantienen igual pero dentro del details) -->
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-1" class="tinetti-option-radio" value="0" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">0 pt</span>
+                                    Se cae o se desliza
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row tinetti-ne-option">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-1" class="tinetti-option-radio" value="NE" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value" style="color: var(--warning);">NE</span>
+                                    No Evaluable
+                                </label>
+                            </div>
                         </div>
                         
-                        <!-- Marcha - 8 ítems -->
-                        <div class="tinetti-category">
-                            <h4><i class="fas fa-shoe-prints"></i> II. MARCHA (Máx. 12 pts)</h4>
-                            
-                            <!-- Items de marcha... -->
+                        <!-- Pregunta 2: Levantarse -->
+                        <div class="tinetti-option-group">
+                            <div class="question-label">2. Levantarse</div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-2" class="tinetti-option-radio" value="2" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">2 pt</span>
+                                    Capaz sin usar brazos
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-2" class="tinetti-option-radio" value="1" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">1 pt</span>
+                                    Capaz, usa brazos para ayudarse
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-2" class="tinetti-option-radio" value="0" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">0 pt</span>
+                                    Incapaz sin ayuda
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row tinetti-ne-option">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-2" class="tinetti-option-radio" value="NE" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value" style="color: var(--warning);">NE</span>
+                                    No Evaluable
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Pregunta 3: Intentos de levantarse -->
+                        <div class="tinetti-option-group">
+                            <div class="question-label">3. Intentos de levantarse</div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-3" class="tinetti-option-radio" value="2" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">2 pt</span>
+                                    Capaz, se levanta con un intento
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-3" class="tinetti-option-radio" value="1" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">1 pt</span>
+                                    Capaz, requiere más de un intento
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-3" class="tinetti-option-radio" value="0" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">0 pt</span>
+                                    Incapaz sin ayuda
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row tinetti-ne-option">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-3" class="tinetti-option-radio" value="NE" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value" style="color: var(--warning);">NE</span>
+                                    No Evaluable
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Pregunta 4: Equilibrio inmediato al levantarse -->
+                        <div class="tinetti-option-group">
+                            <div class="question-label">4. Equilibrio inmediato al levantarse (primeros 5 seg)</div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-4" class="tinetti-option-radio" value="2" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">2 pt</span>
+                                    Estable sin apoyo
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-4" class="tinetti-option-radio" value="1" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">1 pt</span>
+                                    Estable pero usa bastón/andador
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-4" class="tinetti-option-radio" value="0" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">0 pt</span>
+                                    Inestable (se tambalea, mueve pies)
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row tinetti-ne-option">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-4" class="tinetti-option-radio" value="NE" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value" style="color: var(--warning);">NE</span>
+                                    No Evaluable
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Pregunta 5: Equilibrio de pie -->
+                        <div class="tinetti-option-group">
+                            <div class="question-label">5. Equilibrio de pie</div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-5" class="tinetti-option-radio" value="2" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">2 pt</span>
+                                    Estable sin apoyo estrecho
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-5" class="tinetti-option-radio" value="1" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">1 pt</span>
+                                    Estable con apoyo amplio o usa bastón/andador
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-5" class="tinetti-option-radio" value="0" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">0 pt</span>
+                                    Inestable
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row tinetti-ne-option">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-5" class="tinetti-option-radio" value="NE" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value" style="color: var(--warning);">NE</span>
+                                    No Evaluable
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Pregunta 6: Equilibrio con ojos cerrados -->
+                        <div class="tinetti-option-group">
+                            <div class="question-label">6. Equilibrio con ojos cerrados (10 segundos)</div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-6" class="tinetti-option-radio" value="1" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">1 pt</span>
+                                    Estable
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-6" class="tinetti-option-radio" value="0" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">0 pt</span>
+                                    Inestable
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row tinetti-ne-option">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-6" class="tinetti-option-radio" value="NE" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value" style="color: var(--warning);">NE</span>
+                                    No Evaluable
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Pregunta 7: Girar 360 grados -->
+                        <div class="tinetti-option-group">
+                            <div class="question-label">7. Girar 360 grados</div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-7" class="tinetti-option-radio" value="2" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">2 pt</span>
+                                    Continuo y estable
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-7" class="tinetti-option-radio" value="1" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">1 pt</span>
+                                    Pasos continuos
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-7" class="tinetti-option-radio" value="0" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">0 pt</span>
+                                    Pasos discontinuos
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row tinetti-ne-option">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-7" class="tinetti-option-radio" value="NE" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value" style="color: var(--warning);">NE</span>
+                                    No Evaluable
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Pregunta 8: Sentarse -->
+                        <div class="tinetti-option-group">
+                            <div class="question-label">8. Sentarse</div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-8" class="tinetti-option-radio" value="2" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">2 pt</span>
+                                    Seguro, movimientos suaves
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-8" class="tinetti-option-radio" value="1" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">1 pt</span>
+                                    Usa brazos o no es suave
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-8" class="tinetti-option-radio" value="0" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">0 pt</span>
+                                    Inseguro (mal alineamiento, distancia)
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row tinetti-ne-option">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-balance-8" class="tinetti-option-radio" value="NE" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value" style="color: var(--warning);">NE</span>
+                                    No Evaluable
+                                </label>
+                            </div>
                         </div>
                     </div>
-                </details>
+                    
+                    <!-- Marcha - 8 ítems COMPLETOS -->
+                    <div class="tinetti-category">
+                        <h4><i class="fas fa-shoe-prints"></i> II. MARCHA (Máx. 12 pts)</h4>
+                        
+                        <!-- Pregunta 9: Inicio de la marcha -->
+                        <div class="tinetti-option-group">
+                            <div class="question-label">9. Inicio de la marcha</div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-9" class="tinetti-option-radio" value="1" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">1 pt</span>
+                                    Sin vacilación
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-9" class="tinetti-option-radio" value="0" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">0 pt</span>
+                                    Cualquier vacilación o múltiples intentos
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row tinetti-ne-option">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-9" class="tinetti-option-radio" value="NE" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value" style="color: var(--warning);">NE</span>
+                                    No Evaluable
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Pregunta 10: Longitud y altura del paso (pie derecho) -->
+                        <div class="tinetti-option-group">
+                            <div class="question-label">10. Longitud y altura del paso (pie derecho)</div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-10" class="tinetti-option-radio" value="1" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">1 pt</span>
+                                    Pasa al derecho
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-10" class="tinetti-option-radio" value="0" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">0 pt</span>
+                                    Pie izquierdo no pasa al derecho
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row tinetti-ne-option">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-10" class="tinetti-option-radio" value="NE" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value" style="color: var(--warning);">NE</span>
+                                    No Evaluable
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Pregunta 11: Longitud y altura del paso (pie izquierdo) -->
+                        <div class="tinetti-option-group">
+                            <div class="question-label">11. Longitud y altura del paso (pie izquierdo)</div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-11" class="tinetti-option-radio" value="1" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">1 pt</span>
+                                    Pasa al izquierdo
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-11" class="tinetti-option-radio" value="0" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">0 pt</span>
+                                    Pie derecho no pasa al izquierdo
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row tinetti-ne-option">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-11" class="tinetti-option-radio" value="NE" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value" style="color: var(--warning);">NE</span>
+                                    No Evaluable
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Pregunta 12: Simetría del paso -->
+                        <div class="tinetti-option-group">
+                            <div class="question-label">12. Simetría del paso</div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-12" class="tinetti-option-radio" value="1" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">1 pt</span>
+                                    Simétrico
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-12" class="tinetti-option-radio" value="0" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">0 pt</span>
+                                    Asimétrico
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row tinetti-ne-option">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-12" class="tinetti-option-radio" value="NE" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value" style="color: var(--warning);">NE</span>
+                                    No Evaluable
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Pregunta 13: Continuidad del paso -->
+                        <div class="tinetti-option-group">
+                            <div class="question-label">13. Continuidad del paso</div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-13" class="tinetti-option-radio" value="1" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">1 pt</span>
+                                    Continuo
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-13" class="tinetti-option-radio" value="0" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">0 pt</span>
+                                    Interrumpido o discontinuo
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row tinetti-ne-option">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-13" class="tinetti-option-radio" value="NE" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value" style="color: var(--warning);">NE</span>
+                                    No Evaluable
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Pregunta 14: Desviación de la marcha -->
+                        <div class="tinetti-option-group">
+                            <div class="question-label">14. Desviación de la marcha</div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-14" class="tinetti-option-radio" value="2" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">2 pt</span>
+                                    Sin desviación
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-14" class="tinetti-option-radio" value="1" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">1 pt</span>
+                                    Se desvía levemente/usa dispositivo
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-14" class="tinetti-option-radio" value="0" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">0 pt</span>
+                                    Se desvía marcadamente
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row tinetti-ne-option">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-14" class="tinetti-option-radio" value="NE" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value" style="color: var(--warning);">NE</span>
+                                    No Evaluable
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Pregunta 15: Tronco -->
+                        <div class="tinetti-option-group">
+                            <div class="question-label">15. Tronco</div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-15" class="tinetti-option-radio" value="2" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">2 pt</span>
+                                    Sin oscilación, sin flexión
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-15" class="tinetti-option-radio" value="1" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">1 pt</span>
+                                    Sin oscilación pero flexión rodillas/espalda
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-15" class="tinetti-option-radio" value="0" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">0 pt</span>
+                                    Marcada oscilación o usa dispositivo
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row tinetti-ne-option">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-15" class="tinetti-option-radio" value="NE" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value" style="color: var(--warning);">NE</span>
+                                    No Evaluable
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Pregunta 16: Base de sustentación -->
+                        <div class="tinetti-option-group">
+                            <div class="question-label">16. Base de sustentación</div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-16" class="tinetti-option-radio" value="1" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">1 pt</span>
+                                    Talones casi juntos al caminar
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-16" class="tinetti-option-radio" value="0" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value">0 pt</span>
+                                    Talones separados al caminar
+                                </label>
+                            </div>
+                            <div class="tinetti-option-row tinetti-ne-option">
+                                <label class="tinetti-option-label">
+                                    <input type="radio" name="tinetti-gait-16" class="tinetti-option-radio" value="NE" onchange="calcularTinetti()">
+                                    <span class="tinetti-option-value" style="color: var(--warning);">NE</span>
+                                    No Evaluable
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
                 <!-- Contador de NE -->
                 <div style="text-align: center; margin: 20px 0; padding: 15px; background: #fff3e0; border-radius: var(--radius);">
@@ -1445,6 +1892,16 @@
                     <div class="score-label">Puntaje Total Tinetti (Ajustado)</div>
                     <div class="score-value" id="puntaje-tinetti">0</div>
                     <div class="score-description" id="tinetti-description">Puntaje sobre 28 puntos</div>
+                </div>
+            </div>
+
+            <!-- RESTRICCIONES DE AYUDAS TÉCNICAS SEGÚN CONDICIÓN FÍSICA -->
+            <div class="restricciones-display" id="restricciones-display">
+                <h4 style="color: var(--warning); margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-exclamation-circle"></i> Restricciones de Ayudas Técnicas
+                </h4>
+                <div id="restricciones-lista">
+                    <!-- Se llenará dinámicamente -->
                 </div>
             </div>
 
@@ -1776,9 +2233,11 @@
         let currentUser = null;
         let currentUserId = null;
         let lastReportData = {};
+        let restriccionesActivas = [];
         
         // ============================================
         // SISTEMA INTEGRADO IRAT+TINETTI+NORTON
+        // CON RESTRICCIONES FÍSICAS
         // ============================================
         const SistemaIntegrado = {
             escalasMaximas: {
@@ -1794,14 +2253,14 @@
             },
             
             ayudasTecnicas: [
-                { id: "baston-simple", nombre: "Bastón Simple", icono: "fas fa-cane", nivel: 1 },
-                { id: "baston-3-apoyos", nombre: "Bastón de 3 Apoyos", icono: "fas fa-cane", nivel: 2 },
-                { id: "andador-2-ruedas", nombre: "Andador de 2 Ruedas", icono: "fas fa-walking", nivel: 3 },
-                { id: "andador-4-ruedas", nombre: "Andador de 4 Ruedas", icono: "fas fa-walking", nivel: 4 },
-                { id: "andador-fijo", nombre: "Andador Fijo", icono: "fas fa-walking", nivel: 5 },
-                { id: "silla-ruedas", nombre: "Silla de Ruedas", icono: "fas fa-wheelchair", nivel: 6 },
-                { id: "cojin-antiescaras", nombre: "Cojín Antiescaras", icono: "fas fa-bed", nivel: 7 },
-                { id: "colchon-antiescaras", nombre: "Colchón Antiescaras", icono: "fas fa-bed", nivel: 8 }
+                { id: "baston-simple", nombre: "Bastón Simple", icono: "fas fa-cane", nivel: 1, requiereAmbosBrazos: false },
+                { id: "baston-3-apoyos", nombre: "Bastón de 3 Apoyos", icono: "fas fa-cane", nivel: 2, requiereAmbosBrazos: false },
+                { id: "andador-2-ruedas", nombre: "Andador de 2 Ruedas", icono: "fas fa-walking", nivel: 3, requiereAmbosBrazos: true },
+                { id: "andador-4-ruedas", nombre: "Andador de 4 Ruedas", icono: "fas fa-walking", nivel: 4, requiereAmbosBrazos: true },
+                { id: "andador-fijo", nombre: "Andador Fijo", icono: "fas fa-walking", nivel: 5, requiereAmbosBrazos: true },
+                { id: "silla-ruedas", nombre: "Silla de Ruedas", icono: "fas fa-wheelchair", nivel: 6, requiereAmbosBrazos: false },
+                { id: "cojin-antiescaras", nombre: "Cojín Antiescaras", icono: "fas fa-bed", nivel: 7, requiereAmbosBrazos: false },
+                { id: "colchon-antiescaras", nombre: "Colchón Antiescaras", icono: "fas fa-bed", nivel: 8, requiereAmbosBrazos: false }
             ],
             
             clasificacionIIM: [
@@ -1855,6 +2314,67 @@
                 }
             ],
             
+            // NUEVO: Definir restricciones según condiciones físicas
+            restricciones: {
+                // Usuario con solo 1 brazo bueno
+                soloUnBrazoBueno: {
+                    id: "solo-un-brazo",
+                    mensaje: "⚠️ Usuario con solo 1 brazo funcional",
+                    ayudasPermitidas: ["baston-simple", "baston-3-apoyos", "silla-ruedas"],
+                    ayudasBloqueadas: ["andador-2-ruedas", "andador-4-ruedas", "andador-fijo"],
+                    aplica: function(amputacion, brazos) {
+                        return brazos === 1; // Problemas en un brazo
+                    }
+                },
+                
+                // Usuario con amputación bilateral (ambas piernas)
+                amputacionBilateral: {
+                    id: "amputacion-bilateral",
+                    mensaje: "🚫 Usuario con amputación bilateral de miembros inferiores",
+                    ayudasPermitidas: ["silla-ruedas", "cojin-antiescaras", "colchon-antiescaras"],
+                    ayudasBloqueadas: ["baston-simple", "baston-3-apoyos", "andador-2-ruedas", "andador-4-ruedas", "andador-fijo"],
+                    aplica: function(amputacion, brazos) {
+                        // Amputación bilateral infracondílea (4) o supracondílea (6)
+                        return amputacion === 4 || amputacion === 6;
+                    }
+                },
+                
+                // Usuario con amputación unilateral
+                amputacionUnilateral: {
+                    id: "amputacion-unilateral",
+                    mensaje: "⚠️ Usuario con amputación unilateral - Requiere evaluación específica",
+                    ayudasPermitidas: ["baston-simple", "baston-3-apoyos", "andador-2-ruedas", "andador-4-ruedas", "silla-ruedas"],
+                    ayudasBloqueadas: [],
+                    evaluacionEspecial: true,
+                    aplica: function(amputacion, brazos) {
+                        // Amputación unilateral infracondílea (3) o supracondílea (5)
+                        return amputacion === 3 || amputacion === 5;
+                    }
+                },
+                
+                // Usuario con problemas en ambos brazos
+                ambosBrazosProblemas: {
+                    id: "ambos-brazos-problemas",
+                    mensaje: "🚫 Usuario con problemas en ambos brazos",
+                    ayudasPermitidas: ["silla-ruedas", "cojin-antiescaras", "colchon-antiescaras"],
+                    ayudasBloqueadas: ["baston-simple", "baston-3-apoyos", "andador-2-ruedas", "andador-4-ruedas", "andador-fijo"],
+                    aplica: function(amputacion, brazos) {
+                        return brazos === 2; // Problemas en ambos brazos
+                    }
+                },
+                
+                // Usuario con amputación transmetatarsiana
+                amputacionTransmetatarsiana: {
+                    id: "amputacion-transmetatarsiana",
+                    mensaje: "⚠️ Usuario con amputación transmetatarsiana - Limitaciones menores",
+                    ayudasPermitidas: ["baston-simple", "baston-3-apoyos", "andador-2-ruedas", "andador-4-ruedas", "silla-ruedas"],
+                    ayudasBloqueadas: ["andador-fijo"],
+                    aplica: function(amputacion, brazos) {
+                        return amputacion === 1;
+                    }
+                }
+            },
+            
             calcularTinettiAjustado: function(puntajeBruto, itemsNE) {
                 if (itemsNE === 0) {
                     return {
@@ -1896,7 +2416,56 @@
                 return Math.round(iim * 100) / 100;
             },
             
-            determinarClasificacion: function(iim, factoresCriticos) {
+            // NUEVO: Detectar restricciones físicas
+            detectarRestricciones: function(amputacion, brazos) {
+                const restriccionesDetectadas = [];
+                
+                for (const key in this.restricciones) {
+                    const restriccion = this.restricciones[key];
+                    if (restriccion.aplica(amputacion, brazos)) {
+                        restriccionesDetectadas.push(restriccion);
+                    }
+                }
+                
+                return restriccionesDetectadas;
+            },
+            
+            // NUEVO: Filtrar ayudas según restricciones
+            filtrarAyudasPorRestricciones: function(combinacionesBase, restricciones) {
+                if (restricciones.length === 0) {
+                    return combinacionesBase;
+                }
+                
+                let ayudasPermitidas = [];
+                let ayudasBloqueadas = [];
+                
+                // Recolectar todas las ayudas permitidas y bloqueadas
+                restricciones.forEach(restriccion => {
+                    if (restriccion.ayudasPermitidas) {
+                        ayudasPermitidas = [...ayudasPermitidas, ...restriccion.ayudasPermitidas];
+                    }
+                    if (restriccion.ayudasBloqueadas) {
+                        ayudasBloqueadas = [...ayudasBloqueadas, ...restriccion.ayudasBloqueadas];
+                    }
+                });
+                
+                // Si hay ayudas permitidas específicas, usarlas como base
+                if (ayudasPermitidas.length > 0) {
+                    const ayudasUnicas = [...new Set(ayudasPermitidas)];
+                    return combinacionesBase.filter(ayuda => ayudasUnicas.includes(ayuda));
+                }
+                
+                // Si no hay ayudas permitidas específicas, bloquear las no permitidas
+                if (ayudasBloqueadas.length > 0) {
+                    const bloqueadasUnicas = [...new Set(ayudasBloqueadas)];
+                    return combinacionesBase.filter(ayuda => !bloqueadasUnicas.includes(ayuda));
+                }
+                
+                return combinacionesBase;
+            },
+            
+            determinarClasificacion: function(iim, factoresCriticos, amputacion, brazos) {
+                // Determinar clasificación base por IIM
                 let clasificacionBase = null;
                 for (const clasif of this.clasificacionIIM) {
                     if (iim >= clasif.rango[0] && iim <= clasif.rango[1]) {
@@ -1909,9 +2478,21 @@
                     clasificacionBase = { ...this.clasificacionIIM[0] };
                 }
                 
-                let clasificacionFinal = { ...clasificacionBase };
-                const combinacionesAjustadas = [...clasificacionBase.combinaciones];
+                // NUEVO: Detectar restricciones físicas
+                const restriccionesDetectadas = this.detectarRestricciones(amputacion, brazos);
                 
+                // NUEVO: Filtrar combinaciones según restricciones
+                let combinacionesAjustadas = [...clasificacionBase.combinaciones];
+                
+                // Aplicar filtro de restricciones
+                combinacionesAjustadas = this.filtrarAyudasPorRestricciones(combinacionesAjustadas, restriccionesDetectadas);
+                
+                // Si después de filtrar no quedan ayudas, agregar silla de ruedas por defecto
+                if (combinacionesAjustadas.length === 0) {
+                    combinacionesAjustadas.push("silla-ruedas");
+                }
+                
+                // Aplicar factores críticos tradicionales
                 if (factoresCriticos.nortonScore <= 12) {
                     if (!combinacionesAjustadas.includes("cojin-antiescaras")) {
                         combinacionesAjustadas.push("cojin-antiescaras");
@@ -1944,12 +2525,18 @@
                     }
                 }
                 
-                clasificacionFinal.combinaciones = [...new Set(combinacionesAjustadas)];
-                const ayudaPrincipalNombres = clasificacionFinal.combinaciones.map(id => {
-                    const ayuda = this.ayudasTecnicas.find(a => a.id === id);
+                const combinacionesFinales = [...new Set(combinacionesAjustadas)];
+                const ayudaPrincipalNombres = combinacionesFinales.map(id => {
+                    const ayuda = this.getAyudaById(id);
                     return ayuda ? ayuda.nombre : id;
                 });
-                clasificacionFinal.ayudaPrincipal = ayudaPrincipalNombres.join(" + ");
+                
+                const clasificacionFinal = {
+                    ...clasificacionBase,
+                    combinaciones: combinacionesFinales,
+                    ayudaPrincipal: ayudaPrincipalNombres.join(" + "),
+                    restricciones: restriccionesDetectadas
+                };
                 
                 return clasificacionFinal;
             },
@@ -1958,7 +2545,7 @@
                 return this.ayudasTecnicas.find(ayuda => ayuda.id === id);
             },
             
-            generarRecomendaciones: function(clasificacion, puntajes, factoresCriticos) {
+            generarRecomendaciones: function(clasificacion, puntajes, factoresCriticos, restricciones) {
                 const recomendaciones = [];
                 
                 recomendaciones.push({
@@ -1968,6 +2555,28 @@
                           clasificacion.riesgo === "ALTO" ? "warning" : "info",
                     icono: "fas fa-chart-bar"
                 });
+                
+                // NUEVO: Recomendaciones específicas por restricciones
+                if (restricciones && restricciones.length > 0) {
+                    restricciones.forEach(restriccion => {
+                        recomendaciones.push({
+                            titulo: `⚠️ ${restriccion.mensaje.split(' - ')[0]}`,
+                            texto: restriccion.mensaje,
+                            tipo: restriccion.id.includes("bilateral") ? "danger" : "warning",
+                            icono: "fas fa-exclamation-triangle"
+                        });
+                        
+                        // Si es amputación unilateral, agregar recomendación específica
+                        if (restriccion.id === "amputacion-unilateral") {
+                            recomendaciones.push({
+                                titulo: "🦿 Evaluación Especial para Amputación Unilateral",
+                                texto: "Requiere evaluación por especialista en rehabilitación para determinar el tipo específico de ayuda técnica. Considerar: 1. Entrenamiento de marcha con prótesis. 2. Adaptación del entorno. 3. Terapia física específica.",
+                                tipo: "warning",
+                                icono: "fas fa-user-md"
+                            });
+                        }
+                    });
+                }
                 
                 recomendaciones.push({
                     titulo: `🦽 Ayudas Recomendadas`,
@@ -2011,25 +2620,6 @@
                         icono: "fas fa-exclamation-triangle"
                     });
                 }
-                
-                if (factoresCriticos.viveSolo) {
-                    recomendaciones.push({
-                        titulo: "🏠 Vive Solo",
-                        texto: "Sistema de teleasistencia recomendado. Visitas regulares de servicios sociales.",
-                        tipo: "info",
-                        icono: "fas fa-home"
-                    });
-                }
-                
-                recomendaciones.push({
-                    titulo: "📅 Seguimiento",
-                    texto: clasificacion.riesgo === "EXTREMO" ? "Reevaluación semanal." :
-                          clasificacion.riesgo === "MUY ALTO" ? "Reevaluación cada 15 días." :
-                          clasificacion.riesgo === "ALTO" ? "Reevaluación mensual." :
-                          "Reevaluación cada 3 meses.",
-                    tipo: "success",
-                    icono: "fas fa-calendar-check"
-                });
                 
                 return recomendaciones.slice(0, 7);
             }
@@ -2223,6 +2813,37 @@
         }
         
         // ============================================
+        // ACTUALIZAR RESTRICCIONES SEGÚN CONDICIÓN FÍSICA
+        // ============================================
+        function actualizarRestricciones() {
+            const amputacion = parseInt(document.getElementById('amputacion').value) || 0;
+            const brazos = parseInt(document.getElementById('brazos').value) || 0;
+            
+            const restriccionesDetectadas = SistemaIntegrado.detectarRestricciones(amputacion, brazos);
+            restriccionesActivas = restriccionesDetectadas;
+            
+            const restriccionesDisplay = document.getElementById('restricciones-display');
+            const restriccionesLista = document.getElementById('restricciones-lista');
+            
+            if (restriccionesDetectadas.length > 0) {
+                restriccionesDisplay.classList.add('active');
+                restriccionesLista.innerHTML = '';
+                
+                restriccionesDetectadas.forEach(restriccion => {
+                    const item = document.createElement('div');
+                    item.className = 'restriccion-item';
+                    item.innerHTML = `
+                        <i class="fas fa-exclamation-circle" style="color: var(--warning);"></i>
+                        <div>${restriccion.mensaje}</div>
+                    `;
+                    restriccionesLista.appendChild(item);
+                });
+            } else {
+                restriccionesDisplay.classList.remove('active');
+            }
+        }
+        
+        // ============================================
         // GENERACIÓN DE RESULTADOS
         // ============================================
         function generarResultadosIntegrados() {
@@ -2234,6 +2855,8 @@
             const iratScore = calcularIRAT();
             const tinettiResult = calcularTinetti();
             const nortonScore = calcularNorton();
+            const amputacion = parseInt(document.getElementById('amputacion').value) || 0;
+            const brazos = parseInt(document.getElementById('brazos').value) || 0;
             
             const factoresCriticos = {
                 tinettiNE: tinettiResult.neCount,
@@ -2252,7 +2875,7 @@
             );
             
             const iim = SistemaIntegrado.calcularIIM(puntajesNormalizados);
-            const clasificacion = SistemaIntegrado.determinarClasificacion(iim, factoresCriticos);
+            const clasificacion = SistemaIntegrado.determinarClasificacion(iim, factoresCriticos, amputacion, brazos);
             const recomendaciones = SistemaIntegrado.generarRecomendaciones(
                 clasificacion, 
                 {
@@ -2261,7 +2884,8 @@
                     tinettiNorm: puntajesNormalizados.TINETTI,
                     nortonNorm: puntajesNormalizados.NORTON
                 },
-                factoresCriticos
+                factoresCriticos,
+                clasificacion.restricciones
             );
             
             actualizarUIResultados(iratScore, tinettiResult, nortonScore, puntajesNormalizados, iim, clasificacion, recomendaciones);
@@ -2287,6 +2911,7 @@
                 },
                 factoresCriticos: factoresCriticos,
                 clasificacion: clasificacion,
+                restricciones: clasificacion.restricciones,
                 recomendaciones: recomendaciones,
                 timestamp: new Date().toISOString()
             };
@@ -2455,6 +3080,7 @@
             calcularIRAT();
             calcularTinetti();
             calcularNorton();
+            actualizarRestricciones();
             
             document.getElementById('results-section').style.display = 'none';
             
@@ -2569,7 +3195,6 @@
             }
             
             showNotification('⚠️ Función PDF en desarrollo', 'warning');
-            // Aquí iría la lógica completa de generación de PDF
         }
         
         // ============================================
@@ -2582,19 +3207,6 @@
                 document.getElementById('quick-nav').style.display = 'none';
             }
         });
-        
-        // Prevenir zoom en inputs en iOS
-        document.addEventListener('touchstart', function(event) {
-            if (event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT' || event.target.tagName === 'TEXTAREA') {
-                event.target.style.fontSize = '16px';
-            }
-        });
-        
-        document.addEventListener('blur', function(event) {
-            if (event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT' || event.target.tagName === 'TEXTAREA') {
-                event.target.style.fontSize = '';
-            }
-        }, true);
     </script>
 </body>
-    </html>
+                        </html>
