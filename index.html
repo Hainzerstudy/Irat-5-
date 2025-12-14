@@ -538,6 +538,37 @@
             line-height: 1.4;
         }
 
+        /* ===== IIM SCORE RADIO ===== */
+        .iim-score-radio {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .iim-score-radio input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .iim-score-radio label {
+            color: var(--dark);
+            cursor: pointer;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .iim-score-value {
+            background: #e1bee7;
+            color: #7b1fa2;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            margin-left: 5px;
+        }
+
         /* ===== RESULTS SECTION ===== */
         .results-section {
             background: linear-gradient(135deg, #e8f5e9 0%, #e0f2e1 100%);
@@ -611,6 +642,32 @@
         .risk-moderate { background: #fff3e0; color: #ef6c00; }
         .risk-high { background: #ffebee; color: #c62828; }
         .risk-critical { background: #f3e5f5; color: #7b1fa2; }
+
+        /* ===== IIM INDEX INTERPRETATION ===== */
+        .iim-interpretation {
+            background: white;
+            padding: 25px;
+            border-radius: var(--radius);
+            margin-top: 30px;
+            border-left: 6px solid #9c27b0;
+            box-shadow: var(--shadow);
+        }
+
+        .iim-interpretation h4 {
+            color: #7b1fa2;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .iim-interpretation ul {
+            padding-left: 20px;
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        .iim-interpretation li {
+            margin-bottom: 8px;
+        }
 
         /* ===== RECOMMENDATIONS ===== */
         .recommendations-grid {
@@ -1512,7 +1569,7 @@
                 </div>
             </div>
 
-            <!-- IIM - INVENTARIO DE AYUDAS TÉCNICAS -->
+            <!-- IIM - INVENTARIO DE AYUDAS TÉCNICAS CON ÍNDICE -->
             <div class="evaluation-card iim">
                 <div class="evaluation-card-header">
                     <div class="card-icon iim">
@@ -1520,7 +1577,42 @@
                     </div>
                     <div>
                         <h3 class="card-title">IIM - Inventario de Ayudas Técnicas</h3>
-                        <p class="card-subtitle">Seleccione las ayudas técnicas recomendadas para el paciente</p>
+                        <p class="card-subtitle">Evaluación del nivel de dependencia y recomendación de ayudas técnicas (Índice: 0-100)</p>
+                    </div>
+                </div>
+                
+                <!-- PUNTUACIÓN IIM (0-100) -->
+                <div style="background: #f3e5f5; padding: 25px; border-radius: var(--radius); margin-bottom: 30px; border: 2px solid #e1bee7;">
+                    <h4 style="color: #7b1fa2; margin-bottom: 20px; text-align: center;">
+                        <i class="fas fa-calculator"></i> ÍNDICE IIM - Nivel de Dependencia
+                    </h4>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                        <!-- Ítems del IIM con puntuación -->
+                        <div class="iim-score-radio">
+                            <input type="radio" name="iim-puntuacion" id="iim-0" value="0" onchange="calcularIIM()">
+                            <label for="iim-0">0 - Independiente total <span class="iim-score-value">0 pts</span></label>
+                        </div>
+                        
+                        <div class="iim-score-radio">
+                            <input type="radio" name="iim-puntuacion" id="iim-25" value="25" onchange="calcularIIM()">
+                            <label for="iim-25">25 - Independiente con supervisión <span class="iim-score-value">25 pts</span></label>
+                        </div>
+                        
+                        <div class="iim-score-radio">
+                            <input type="radio" name="iim-puntuacion" id="iim-50" value="50" onchange="calcularIIM()">
+                            <label for="iim-50">50 - Dependencia mínima <span class="iim-score-value">50 pts</span></label>
+                        </div>
+                        
+                        <div class="iim-score-radio">
+                            <input type="radio" name="iim-puntuacion" id="iim-75" value="75" onchange="calcularIIM()">
+                            <label for="iim-75">75 - Dependencia moderada <span class="iim-score-value">75 pts</span></label>
+                        </div>
+                        
+                        <div class="iim-score-radio">
+                            <input type="radio" name="iim-puntuacion" id="iim-100" value="100" onchange="calcularIIM()">
+                            <label for="iim-100">100 - Dependencia total <span class="iim-score-value">100 pts</span></label>
+                        </div>
                     </div>
                 </div>
                 
@@ -1711,11 +1803,22 @@
                     </div>
                 </div>
                 
-                <!-- Resumen IIM -->
+                <!-- Puntaje IIM con interpretación -->
                 <div class="score-display" style="background: var(--gradient-iim);">
-                    <div class="score-label">Ayudas Técnicas Recomendadas</div>
+                    <div class="score-label">ÍNDICE IIM - Nivel de Dependencia</div>
                     <div class="score-value" id="puntaje-iim">0</div>
-                    <div class="score-description">Total de ayudas técnicas seleccionadas</div>
+                    <div class="score-description">Interpretación: 0-25 (Independiente) | 26-50 (Mínima) | 51-75 (Moderada) | 76-100 (Severa)</div>
+                </div>
+                
+                <!-- Interpretación del Índice IIM -->
+                <div class="iim-interpretation">
+                    <h4><i class="fas fa-info-circle"></i> Interpretación del Índice IIM</h4>
+                    <ul>
+                        <li><strong>0-25 puntos:</strong> Independiente - Requiere pocas o ninguna ayuda técnica</li>
+                        <li><strong>26-50 puntos:</strong> Dependencia mínima - Se beneficia de algunas ayudas técnicas</li>
+                        <li><strong>51-75 puntos:</strong> Dependencia moderada - Necesita múltiples ayudas técnicas</li>
+                        <li><strong>76-100 puntos:</strong> Dependencia severa - Requiere adaptaciones extensas y supervisión</li>
+                    </ul>
                 </div>
             </div>
 
@@ -1769,15 +1872,23 @@
                     </div>
                     
                     <div class="summary-card iim">
-                        <div class="summary-title">Ayudas Técnicas</div>
+                        <div class="summary-title">Índice IIM</div>
                         <div class="summary-value" id="res-iim-total">0</div>
-                        <div class="summary-risk" id="res-iim-riesgo">Seleccionadas</div>
+                        <div class="summary-risk" id="res-iim-riesgo">Independiente</div>
                     </div>
                     
                     <div class="summary-card global">
                         <div class="summary-title">Clasificación Global</div>
                         <div class="summary-value" id="res-global-riesgo">BAJO</div>
                         <div class="summary-risk" id="res-global-desc">Evaluación</div>
+                    </div>
+                </div>
+                
+                <!-- INTERPRETACIÓN IIM -->
+                <div class="iim-interpretation" style="margin: 30px 0;">
+                    <h4><i class="fas fa-wheelchair"></i> Interpretación del Índice IIM</h4>
+                    <div id="iim-interpretacion-texto">
+                        <!-- La interpretación se generará dinámicamente -->
                     </div>
                 </div>
                 
@@ -1788,6 +1899,16 @@
                     </h3>
                     <div id="iim-recomendaciones-container" class="recommendations-grid">
                         <!-- Las recomendaciones IIM se generan dinámicamente aquí -->
+                    </div>
+                </div>
+                
+                <!-- LISTADO DE AYUDAS SELECCIONADAS -->
+                <div style="margin: 40px 0; display: none;" id="iim-ayudas-container">
+                    <h3 style="color: #7b1fa2; margin-bottom: 20px; border-bottom: 2px solid #e1bee7; padding-bottom: 10px;">
+                        <i class="fas fa-list-check"></i> Ayudas Técnicas Recomendadas
+                    </h3>
+                    <div id="iim-ayudas-lista" style="background: white; padding: 25px; border-radius: var(--radius); box-shadow: var(--shadow);">
+                        <!-- Lista de ayudas seleccionadas -->
                     </div>
                 </div>
                 
@@ -2052,9 +2173,16 @@
         }
         
         // ============================================
-        // IIM - INVENTARIO DE AYUDAS TÉCNICAS
+        // IIM - CÁLCULO DEL ÍNDICE (0-100)
         // ============================================
         function setupIIMListeners() {
+            // Para radio buttons de puntuación
+            const radios = document.querySelectorAll('input[name="iim-puntuacion"]');
+            radios.forEach(radio => {
+                radio.addEventListener('change', calcularIIM);
+            });
+            
+            // Para checkboxes de ayudas técnicas
             const checkboxes = document.querySelectorAll('.iim-checkbox');
             checkboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', calcularIIM);
@@ -2062,85 +2190,133 @@
         }
         
         function calcularIIM() {
+            // Obtener puntuación del radio button seleccionado (0-100)
+            const radioSeleccionado = document.querySelector('input[name="iim-puntuacion"]:checked');
+            let puntuacion = radioSeleccionado ? parseInt(radioSeleccionado.value) : 0;
+            
+            // Ajustar según ayudas seleccionadas
             const checkboxes = document.querySelectorAll('.iim-checkbox:checked');
-            const total = checkboxes.length;
-            document.getElementById('puntaje-iim').textContent = total;
-            return total;
+            const totalAyudas = checkboxes.length;
+            
+            // Fórmula del índice IIM: 
+            // Puntuación base + (número de ayudas * factor de ajuste)
+            // Factor de ajuste: 2 puntos por ayuda (máximo 30 ayudas = 60 puntos)
+            const ajusteAyudas = Math.min(totalAyudas * 2, 60);
+            
+            // Índice final (máximo 100)
+            const indiceFinal = Math.min(puntuacion + ajusteAyudas, 100);
+            
+            document.getElementById('puntaje-iim').textContent = indiceFinal;
+            return indiceFinal;
         }
         
-        function getIIMRecomendaciones() {
+        function getIIMInterpretacion(indice) {
+            let interpretacion = '';
+            let nivel = '';
+            let color = '';
+            
+            if (indice <= 25) {
+                interpretacion = 'Paciente independiente. Requiere pocas o ninguna ayuda técnica para las actividades de la vida diaria.';
+                nivel = 'INDEPENDIENTE';
+                color = 'success';
+            } else if (indice <= 50) {
+                interpretacion = 'Dependencia mínima. Se beneficia de algunas ayudas técnicas específicas para mejorar su autonomía y seguridad.';
+                nivel = 'MÍNIMA DEPENDENCIA';
+                color = 'warning';
+            } else if (indice <= 75) {
+                interpretacion = 'Dependencia moderada. Necesita múltiples ayudas técnicas y posiblemente adaptaciones del entorno para mantener su funcionalidad.';
+                nivel = 'DEPENDENCIA MODERADA';
+                color = 'danger';
+            } else {
+                interpretacion = 'Dependencia severa. Requiere adaptaciones extensas, múltiples ayudas técnicas y supervisión constante para las actividades básicas.';
+                nivel = 'DEPENDENCIA SEVERA';
+                color = 'critical';
+            }
+            
+            return {
+                texto: interpretacion,
+                nivel: nivel,
+                color: color,
+                indice: indice
+            };
+        }
+        
+        function getIIMRecomendaciones(indice, ayudasSeleccionadas) {
             const recomendaciones = [];
-            const ayudasSeleccionadas = [];
             
-            // Recolectar ayudas seleccionadas
-            const checkboxes = document.querySelectorAll('.iim-checkbox:checked');
-            checkboxes.forEach(checkbox => {
-                const label = document.querySelector(`label[for="${checkbox.id}"]`);
-                if (label) {
-                    ayudasSeleccionadas.push(label.textContent.trim());
-                }
-            });
-            
-            // Generar recomendaciones basadas en las ayudas seleccionadas
-            if (ayudasSeleccionadas.length > 0) {
+            // Recomendaciones basadas en el índice
+            if (indice <= 25) {
                 recomendaciones.push({
-                    titulo: '🎯 Recomendaciones Específicas de Ayudas Técnicas',
-                    texto: `Se han seleccionado ${ayudasSeleccionadas.length} ayudas técnicas para el paciente. Es importante realizar una capacitación en el uso correcto de cada una.`,
+                    titulo: '✅ Evaluación Preventiva',
+                    texto: 'Realizar seguimiento anual. Mantener actividad física regular y evaluar entorno domiciliario para prevención.',
                     tipo: 'iim',
                     color: 'iim'
                 });
-                
-                // Recomendaciones por categoría
-                const categorias = {
-                    'marcha': 'Marcha y Deambulación',
-                    'sillas': 'Movilidad con Silla de Ruedas',
-                    'baño': 'Seguridad en el Baño',
-                    'vestido': 'Vestido Independiente',
-                    'alimentacion': 'Alimentación Autónoma',
-                    'hogar': 'Adaptaciones del Hogar'
-                };
-                
-                Object.entries(categorias).forEach(([categoria, nombre]) => {
-                    const ayudasCategoria = document.querySelectorAll(`.iim-checkbox[data-category="${categoria}"]:checked`);
-                    if (ayudasCategoria.length > 0) {
-                        recomendaciones.push({
-                            titulo: `🏠 ${nombre}`,
-                            texto: `Se recomiendan ${ayudasCategoria.length} ayudas técnicas para ${nombre.toLowerCase()}.`,
-                            tipo: 'iim',
-                            color: 'iim'
-                        });
-                    }
-                });
-                
-                // Recomendaciones de entrenamiento
+            } else if (indice <= 50) {
                 recomendaciones.push({
-                    titulo: '🏋️‍♂️ Entrenamiento en el Uso de Ayudas',
-                    texto: 'Programar sesiones de entrenamiento con terapia ocupacional para el uso seguro de las ayudas técnicas recomendadas.',
+                    titulo: '🛠️ Ayudas Técnicas Básicas',
+                    texto: 'Considerar implementación de ayudas técnicas seleccionadas. Capacitar en su uso correcto.',
                     tipo: 'iim',
                     color: 'iim'
                 });
                 
                 recomendaciones.push({
-                    titulo: '🏠 Evaluación del Entorno',
-                    texto: 'Realizar evaluación domiciliaria para verificar que el entorno sea adecuado para el uso de las ayudas técnicas recomendadas.',
+                    titulo: '🏠 Evaluación Domiciliaria',
+                    texto: 'Realizar evaluación del entorno domiciliario para identificar barreras y realizar adaptaciones menores.',
+                    tipo: 'iim',
+                    color: 'iim'
+                });
+            } else if (indice <= 75) {
+                recomendaciones.push({
+                    titulo: '🦽 Adaptaciones Extensas',
+                    texto: 'Implementar programa completo de ayudas técnicas. Considerar terapia ocupacional para entrenamiento.',
                     tipo: 'iim',
                     color: 'iim'
                 });
                 
                 recomendaciones.push({
-                    titulo: '📅 Seguimiento y Ajustes',
-                    texto: 'Programar reevaluación a los 30 días para ajustar las ayudas técnicas según la adaptación del paciente.',
+                    titulo: '👥 Intervención Multidisciplinaria',
+                    texto: 'Coordinar con terapia ocupacional, kinesiología y trabajo social para manejo integral.',
                     tipo: 'iim',
                     color: 'iim'
                 });
             } else {
                 recomendaciones.push({
-                    titulo: 'ℹ️ Ayudas Técnicas',
-                    texto: 'No se han seleccionado ayudas técnicas. Considere evaluar si el paciente podría beneficiarse de alguna ayuda para mejorar su independencia.',
+                    titulo: '🏥 Manejo Integral',
+                    texto: 'Requiere evaluación geriátrica integral. Considerar asistencia domiciliaria o centro de día.',
+                    tipo: 'iim',
+                    color: 'iim'
+                });
+                
+                recomendaciones.push({
+                    titulo: '🚑 Supervisión Constante',
+                    texto: 'Implementar sistema de supervisión y alarma. Adaptaciones domiciliarias extensas requeridas.',
                     tipo: 'iim',
                     color: 'iim'
                 });
             }
+            
+            // Recomendaciones específicas por categorías de ayudas seleccionadas
+            const categorias = {
+                'marcha': 'marcha y deambulación',
+                'sillas': 'movilidad con silla de ruedas',
+                'baño': 'seguridad en el baño',
+                'vestido': 'vestido independiente',
+                'alimentacion': 'alimentación autónoma',
+                'hogar': 'adaptaciones del hogar'
+            };
+            
+            Object.entries(categorias).forEach(([categoria, nombre]) => {
+                const ayudasCategoria = document.querySelectorAll(`.iim-checkbox[data-category="${categoria}"]:checked`);
+                if (ayudasCategoria.length > 0) {
+                    recomendaciones.push({
+                        titulo: `🔧 ${ayudasCategoria.length} Ayudas para ${nombre}`,
+                        texto: `Se recomiendan ${ayudasCategoria.length} ayudas técnicas específicas para mejorar la ${nombre}.`,
+                        tipo: 'iim',
+                        color: 'iim'
+                    });
+                }
+            });
             
             return {
                 recomendaciones: recomendaciones,
@@ -2170,7 +2346,7 @@
         // ============================================
         // CLASIFICACIÓN Y RECOMENDACIONES AMPLIADAS
         // ============================================
-        function getCombinedClinicalClassification(iratScore, tinettiScore, nortonScore, iimSeleccionadas) {
+        function getCombinedClinicalClassification(iratScore, tinettiScore, nortonScore, iimIndice, iimNivel) {
             let recomendaciones = [];
             let nivelRiesgoGlobal = 'BAJO';
             let colorGlobal = 'success';
@@ -2225,36 +2401,31 @@
                 }
             }
             
+            // Considerar IIM en la clasificación global
+            if (iimNivel === 'DEPENDENCIA SEVERA' && nivelRiesgoGlobal === 'BAJO') {
+                nivelRiesgoGlobal = 'MODERADO';
+                colorGlobal = 'warning';
+            } else if (iimNivel === 'DEPENDENCIA SEVERA' && nivelRiesgoGlobal === 'MODERADO') {
+                nivelRiesgoGlobal = 'ALTO';
+                colorGlobal = 'danger';
+            }
+            
             // ============================================
             // RECOMENDACIONES AMPLIADAS
             // ============================================
             
             // 1. INTERVENCIÓN CON KINESIOLOGÍA
             recomendaciones.push({
-                titulo: '🏋️‍♂️ Evaluación Kinesiológica Inicial',
-                texto: 'Realizar evaluación completa de fuerza muscular, rango articular y equilibrio estático/dinámico.',
-                tipo: 'kin',
-                color: 'kin'
-            });
-            
-            recomendaciones.push({
-                titulo: '🦵 Ejercicios de Fortalecimiento',
-                texto: 'Programa progresivo de ejercicios para cuádriceps, isquiotibiales, glúteos y músculos estabilizadores del tobillo.',
+                titulo: '🏋️‍♂️ Evaluación Kinesiológica',
+                texto: 'Realizar evaluación completa de fuerza, equilibrio y movilidad funcional.',
                 tipo: 'kin',
                 color: 'kin'
             });
             
             // 2. SALUD MENTAL
             recomendaciones.push({
-                titulo: '🧠 Evaluación Neuropsicológica',
-                texto: 'Valoración de funciones cognitivas, memoria, atención y estado emocional.',
-                tipo: 'mental',
-                color: 'mental'
-            });
-            
-            recomendaciones.push({
-                titulo: '😊 Intervención en Depresión/Ansiedad',
-                texto: 'Evaluar síntomas depresivos y ansiosos, derivar a psicología si es necesario.',
+                titulo: '🧠 Evaluación Psicoemocional',
+                texto: 'Valorar estado anímico, adaptación a limitaciones y apoyo psicosocial.',
                 tipo: 'mental',
                 color: 'mental'
             });
@@ -2293,7 +2464,7 @@
             // 4. PREVENCIÓN DE ÚLCERAS
             if (nortonScore <= 11) {
                 recomendaciones.push({
-                    titulo: '🛌 Protocolo Estricto de Cambios Posturales',
+                    titulo: '🛌 Protocolo de Cambios Posturales',
                     texto: 'Cambios de posición cada 2 horas, uso de colchón antiescaras y protectores de talones.',
                     tipo: 'danger',
                     color: 'danger'
@@ -2320,17 +2491,43 @@
                 return;
             }
             
+            // Validar IIM
+            const iimRadio = document.querySelector('input[name="iim-puntuacion"]:checked');
+            if (!iimRadio) {
+                showNotification('Seleccione el nivel de dependencia en el IIM', 'warning');
+                return;
+            }
+            
             // Calcular puntajes
             const iratScore = calcularIRAT();
             const tinettiScore = calcularTinetti();
             const nortonScore = calcularNorton();
-            const iimTotal = calcularIIM();
+            const iimIndice = calcularIIM();
+            
+            // Obtener interpretación IIM
+            const iimInterpretacion = getIIMInterpretacion(iimIndice);
+            
+            // Obtener ayudas seleccionadas
+            const checkboxes = document.querySelectorAll('.iim-checkbox:checked');
+            const ayudasSeleccionadas = [];
+            checkboxes.forEach(checkbox => {
+                const label = document.querySelector(`label[for="${checkbox.id}"]`);
+                if (label) {
+                    ayudasSeleccionadas.push(label.textContent.trim());
+                }
+            });
             
             // Obtener recomendaciones IIM
-            const iimData = getIIMRecomendaciones();
+            const iimData = getIIMRecomendaciones(iimIndice, ayudasSeleccionadas);
             
             // Obtener clasificación clínica
-            const clasificacion = getCombinedClinicalClassification(iratScore, tinettiScore, nortonScore, iimData.ayudasSeleccionadas);
+            const clasificacion = getCombinedClinicalClassification(
+                iratScore, 
+                tinettiScore, 
+                nortonScore, 
+                iimIndice, 
+                iimInterpretacion.nivel
+            );
             
             // Actualizar UI de resultados
             document.getElementById('res-irat-total').textContent = iratScore;
@@ -2345,12 +2542,33 @@
             document.getElementById('res-norton-riesgo').textContent = clasificacion.nortonRiesgo;
             document.getElementById('res-norton-riesgo').className = `summary-risk risk-${clasificacion.nortonRiesgo.toLowerCase().replace(' ', '-')}`;
             
-            document.getElementById('res-iim-total').textContent = iimTotal;
-            document.getElementById('res-iim-riesgo').textContent = iimTotal > 0 ? 'Recomendadas' : 'Evaluar';
+            document.getElementById('res-iim-total').textContent = iimIndice;
+            document.getElementById('res-iim-riesgo').textContent = iimInterpretacion.nivel;
+            document.getElementById('res-iim-riesgo').className = `summary-risk risk-${iimInterpretacion.color}`;
             
             document.getElementById('res-global-riesgo').textContent = clasificacion.nivelRiesgoGlobal;
             document.getElementById('res-global-desc').textContent = 'Clasificación';
             document.getElementById('res-global-desc').className = `summary-risk risk-${clasificacion.colorGlobal}`;
+            
+            // Mostrar interpretación IIM
+            const interpretacionContainer = document.getElementById('iim-interpretacion-texto');
+            interpretacionContainer.innerHTML = `
+                <p><strong>Índice IIM:</strong> ${iimIndice}/100 puntos</p>
+                <p><strong>Nivel de Dependencia:</strong> ${iimInterpretacion.nivel}</p>
+                <p><strong>Interpretación:</strong> ${iimInterpretacion.texto}</p>
+                <p><strong>Ayudas técnicas seleccionadas:</strong> ${ayudasSeleccionadas.length}</p>
+            `;
+            
+            // Mostrar ayudas seleccionadas si hay alguna
+            if (ayudasSeleccionadas.length > 0) {
+                document.getElementById('iim-ayudas-container').style.display = 'block';
+                const ayudasLista = document.getElementById('iim-ayudas-lista');
+                ayudasLista.innerHTML = `
+                    <ul style="columns: 2; -webkit-columns: 2; -moz-columns: 2;">
+                        ${ayudasSeleccionadas.map(ayuda => `<li style="margin-bottom: 8px;">${ayuda}</li>`).join('')}
+                    </ul>
+                `;
+            }
             
             // Mostrar recomendaciones IIM
             const iimContainer = document.getElementById('iim-recomendaciones-container');
@@ -2371,30 +2589,12 @@
                 iimContainer.appendChild(card);
             });
             
-            // Mostrar listado de ayudas seleccionadas
-            if (iimData.ayudasSeleccionadas.length > 0) {
-                const ayudaListCard = document.createElement('div');
-                ayudaListCard.className = 'recommendation-card iim';
-                ayudaListCard.innerHTML = `
-                    <div class="recommendation-icon" style="background: var(--iim);">
-                        <i class="fas fa-list-check"></i>
-                    </div>
-                    <div class="recommendation-content">
-                        <h4>📋 Ayudas Técnicas Seleccionadas</h4>
-                        <ul style="margin-top: 10px; padding-left: 20px;">
-                            ${iimData.ayudasSeleccionadas.map(ayuda => `<li>${ayuda}</li>`).join('')}
-                        </ul>
-                    </div>
-                `;
-                iimContainer.appendChild(ayudaListCard);
-            }
-            
             // Mostrar recomendaciones clínicas generales
             const container = document.getElementById('recomendaciones-container');
             container.innerHTML = '';
             
-            // Mostrar solo las primeras 8 recomendaciones para no saturar
-            const maxRecomendaciones = 8;
+            // Mostrar solo las primeras 6 recomendaciones para no saturar
+            const maxRecomendaciones = 6;
             const recomendacionesMostrar = clasificacion.recomendaciones.slice(0, maxRecomendaciones);
             
             recomendacionesMostrar.forEach(rec => {
@@ -2451,13 +2651,15 @@
                     irat: iratScore,
                     tinetti: tinettiScore,
                     norton: nortonScore,
-                    iim: iimTotal,
+                    iim: iimIndice,
+                    iimNivel: iimInterpretacion.nivel,
                     iratRiesgo: clasificacion.iratRiesgo,
                     tinettiRiesgo: clasificacion.tinettiRiesgo,
                     nortonRiesgo: clasificacion.nortonRiesgo,
                     riesgoGlobal: clasificacion.nivelRiesgoGlobal
                 },
-                ayudasTecnicas: iimData.ayudasSeleccionadas,
+                ayudasTecnicas: ayudasSeleccionadas,
+                iimInterpretacion: iimInterpretacion,
                 recomendaciones: clasificacion.recomendaciones,
                 recomendacionesIIM: iimData.recomendaciones,
                 timestamp: new Date().toISOString()
@@ -2495,7 +2697,8 @@
                     <li><strong>IRAT-5:</strong> ${lastReportData.puntajes.irat} puntos (${lastReportData.puntajes.iratRiesgo})</li>
                     <li><strong>Test de Tinetti:</strong> ${lastReportData.puntajes.tinetti}/28 puntos (${lastReportData.puntajes.tinettiRiesgo})</li>
                     <li><strong>Escala Norton:</strong> ${lastReportData.puntajes.norton}/20 puntos (${lastReportData.puntajes.nortonRiesgo})</li>
-                    <li><strong>Ayudas Técnicas Recomendadas:</strong> ${lastReportData.puntajes.iim}</li>
+                    <li><strong>Índice IIM:</strong> ${lastReportData.puntajes.iim}/100 puntos (${lastReportData.puntajes.iimNivel})</li>
+                    <li><strong>Ayudas Técnicas:</strong> ${lastReportData.ayudasTecnicas.length} recomendadas</li>
                     <li><strong>Riesgo Global:</strong> ${lastReportData.puntajes.riesgoGlobal}</li>
                 </ul>
                 <br>
@@ -2524,7 +2727,7 @@
         }
         
         // ============================================
-        // GENERACIÓN DE PDF MEJORADA CON IIM
+        // GENERACIÓN DE PDF MEJORADA CON IIM COMPLETO
         // ============================================
         function generatePDF() {
             if (!lastReportData.paciente) {
@@ -2587,7 +2790,7 @@
             y += 7;
             doc.text(`Escala Norton: ${lastReportData.puntajes.norton}/20 puntos (${lastReportData.puntajes.nortonRiesgo})`, margin + 5, y);
             y += 7;
-            doc.text(`Ayudas Técnicas Recomendadas: ${lastReportData.puntajes.iim}`, margin + 5, y);
+            doc.text(`Índice IIM: ${lastReportData.puntajes.iim}/100 puntos (${lastReportData.puntajes.iimNivel})`, margin + 5, y);
             y += 7;
             
             doc.setFontSize(12);
@@ -2595,26 +2798,62 @@
             doc.text(`Clasificación Global: ${lastReportData.puntajes.riesgoGlobal}`, margin, y);
             y += 15;
             
-            // Ayudas técnicas recomendadas (IIM)
+            // Interpretación IIM
+            doc.setFontSize(14);
+            doc.setTextColor(156, 39, 176);
+            doc.text('INTERPRETACIÓN IIM - NIVEL DE DEPENDENCIA', margin, y);
+            y += 10;
+            
+            doc.setFontSize(10);
+            doc.setTextColor(50, 50, 50);
+            doc.text(`Índice: ${lastReportData.puntajes.iim}/100 puntos`, margin + 5, y);
+            y += 7;
+            doc.text(`Nivel: ${lastReportData.puntajes.iimNivel}`, margin + 5, y);
+            y += 7;
+            const interpretacionLines = doc.splitTextToSize(lastReportData.iimInterpretacion.texto, pageWidth - margin * 2 - 10);
+            doc.text(interpretacionLines, margin + 5, y);
+            y += interpretacionLines.length * 5 + 10;
+            
+            // Ayudas técnicas recomendadas
             if (lastReportData.ayudasTecnicas && lastReportData.ayudasTecnicas.length > 0) {
                 doc.setFontSize(14);
                 doc.setTextColor(156, 39, 176);
-                doc.text('AYUDAS TÉCNICAS RECOMENDADAS (IIM)', margin, y);
+                doc.text('AYUDAS TÉCNICAS RECOMENDADAS', margin, y);
                 y += 10;
                 
                 doc.setFontSize(10);
                 doc.setTextColor(50, 50, 50);
+                doc.text(`Total: ${lastReportData.ayudasTecnicas.length} ayudas técnicas`, margin + 5, y);
+                y += 7;
                 
-                lastReportData.ayudasTecnicas.forEach((ayuda, index) => {
-                    if (y > 270) {
+                // Mostrar en dos columnas si hay muchas
+                const ayudasPorColumna = Math.ceil(lastReportData.ayudasTecnicas.length / 2);
+                let col1 = lastReportData.ayudasTecnicas.slice(0, ayudasPorColumna);
+                let col2 = lastReportData.ayudasTecnicas.slice(ayudasPorColumna);
+                
+                // Columna 1
+                let yTemp = y;
+                col1.forEach((ayuda, index) => {
+                    if (yTemp > 270) {
                         doc.addPage();
-                        y = 20;
+                        yTemp = 20;
                     }
-                    doc.text(`• ${ayuda}`, margin + 5, y);
-                    y += 7;
+                    doc.text(`• ${ayuda}`, margin + 5, yTemp);
+                    yTemp += 7;
                 });
                 
-                y += 10;
+                // Columna 2
+                yTemp = y;
+                col2.forEach((ayuda, index) => {
+                    if (yTemp > 270) {
+                        doc.addPage();
+                        yTemp = 20;
+                    }
+                    doc.text(`• ${ayuda}`, margin + 100, yTemp);
+                    yTemp += 7;
+                });
+                
+                y = Math.max(y + col1.length * 7, yTemp) + 10;
             }
             
             // Recomendaciones
@@ -2626,58 +2865,52 @@
             doc.setFontSize(10);
             doc.setTextColor(50, 50, 50);
             
-            // Agrupar recomendaciones por categoría
-            const categorias = {
-                kin: '🏋️‍♂️ INTERVENCIÓN CON KINESIOLOGÍA',
-                mental: '🧠 SALUD MENTAL',
-                danger: '🚨 RECOMENDACIONES DE ALTO RIESGO',
-                warning: '⚠️ RECOMENDACIONES DE RIESGO MODERADO',
-                success: '✅ RECOMENDACIONES PREVENTIVAS',
-                info: '💡 RECOMENDACIONES GENERALES',
-                iim: '🦽 RECOMENDACIONES DE AYUDAS TÉCNICAS'
-            };
-            
-            // Mostrar todas las recomendaciones agrupadas
-            Object.entries(categorias).forEach(([categoria, titulo]) => {
-                let recsCategoria = [];
+            // Recomendaciones IIM primero
+            if (lastReportData.recomendacionesIIM && lastReportData.recomendacionesIIM.length > 0) {
+                doc.setFontSize(11);
+                doc.setTextColor(156, 39, 176);
+                doc.text('🦽 RECOMENDACIONES DE AYUDAS TÉCNICAS (IIM)', margin, y);
+                y += 7;
                 
-                if (categoria === 'iim') {
-                    recsCategoria = lastReportData.recomendacionesIIM || [];
-                } else {
-                    recsCategoria = lastReportData.recomendaciones.filter(rec => rec.tipo === categoria || rec.color === categoria);
-                }
+                doc.setFontSize(9);
+                doc.setTextColor(50, 50, 50);
                 
-                if (recsCategoria.length > 0) {
-                    if (y > 250) {
+                lastReportData.recomendacionesIIM.forEach((rec, index) => {
+                    if (y > 270) {
                         doc.addPage();
                         y = 20;
                     }
                     
-                    // Título de categoría
-                    doc.setFontSize(11);
-                    doc.setTextColor(categoria === 'iim' ? 156 : 26, categoria === 'iim' ? 39 : 35, categoria === 'iim' ? 176 : 126);
-                    doc.text(titulo, margin, y);
-                    y += 7;
-                    
-                    // Recomendaciones de esta categoría
-                    doc.setFontSize(9);
-                    doc.setTextColor(50, 50, 50);
-                    
-                    recsCategoria.forEach((rec, index) => {
-                        if (y > 270) {
-                            doc.addPage();
-                            y = 20;
-                        }
-                        
-                        doc.text(`• ${rec.titulo}`, margin + 5, y);
-                        y += 5;
-                        const lines = doc.splitTextToSize(rec.texto, pageWidth - margin * 2 - 10);
-                        doc.text(lines, margin + 10, y);
-                        y += lines.length * 4 + 3;
-                    });
-                    
-                    y += 5; // Espacio entre categorías
+                    doc.text(`• ${rec.titulo}`, margin + 5, y);
+                    y += 5;
+                    const lines = doc.splitTextToSize(rec.texto, pageWidth - margin * 2 - 10);
+                    doc.text(lines, margin + 10, y);
+                    y += lines.length * 4 + 3;
+                });
+                
+                y += 5;
+            }
+            
+            // Recomendaciones clínicas
+            doc.setFontSize(11);
+            doc.setTextColor(26, 35, 126);
+            doc.text('🏥 RECOMENDACIONES CLÍNICAS INTEGRALES', margin, y);
+            y += 7;
+            
+            doc.setFontSize(9);
+            doc.setTextColor(50, 50, 50);
+            
+            lastReportData.recomendaciones.forEach((rec, index) => {
+                if (y > 270) {
+                    doc.addPage();
+                    y = 20;
                 }
+                
+                doc.text(`• ${rec.titulo}`, margin + 5, y);
+                y += 5;
+                const lines = doc.splitTextToSize(rec.texto, pageWidth - margin * 2 - 10);
+                doc.text(lines, margin + 10, y);
+                y += lines.length * 4 + 3;
             });
             
             // Pie de página
@@ -2764,7 +2997,7 @@
                                 <span>IRAT: ${data.puntajes.irat}</span> | 
                                 <span>Tinetti: ${data.puntajes.tinetti}</span> | 
                                 <span>Norton: ${data.puntajes.norton}</span> |
-                                <span>Ayudas: ${data.puntajes.iim || 0}</span>
+                                <span>IIM: ${data.puntajes.iim || 0}</span>
                             </div>
                         </div>
                         <div>
@@ -2802,6 +3035,17 @@
                 document.getElementById('edad').value = data.paciente.edad || '';
                 document.getElementById('evaluador').value = data.paciente.evaluador || '';
                 document.getElementById('institucion').value = data.paciente.institucion || '';
+                
+                // Cargar IIM
+                if (data.puntajes.iim !== undefined) {
+                    // Buscar el radio button correspondiente
+                    const radios = document.querySelectorAll('input[name="iim-puntuacion"]');
+                    radios.forEach(radio => {
+                        if (parseInt(radio.value) === data.puntajes.iim) {
+                            radio.checked = true;
+                        }
+                    });
+                }
                 
                 // Cargar ayudas técnicas IIM
                 if (data.ayudasTecnicas) {
@@ -2881,10 +3125,18 @@
             document.getElementById('norton-movilidad').selectedIndex = 0;
             document.getElementById('norton-incontinencia').selectedIndex = 0;
             
+            // Limpiar IIM
+            document.querySelectorAll('input[name="iim-puntuacion"]').forEach(radio => {
+                radio.checked = false;
+            });
+            
             // Limpiar checkboxes IIM
             document.querySelectorAll('.iim-checkbox').forEach(checkbox => {
                 checkbox.checked = false;
             });
+            
+            // Ocultar ayudas seleccionadas
+            document.getElementById('iim-ayudas-container').style.display = 'none';
             
             // Recalcular puntajes
             calcularIRAT();
@@ -2919,7 +3171,8 @@
                         `• IRAT-5: ${lastReportData.puntajes.irat} (${lastReportData.puntajes.iratRiesgo})\n` +
                         `• Tinetti: ${lastReportData.puntajes.tinetti}/28 (${lastReportData.puntajes.tinettiRiesgo})\n` +
                         `• Norton: ${lastReportData.puntajes.norton}/20 (${lastReportData.puntajes.nortonRiesgo})\n` +
-                        `• Ayudas Técnicas: ${lastReportData.puntajes.iim} recomendadas\n` +
+                        `• Índice IIM: ${lastReportData.puntajes.iim}/100 (${lastReportData.puntajes.iimNivel})\n` +
+                        `• Ayudas Técnicas: ${lastReportData.ayudasTecnicas.length} recomendadas\n` +
                         `• Riesgo Global: ${lastReportData.puntajes.riesgoGlobal}\n\n` +
                         `💡 Recomendaciones completas disponibles en el sistema.`;
             
@@ -2946,4 +3199,4 @@
         }
     </script>
 </body>
-                                                       </html>
+                </html>
