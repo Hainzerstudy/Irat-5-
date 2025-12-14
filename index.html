@@ -32,6 +32,7 @@
             --gradient-success: linear-gradient(135deg, var(--success) 0%, #66bb6a 100%);
             --gradient-warning: linear-gradient(135deg, var(--warning) 0%, #ffb74d 100%);
             --gradient-danger: linear-gradient(135deg, var(--danger) 0%, #ef5350 100%);
+            --gradient-iim: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);
         }
 
         /* ===== RESET Y BASE ===== */
@@ -360,6 +361,7 @@
         .card-icon.irat { background: var(--gradient-primary); }
         .card-icon.tinetti { background: var(--gradient-warning); }
         .card-icon.norton { background: var(--gradient-success); }
+        .card-icon.iim { background: var(--gradient-iim); }
 
         .card-title {
             font-size: 1.5rem;
@@ -490,6 +492,52 @@
             font-size: 1.2rem;
         }
 
+        /* ===== IIM GRID ===== */
+        .iim-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .iim-category {
+            background: #f3e5f5;
+            padding: 25px;
+            border-radius: var(--radius);
+            border: 2px solid #e1bee7;
+        }
+
+        .iim-category h4 {
+            color: #7b1fa2;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e1bee7;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        .checkbox-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-top: 3px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            flex: 1;
+            color: var(--dark);
+            cursor: pointer;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
         /* ===== RESULTS SECTION ===== */
         .results-section {
             background: linear-gradient(135deg, #e8f5e9 0%, #e0f2e1 100%);
@@ -509,8 +557,8 @@
 
         .results-summary {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
             margin-bottom: 40px;
         }
 
@@ -532,6 +580,7 @@
         .summary-card.irat { border-top-color: var(--primary); }
         .summary-card.tinetti { border-top-color: var(--warning); }
         .summary-card.norton { border-top-color: var(--success); }
+        .summary-card.iim { border-top-color: #9c27b0; }
         .summary-card.global { border-top-color: var(--danger); }
 
         .summary-title {
@@ -543,16 +592,16 @@
         }
 
         .summary-value {
-            font-size: 2.8rem;
+            font-size: 2.2rem;
             font-weight: 700;
             margin: 10px 0;
             line-height: 1;
         }
 
         .summary-risk {
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 500;
-            padding: 8px 20px;
+            padding: 8px 15px;
             border-radius: 20px;
             display: inline-block;
             margin-top: 10px;
@@ -593,6 +642,7 @@
         .recommendation-card.info { border-left-color: var(--primary); }
         .recommendation-card.kin { border-left-color: #2196f3; }
         .recommendation-card.mental { border-left-color: #9c27b0; }
+        .recommendation-card.iim { border-left-color: #7b1fa2; }
 
         .recommendation-icon {
             width: 50px;
@@ -1009,7 +1059,7 @@
                     </div>
                 </div>
                 <h1>Evaluador <span>Clínico Integrado</span></h1>
-                <p>Sistema profesional para evaluación de riesgo de caídas, movilidad y prevención de úlceras por presión. Herramienta validada para uso clínico.</p>
+                <p>Sistema profesional para evaluación de riesgo de caídas, movilidad, prevención de úlceras y recomendación de ayudas técnicas.</p>
             </div>
         </div>
 
@@ -1462,6 +1512,213 @@
                 </div>
             </div>
 
+            <!-- IIM - INVENTARIO DE AYUDAS TÉCNICAS -->
+            <div class="evaluation-card iim">
+                <div class="evaluation-card-header">
+                    <div class="card-icon iim">
+                        <i class="fas fa-wheelchair"></i>
+                    </div>
+                    <div>
+                        <h3 class="card-title">IIM - Inventario de Ayudas Técnicas</h3>
+                        <p class="card-subtitle">Seleccione las ayudas técnicas recomendadas para el paciente</p>
+                    </div>
+                </div>
+                
+                <div class="iim-grid">
+                    <!-- Ayudas para la Marcha -->
+                    <div class="iim-category">
+                        <h4><i class="fas fa-walking"></i> Ayudas para la Marcha</h4>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-baston" class="iim-checkbox" data-category="marcha">
+                            <label for="iim-baston">Bastón simple de base amplia</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-baston-cuadrupedo" class="iim-checkbox" data-category="marcha">
+                            <label for="iim-baston-cuadrupedo">Bastón cuadrúpedo (4 patas)</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-andador-fijo" class="iim-checkbox" data-category="marcha">
+                            <label for="iim-andador-fijo">Andador fijo sin ruedas</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-andador-ruedas" class="iim-checkbox" data-category="marcha">
+                            <label for="iim-andador-ruedas">Andador con ruedas delanteras</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-andador-4ruedas" class="iim-checkbox" data-category="marcha">
+                            <label for="iim-andador-4ruedas">Andador con 4 ruedas y frenos</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-muletas" class="iim-checkbox" data-category="marcha">
+                            <label for="iim-muletas">Muletas axilares o canadiense</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Sillas de Ruedas -->
+                    <div class="iim-category">
+                        <h4><i class="fas fa-wheelchair"></i> Sillas de Ruedas</h4>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-silla-auto" class="iim-checkbox" data-category="sillas">
+                            <label for="iim-silla-auto">Silla de ruedas autopropulsable</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-silla-acompañante" class="iim-checkbox" data-category="sillas">
+                            <label for="iim-silla-acompañante">Silla de ruedas para acompañante</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-silla-transporte" class="iim-checkbox" data-category="sillas">
+                            <label for="iim-silla-transporte">Silla de ruedas de transporte ligero</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-silla-elevalunas" class="iim-checkbox" data-category="sillas">
+                            <label for="iim-silla-elevalunas">Silla de ruedas con elevalunas</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-silla-elevable" class="iim-checkbox" data-category="sillas">
+                            <label for="iim-silla-elevable">Silla de ruedas elevable (para bipedestación)</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Ayudas para el Baño -->
+                    <div class="iim-category">
+                        <h4><i class="fas fa-bath"></i> Ayudas para el Baño</h4>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-silla-baño" class="iim-checkbox" data-category="baño">
+                            <label for="iim-silla-baño">Silla o taburete para ducha</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-asiento-wc" class="iim-checkbox" data-category="baño">
+                            <label for="iim-asiento-wc">Asiento elevador para WC</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-barra-apoyo" class="iim-checkbox" data-category="baño">
+                            <label for="iim-barra-apoyo">Barras de apoyo para baño</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-antideslizante" class="iim-checkbox" data-category="baño">
+                            <label for="iim-antideslizante">Alfombra antideslizante para ducha</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-agarradera" class="iim-checkbox" data-category="baño">
+                            <label for="iim-agarradera">Agarradera para bañera</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Ayudas para el Vestido -->
+                    <div class="iim-category">
+                        <h4><i class="fas fa-tshirt"></i> Ayudas para el Vestido</h4>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-calzador-largo" class="iim-checkbox" data-category="vestido">
+                            <label for="iim-calzador-largo">Calzador de mango largo</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-abrochador-botones" class="iim-checkbox" data-category="vestido">
+                            <label for="iim-abrochador-botones">Abrochador de botones</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-abridor-cremallera" class="iim-checkbox" data-category="vestido">
+                            <label for="iim-abridor-cremallera">Abridor de cremalleras</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-medias" class="iim-checkbox" data-category="vestido">
+                            <label for="iim-medias">Ayuda para ponerse medias/calcetines</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-gancho-vestir" class="iim-checkbox" data-category="vestido">
+                            <label for="iim-gancho-vestir">Gancho para vestir</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Ayudas para la Alimentación -->
+                    <div class="iim-category">
+                        <h4><i class="fas fa-utensils"></i> Ayudas para la Alimentación</h4>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-cubiertos-adaptados" class="iim-checkbox" data-category="alimentacion">
+                            <label for="iim-cubiertos-adaptados">Cubiertos con mangos adaptados</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-vasos-antiderrame" class="iim-checkbox" data-category="alimentacion">
+                            <label for="iim-vasos-antiderrame">Vasos y tazas antiderrame</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-platos-reborde" class="iim-checkbox" data-category="alimentacion">
+                            <label for="iim-platos-reborde">Platos con reborde o ventosa</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-pajitas" class="iim-checkbox" data-category="alimentacion">
+                            <label for="iim-pajitas">Pajitas flexibles o rígidas</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-cortador-alimentos" class="iim-checkbox" data-category="alimentacion">
+                            <label for="iim-cortador-alimentos">Cortador de alimentos de una mano</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Ayudas para el Hogar -->
+                    <div class="iim-category">
+                        <h4><i class="fas fa-home"></i> Ayudas para el Hogar</h4>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-alza-silla" class="iim-checkbox" data-category="hogar">
+                            <label for="iim-alza-silla">Alza para sillas o sillones</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-barra-cama" class="iim-checkbox" data-category="hogar">
+                            <label for="iim-barra-cama">Barra para levantarse de la cama</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-colchon-antiescaras" class="iim-checkbox" data-category="hogar">
+                            <label for="iim-colchon-antiescaras">Colchón o cojín antiescaras</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-rampa-portatil" class="iim-checkbox" data-category="hogar">
+                            <label for="iim-rampa-portatil">Rampa portátil para escalones</label>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="iim-alarma-caidas" class="iim-checkbox" data-category="hogar">
+                            <label for="iim-alarma-caidas">Sistema de alarma para caídas</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Resumen IIM -->
+                <div class="score-display" style="background: var(--gradient-iim);">
+                    <div class="score-label">Ayudas Técnicas Recomendadas</div>
+                    <div class="score-value" id="puntaje-iim">0</div>
+                    <div class="score-description">Total de ayudas técnicas seleccionadas</div>
+                </div>
+            </div>
+
             <!-- BOTONES DE ACCIÓN -->
             <div class="action-bar">
                 <button class="btn btn-success btn-lg" onclick="generarResultados()">
@@ -1479,7 +1736,7 @@
                         <h2 class="section-title">
                             <i class="fas fa-chart-line"></i> Resultados Clínicos Integrales
                         </h2>
-                        <p class="section-subtitle">Análisis combinado y recomendaciones personalizadas basadas en las tres escalas</p>
+                        <p class="section-subtitle">Análisis combinado y recomendaciones personalizadas basadas en todas las escalas</p>
                     </div>
                     <div style="display: flex; gap: 10px;">
                         <button class="btn btn-primary" onclick="generatePDF()">
@@ -1511,6 +1768,12 @@
                         <div class="summary-risk" id="res-norton-riesgo">Riesgo</div>
                     </div>
                     
+                    <div class="summary-card iim">
+                        <div class="summary-title">Ayudas Técnicas</div>
+                        <div class="summary-value" id="res-iim-total">0</div>
+                        <div class="summary-risk" id="res-iim-riesgo">Seleccionadas</div>
+                    </div>
+                    
                     <div class="summary-card global">
                         <div class="summary-title">Clasificación Global</div>
                         <div class="summary-value" id="res-global-riesgo">BAJO</div>
@@ -1518,9 +1781,24 @@
                     </div>
                 </div>
                 
-                <!-- RECOMENDACIONES -->
-                <div class="recommendations-grid" id="recomendaciones-container">
-                    <!-- Las recomendaciones se generan dinámicamente aquí -->
+                <!-- RECOMENDACIONES IIM -->
+                <div style="margin: 40px 0;">
+                    <h3 style="color: #7b1fa2; margin-bottom: 20px; border-bottom: 2px solid #e1bee7; padding-bottom: 10px;">
+                        <i class="fas fa-wheelchair"></i> Recomendaciones de Ayudas Técnicas (IIM)
+                    </h3>
+                    <div id="iim-recomendaciones-container" class="recommendations-grid">
+                        <!-- Las recomendaciones IIM se generan dinámicamente aquí -->
+                    </div>
+                </div>
+                
+                <!-- RECOMENDACIONES GENERALES -->
+                <div style="margin: 40px 0;">
+                    <h3 style="color: var(--primary); margin-bottom: 20px; border-bottom: 2px solid rgba(26, 35, 126, 0.2); padding-bottom: 10px;">
+                        <i class="fas fa-stethoscope"></i> Recomendaciones Clínicas Integrales
+                    </h3>
+                    <div class="recommendations-grid" id="recomendaciones-container">
+                        <!-- Las recomendaciones generales se generan dinámicamente aquí -->
+                    </div>
                 </div>
                 
                 <!-- BOTONES DE ACCIÓN FINALES -->
@@ -1602,6 +1880,9 @@
                 // Configurar fecha actual
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('fecha').value = today;
+                
+                // Inicializar IIM
+                setupIIMListeners();
             } catch (e) {
                 console.error("❌ Error al inicializar Firebase:", e);
                 showNotification('Error de conexión con el servidor', 'error', 5000);
@@ -1771,6 +2052,103 @@
         }
         
         // ============================================
+        // IIM - INVENTARIO DE AYUDAS TÉCNICAS
+        // ============================================
+        function setupIIMListeners() {
+            const checkboxes = document.querySelectorAll('.iim-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', calcularIIM);
+            });
+        }
+        
+        function calcularIIM() {
+            const checkboxes = document.querySelectorAll('.iim-checkbox:checked');
+            const total = checkboxes.length;
+            document.getElementById('puntaje-iim').textContent = total;
+            return total;
+        }
+        
+        function getIIMRecomendaciones() {
+            const recomendaciones = [];
+            const ayudasSeleccionadas = [];
+            
+            // Recolectar ayudas seleccionadas
+            const checkboxes = document.querySelectorAll('.iim-checkbox:checked');
+            checkboxes.forEach(checkbox => {
+                const label = document.querySelector(`label[for="${checkbox.id}"]`);
+                if (label) {
+                    ayudasSeleccionadas.push(label.textContent.trim());
+                }
+            });
+            
+            // Generar recomendaciones basadas en las ayudas seleccionadas
+            if (ayudasSeleccionadas.length > 0) {
+                recomendaciones.push({
+                    titulo: '🎯 Recomendaciones Específicas de Ayudas Técnicas',
+                    texto: `Se han seleccionado ${ayudasSeleccionadas.length} ayudas técnicas para el paciente. Es importante realizar una capacitación en el uso correcto de cada una.`,
+                    tipo: 'iim',
+                    color: 'iim'
+                });
+                
+                // Recomendaciones por categoría
+                const categorias = {
+                    'marcha': 'Marcha y Deambulación',
+                    'sillas': 'Movilidad con Silla de Ruedas',
+                    'baño': 'Seguridad en el Baño',
+                    'vestido': 'Vestido Independiente',
+                    'alimentacion': 'Alimentación Autónoma',
+                    'hogar': 'Adaptaciones del Hogar'
+                };
+                
+                Object.entries(categorias).forEach(([categoria, nombre]) => {
+                    const ayudasCategoria = document.querySelectorAll(`.iim-checkbox[data-category="${categoria}"]:checked`);
+                    if (ayudasCategoria.length > 0) {
+                        recomendaciones.push({
+                            titulo: `🏠 ${nombre}`,
+                            texto: `Se recomiendan ${ayudasCategoria.length} ayudas técnicas para ${nombre.toLowerCase()}.`,
+                            tipo: 'iim',
+                            color: 'iim'
+                        });
+                    }
+                });
+                
+                // Recomendaciones de entrenamiento
+                recomendaciones.push({
+                    titulo: '🏋️‍♂️ Entrenamiento en el Uso de Ayudas',
+                    texto: 'Programar sesiones de entrenamiento con terapia ocupacional para el uso seguro de las ayudas técnicas recomendadas.',
+                    tipo: 'iim',
+                    color: 'iim'
+                });
+                
+                recomendaciones.push({
+                    titulo: '🏠 Evaluación del Entorno',
+                    texto: 'Realizar evaluación domiciliaria para verificar que el entorno sea adecuado para el uso de las ayudas técnicas recomendadas.',
+                    tipo: 'iim',
+                    color: 'iim'
+                });
+                
+                recomendaciones.push({
+                    titulo: '📅 Seguimiento y Ajustes',
+                    texto: 'Programar reevaluación a los 30 días para ajustar las ayudas técnicas según la adaptación del paciente.',
+                    tipo: 'iim',
+                    color: 'iim'
+                });
+            } else {
+                recomendaciones.push({
+                    titulo: 'ℹ️ Ayudas Técnicas',
+                    texto: 'No se han seleccionado ayudas técnicas. Considere evaluar si el paciente podría beneficiarse de alguna ayuda para mejorar su independencia.',
+                    tipo: 'iim',
+                    color: 'iim'
+                });
+            }
+            
+            return {
+                recomendaciones: recomendaciones,
+                ayudasSeleccionadas: ayudasSeleccionadas
+            };
+        }
+        
+        // ============================================
         // FUNCIONES PARA MODAL
         // ============================================
         function closeModal(modalId) {
@@ -1792,7 +2170,7 @@
         // ============================================
         // CLASIFICACIÓN Y RECOMENDACIONES AMPLIADAS
         // ============================================
-        function getCombinedClinicalClassification(iratScore, tinettiScore, nortonScore) {
+        function getCombinedClinicalClassification(iratScore, tinettiScore, nortonScore, iimSeleccionadas) {
             let recomendaciones = [];
             let nivelRiesgoGlobal = 'BAJO';
             let colorGlobal = 'success';
@@ -1848,10 +2226,10 @@
             }
             
             // ============================================
-            // RECOMENDACIONES AMPLIADAS (mínimo 6 por área)
+            // RECOMENDACIONES AMPLIADAS
             // ============================================
             
-            // 1. INTERVENCIÓN CON KINESIOLOGÍA (6+ recomendaciones)
+            // 1. INTERVENCIÓN CON KINESIOLOGÍA
             recomendaciones.push({
                 titulo: '🏋️‍♂️ Evaluación Kinesiológica Inicial',
                 texto: 'Realizar evaluación completa de fuerza muscular, rango articular y equilibrio estático/dinámico.',
@@ -1866,42 +2244,7 @@
                 color: 'kin'
             });
             
-            recomendaciones.push({
-                titulo: '⚖️ Entrenamiento del Equilibrio',
-                texto: 'Ejercicios de equilibrio unipodal, apoyo tandem, y superficies inestables con progresión gradual.',
-                tipo: 'kin',
-                color: 'kin'
-            });
-            
-            recomendaciones.push({
-                titulo: '🚶‍♂️ Reeducación de la Marcha',
-                texto: 'Corrección de patrones de marcha, entrenamiento en subir/bajar escaleras, y cambios de dirección.',
-                tipo: 'kin',
-                color: 'kin'
-            });
-            
-            recomendaciones.push({
-                titulo: '🏃‍♂️ Entrenamiento Aeróbico',
-                texto: 'Actividades de baja impacto como bicicleta estática, caminadora o ejercicios en piscina.',
-                tipo: 'kin',
-                color: 'kin'
-            });
-            
-            recomendaciones.push({
-                titulo: '💪 Ejercicios Propioceptivos',
-                texto: 'Uso de superficies inestables, ejercicios con ojos cerrados y coordinación motora.',
-                tipo: 'kin',
-                color: 'kin'
-            });
-            
-            recomendaciones.push({
-                titulo: '📋 Educación de Transferencias',
-                texto: 'Enseñanza de técnicas seguras para levantarse de la cama, silla y uso correcto de ayudas técnicas.',
-                tipo: 'kin',
-                color: 'kin'
-            });
-            
-            // 2. SALUD MENTAL (6+ recomendaciones)
+            // 2. SALUD MENTAL
             recomendaciones.push({
                 titulo: '🧠 Evaluación Neuropsicológica',
                 texto: 'Valoración de funciones cognitivas, memoria, atención y estado emocional.',
@@ -1916,41 +2259,6 @@
                 color: 'mental'
             });
             
-            recomendaciones.push({
-                titulo: '🎯 Entrenamiento Cognitivo',
-                texto: 'Ejercicios de memoria, atención y funciones ejecutivas para mantener capacidades cognitivas.',
-                tipo: 'mental',
-                color: 'mental'
-            });
-            
-            recomendaciones.push({
-                titulo: '👥 Grupos de Apoyo Psicosocial',
-                texto: 'Participación en grupos terapéuticos para compartir experiencias y estrategias de afrontamiento.',
-                tipo: 'mental',
-                color: 'mental'
-            });
-            
-            recomendaciones.push({
-                titulo: '🌙 Manejo de Sueño',
-                texto: 'Educación en higiene del sueño y estrategias para mejorar calidad del descanso.',
-                tipo: 'mental',
-                color: 'mental'
-            });
-            
-            recomendaciones.push({
-                titulo: '💭 Técnicas de Relajación',
-                texto: 'Enseñanza de respiración diafragmática, relajación muscular progresiva y mindfulness.',
-                tipo: 'mental',
-                color: 'mental'
-            });
-            
-            recomendaciones.push({
-                titulo: '👨‍👩‍👧‍👦 Apoyo Familiar',
-                texto: 'Incluir a familiares en el proceso terapéutico y educación sobre el manejo del paciente.',
-                tipo: 'mental',
-                color: 'mental'
-            });
-            
             // 3. RECOMENDACIONES ESPECÍFICAS POR RIESGO
             if (nivelRiesgoGlobal === 'CRÍTICO') {
                 recomendaciones.push({
@@ -1959,28 +2267,6 @@
                     tipo: 'critical',
                     color: 'danger'
                 });
-                
-                recomendaciones.push({
-                    titulo: '🩺 Valoración Geriátrica Integral',
-                    texto: 'Evaluación completa que incluya: capacidad funcional, estado nutricional, polifarmacia y estado social.',
-                    tipo: 'danger',
-                    color: 'danger'
-                });
-                
-                recomendaciones.push({
-                    titulo: '🚑 Protocolo de Supervisión 24/7',
-                    texto: 'Implementar vigilancia constante, sistemas de alarma y asistencia inmediata.',
-                    tipo: 'danger',
-                    color: 'danger'
-                });
-                
-                recomendaciones.push({
-                    titulo: '🏠 Adaptaciones Domiciliarias Emergentes',
-                    texto: 'Instalación de barras de apoyo, rampas, iluminación adecuada y eliminación de alfombras.',
-                    tipo: 'danger',
-                    color: 'danger'
-                });
-                
             } else if (nivelRiesgoGlobal === 'ALTO') {
                 recomendaciones.push({
                     titulo: '👥 Evaluación Interdisciplinaria',
@@ -1988,28 +2274,6 @@
                     tipo: 'danger',
                     color: 'danger'
                 });
-                
-                recomendaciones.push({
-                    titulo: '🦯 Dispositivos de Apoyo',
-                    texto: 'Prescripción de andador o bastón con entrenamiento en su uso correcto.',
-                    tipo: 'danger',
-                    color: 'danger'
-                });
-                
-                recomendaciones.push({
-                    titulo: '📅 Control Semanal',
-                    texto: 'Seguimiento estrecho con evaluaciones semanales de progreso y ajuste de tratamiento.',
-                    tipo: 'danger',
-                    color: 'danger'
-                });
-                
-                recomendaciones.push({
-                    titulo: '📚 Educación a Familiares',
-                    texto: 'Capacitación en técnicas de asistencia, prevención de caídas y reconocimiento de signos de alarma.',
-                    tipo: 'danger',
-                    color: 'danger'
-                });
-                
             } else if (nivelRiesgoGlobal === 'MODERADO') {
                 recomendaciones.push({
                     titulo: '📋 Plan de Seguimiento Estructurado',
@@ -2017,28 +2281,6 @@
                     tipo: 'warning',
                     color: 'warning'
                 });
-                
-                recomendaciones.push({
-                    titulo: '🏋️ Programa de Ejercicios Domiciliarios',
-                    texto: 'Rutina diaria de ejercicios de fuerza y equilibrio con supervisión inicial.',
-                    tipo: 'warning',
-                    color: 'warning'
-                });
-                
-                recomendaciones.push({
-                    titulo: '🩺 Revisión de Medicación',
-                    texto: 'Evaluar fármacos que puedan afectar equilibrio o estado cognitivo.',
-                    tipo: 'warning',
-                    color: 'warning'
-                });
-                
-                recomendaciones.push({
-                    titulo: '📊 Monitorización Periódica',
-                    texto: 'Reevaluación trimestral con escalas validadas para detectar cambios.',
-                    tipo: 'warning',
-                    color: 'warning'
-                });
-                
             } else {
                 recomendaciones.push({
                     titulo: '🌿 Mantenimiento Preventivo',
@@ -2046,30 +2288,9 @@
                     tipo: 'success',
                     color: 'success'
                 });
-                
-                recomendaciones.push({
-                    titulo: '🚶 Actividad Física Regular',
-                    texto: 'Recomendar caminatas diarias de 30 minutos y ejercicios de mantenimiento.',
-                    tipo: 'success',
-                    color: 'success'
-                });
-                
-                recomendaciones.push({
-                    titulo: '🥗 Evaluación Nutricional',
-                    texto: 'Asegurar ingesta adecuada de proteínas, calcio y vitamina D para salud ósea.',
-                    tipo: 'success',
-                    color: 'success'
-                });
-                
-                recomendaciones.push({
-                    titulo: '👁️ Exámenes de Visión',
-                    texto: 'Revisión anual de agudeza visual y adaptación de lentes si es necesario.',
-                    tipo: 'success',
-                    color: 'success'
-                });
             }
             
-            // 4. PREVENCIÓN DE ÚLCERAS (basado en Norton)
+            // 4. PREVENCIÓN DE ÚLCERAS
             if (nortonScore <= 11) {
                 recomendaciones.push({
                     titulo: '🛌 Protocolo Estricto de Cambios Posturales',
@@ -2077,64 +2298,7 @@
                     tipo: 'danger',
                     color: 'danger'
                 });
-                
-                recomendaciones.push({
-                    titulo: '🧴 Cuidados Intensivos de Piel',
-                    texto: 'Inspección diaria de zonas de presión, hidratación cutánea y manejo de humedad.',
-                    tipo: 'danger',
-                    color: 'danger'
-                });
-                
-                recomendaciones.push({
-                    titulo: '⚕️ Valoración por Enfermería Especializada',
-                    texto: 'Evaluación por enfermería especializada en heridas y cuidados de piel.',
-                    tipo: 'danger',
-                    color: 'danger'
-                });
-            } else if (nortonScore <= 15) {
-                recomendaciones.push({
-                    titulo: '🔄 Cambios Posturales Programados',
-                    texto: 'Cambios cada 4 horas, uso de cojines de protección y vigilancia de zonas de roce.',
-                    tipo: 'warning',
-                    color: 'warning'
-                });
-                
-                recomendaciones.push({
-                    titulo: '👐 Movilizaciones Activas',
-                    texto: 'Fomentar cambios de posición independientes y ejercicios en cama/silla.',
-                    tipo: 'warning',
-                    color: 'warning'
-                });
             }
-            
-            // 5. RECOMENDACIONES GENERALES ADICIONALES
-            recomendaciones.push({
-                titulo: '👞 Evaluación del Calzado',
-                texto: 'Verificar que el calzado sea antideslizante, con suela de goma y buen soporte.',
-                tipo: 'info',
-                color: 'info'
-            });
-            
-            recomendaciones.push({
-                titulo: '💊 Revisión de Polifarmacia',
-                texto: 'Evaluar medicamentos que puedan causar mareo, hipotensión o somnolencia.',
-                tipo: 'info',
-                color: 'info'
-            });
-            
-            recomendaciones.push({
-                titulo: '🚽 Adaptación del Baño',
-                texto: 'Instalación de barras de apoyo, silla de ducha y alfombras antideslizantes.',
-                tipo: 'info',
-                color: 'info'
-            });
-            
-            recomendaciones.push({
-                titulo: '📱 Sistema de Alerta',
-                texto: 'Considerar dispositivos de alerta personal para emergencias.',
-                tipo: 'info',
-                color: 'info'
-            });
             
             return {
                 iratRiesgo: iratRiesgo,
@@ -2160,9 +2324,13 @@
             const iratScore = calcularIRAT();
             const tinettiScore = calcularTinetti();
             const nortonScore = calcularNorton();
+            const iimTotal = calcularIIM();
             
-            // Obtener clasificación
-            const clasificacion = getCombinedClinicalClassification(iratScore, tinettiScore, nortonScore);
+            // Obtener recomendaciones IIM
+            const iimData = getIIMRecomendaciones();
+            
+            // Obtener clasificación clínica
+            const clasificacion = getCombinedClinicalClassification(iratScore, tinettiScore, nortonScore, iimData.ayudasSeleccionadas);
             
             // Actualizar UI de resultados
             document.getElementById('res-irat-total').textContent = iratScore;
@@ -2177,16 +2345,56 @@
             document.getElementById('res-norton-riesgo').textContent = clasificacion.nortonRiesgo;
             document.getElementById('res-norton-riesgo').className = `summary-risk risk-${clasificacion.nortonRiesgo.toLowerCase().replace(' ', '-')}`;
             
+            document.getElementById('res-iim-total').textContent = iimTotal;
+            document.getElementById('res-iim-riesgo').textContent = iimTotal > 0 ? 'Recomendadas' : 'Evaluar';
+            
             document.getElementById('res-global-riesgo').textContent = clasificacion.nivelRiesgoGlobal;
             document.getElementById('res-global-desc').textContent = 'Clasificación';
             document.getElementById('res-global-desc').className = `summary-risk risk-${clasificacion.colorGlobal}`;
             
-            // Mostrar recomendaciones
+            // Mostrar recomendaciones IIM
+            const iimContainer = document.getElementById('iim-recomendaciones-container');
+            iimContainer.innerHTML = '';
+            
+            iimData.recomendaciones.forEach(rec => {
+                const card = document.createElement('div');
+                card.className = `recommendation-card ${rec.color}`;
+                card.innerHTML = `
+                    <div class="recommendation-icon" style="background: var(--${rec.color || 'primary'});">
+                        <i class="fas fa-wheelchair"></i>
+                    </div>
+                    <div class="recommendation-content">
+                        <h4>${rec.titulo}</h4>
+                        <p>${rec.texto}</p>
+                    </div>
+                `;
+                iimContainer.appendChild(card);
+            });
+            
+            // Mostrar listado de ayudas seleccionadas
+            if (iimData.ayudasSeleccionadas.length > 0) {
+                const ayudaListCard = document.createElement('div');
+                ayudaListCard.className = 'recommendation-card iim';
+                ayudaListCard.innerHTML = `
+                    <div class="recommendation-icon" style="background: var(--iim);">
+                        <i class="fas fa-list-check"></i>
+                    </div>
+                    <div class="recommendation-content">
+                        <h4>📋 Ayudas Técnicas Seleccionadas</h4>
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            ${iimData.ayudasSeleccionadas.map(ayuda => `<li>${ayuda}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+                iimContainer.appendChild(ayudaListCard);
+            }
+            
+            // Mostrar recomendaciones clínicas generales
             const container = document.getElementById('recomendaciones-container');
             container.innerHTML = '';
             
-            // Mostrar solo las primeras 12 recomendaciones para no saturar
-            const maxRecomendaciones = 12;
+            // Mostrar solo las primeras 8 recomendaciones para no saturar
+            const maxRecomendaciones = 8;
             const recomendacionesMostrar = clasificacion.recomendaciones.slice(0, maxRecomendaciones);
             
             recomendacionesMostrar.forEach(rec => {
@@ -2243,12 +2451,15 @@
                     irat: iratScore,
                     tinetti: tinettiScore,
                     norton: nortonScore,
+                    iim: iimTotal,
                     iratRiesgo: clasificacion.iratRiesgo,
                     tinettiRiesgo: clasificacion.tinettiRiesgo,
                     nortonRiesgo: clasificacion.nortonRiesgo,
                     riesgoGlobal: clasificacion.nivelRiesgoGlobal
                 },
+                ayudasTecnicas: iimData.ayudasSeleccionadas,
                 recomendaciones: clasificacion.recomendaciones,
+                recomendacionesIIM: iimData.recomendaciones,
                 timestamp: new Date().toISOString()
             };
             
@@ -2284,6 +2495,7 @@
                     <li><strong>IRAT-5:</strong> ${lastReportData.puntajes.irat} puntos (${lastReportData.puntajes.iratRiesgo})</li>
                     <li><strong>Test de Tinetti:</strong> ${lastReportData.puntajes.tinetti}/28 puntos (${lastReportData.puntajes.tinettiRiesgo})</li>
                     <li><strong>Escala Norton:</strong> ${lastReportData.puntajes.norton}/20 puntos (${lastReportData.puntajes.nortonRiesgo})</li>
+                    <li><strong>Ayudas Técnicas Recomendadas:</strong> ${lastReportData.puntajes.iim}</li>
                     <li><strong>Riesgo Global:</strong> ${lastReportData.puntajes.riesgoGlobal}</li>
                 </ul>
                 <br>
@@ -2312,7 +2524,7 @@
         }
         
         // ============================================
-        // GENERACIÓN DE PDF MEJORADA
+        // GENERACIÓN DE PDF MEJORADA CON IIM
         // ============================================
         function generatePDF() {
             if (!lastReportData.paciente) {
@@ -2342,7 +2554,7 @@
             
             doc.setFontSize(12);
             doc.setTextColor(100, 100, 100);
-            doc.text('Sistema IRAT-5 + Tinetti + Norton', pageWidth / 2, y, { align: 'center' });
+            doc.text('Sistema IRAT-5 + Tinetti + Norton + IIM', pageWidth / 2, y, { align: 'center' });
             y += 25;
             
             // Datos del paciente
@@ -2375,11 +2587,35 @@
             y += 7;
             doc.text(`Escala Norton: ${lastReportData.puntajes.norton}/20 puntos (${lastReportData.puntajes.nortonRiesgo})`, margin + 5, y);
             y += 7;
+            doc.text(`Ayudas Técnicas Recomendadas: ${lastReportData.puntajes.iim}`, margin + 5, y);
+            y += 7;
             
             doc.setFontSize(12);
             doc.setTextColor(244, 67, 54);
             doc.text(`Clasificación Global: ${lastReportData.puntajes.riesgoGlobal}`, margin, y);
             y += 15;
+            
+            // Ayudas técnicas recomendadas (IIM)
+            if (lastReportData.ayudasTecnicas && lastReportData.ayudasTecnicas.length > 0) {
+                doc.setFontSize(14);
+                doc.setTextColor(156, 39, 176);
+                doc.text('AYUDAS TÉCNICAS RECOMENDADAS (IIM)', margin, y);
+                y += 10;
+                
+                doc.setFontSize(10);
+                doc.setTextColor(50, 50, 50);
+                
+                lastReportData.ayudasTecnicas.forEach((ayuda, index) => {
+                    if (y > 270) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                    doc.text(`• ${ayuda}`, margin + 5, y);
+                    y += 7;
+                });
+                
+                y += 10;
+            }
             
             // Recomendaciones
             doc.setFontSize(14);
@@ -2397,12 +2633,19 @@
                 danger: '🚨 RECOMENDACIONES DE ALTO RIESGO',
                 warning: '⚠️ RECOMENDACIONES DE RIESGO MODERADO',
                 success: '✅ RECOMENDACIONES PREVENTIVAS',
-                info: '💡 RECOMENDACIONES GENERALES'
+                info: '💡 RECOMENDACIONES GENERALES',
+                iim: '🦽 RECOMENDACIONES DE AYUDAS TÉCNICAS'
             };
             
             // Mostrar todas las recomendaciones agrupadas
             Object.entries(categorias).forEach(([categoria, titulo]) => {
-                const recsCategoria = lastReportData.recomendaciones.filter(rec => rec.tipo === categoria || rec.color === categoria);
+                let recsCategoria = [];
+                
+                if (categoria === 'iim') {
+                    recsCategoria = lastReportData.recomendacionesIIM || [];
+                } else {
+                    recsCategoria = lastReportData.recomendaciones.filter(rec => rec.tipo === categoria || rec.color === categoria);
+                }
                 
                 if (recsCategoria.length > 0) {
                     if (y > 250) {
@@ -2412,7 +2655,7 @@
                     
                     // Título de categoría
                     doc.setFontSize(11);
-                    doc.setTextColor(26, 35, 126);
+                    doc.setTextColor(categoria === 'iim' ? 156 : 26, categoria === 'iim' ? 39 : 35, categoria === 'iim' ? 176 : 126);
                     doc.text(titulo, margin, y);
                     y += 7;
                     
@@ -2520,7 +2763,8 @@
                                 <span>${fecha}</span> | 
                                 <span>IRAT: ${data.puntajes.irat}</span> | 
                                 <span>Tinetti: ${data.puntajes.tinetti}</span> | 
-                                <span>Norton: ${data.puntajes.norton}</span>
+                                <span>Norton: ${data.puntajes.norton}</span> |
+                                <span>Ayudas: ${data.puntajes.iim || 0}</span>
                             </div>
                         </div>
                         <div>
@@ -2558,6 +2802,26 @@
                 document.getElementById('edad').value = data.paciente.edad || '';
                 document.getElementById('evaluador').value = data.paciente.evaluador || '';
                 document.getElementById('institucion').value = data.paciente.institucion || '';
+                
+                // Cargar ayudas técnicas IIM
+                if (data.ayudasTecnicas) {
+                    // Limpiar todos los checkboxes primero
+                    document.querySelectorAll('.iim-checkbox').forEach(checkbox => {
+                        checkbox.checked = false;
+                    });
+                    
+                    // Marcar las ayudas guardadas
+                    data.ayudasTecnicas.forEach(ayuda => {
+                        // Buscar el checkbox correspondiente
+                        const checkboxes = document.querySelectorAll('.iim-checkbox');
+                        checkboxes.forEach(checkbox => {
+                            const label = document.querySelector(`label[for="${checkbox.id}"]`);
+                            if (label && label.textContent.trim() === ayuda) {
+                                checkbox.checked = true;
+                            }
+                        });
+                    });
+                }
                 
                 // Generar resultados para mostrar
                 generarResultados();
@@ -2617,10 +2881,16 @@
             document.getElementById('norton-movilidad').selectedIndex = 0;
             document.getElementById('norton-incontinencia').selectedIndex = 0;
             
+            // Limpiar checkboxes IIM
+            document.querySelectorAll('.iim-checkbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
             // Recalcular puntajes
             calcularIRAT();
             calcularTinetti();
             calcularNorton();
+            calcularIIM();
             
             // Ocultar resultados
             document.getElementById('results-section').style.display = 'none';
@@ -2641,7 +2911,7 @@
                 return;
             }
             
-            const text = `📋 EVALUACIÓN CLÍNICA\n\n` +
+            const text = `📋 EVALUACIÓN CLÍNICA INTEGRAL\n\n` +
                         `Paciente: ${lastReportData.paciente.nombre}\n` +
                         `Fecha: ${lastReportData.paciente.fecha}\n` +
                         `Evaluador: ${lastReportData.paciente.evaluador}\n\n` +
@@ -2649,12 +2919,13 @@
                         `• IRAT-5: ${lastReportData.puntajes.irat} (${lastReportData.puntajes.iratRiesgo})\n` +
                         `• Tinetti: ${lastReportData.puntajes.tinetti}/28 (${lastReportData.puntajes.tinettiRiesgo})\n` +
                         `• Norton: ${lastReportData.puntajes.norton}/20 (${lastReportData.puntajes.nortonRiesgo})\n` +
+                        `• Ayudas Técnicas: ${lastReportData.puntajes.iim} recomendadas\n` +
                         `• Riesgo Global: ${lastReportData.puntajes.riesgoGlobal}\n\n` +
-                        `💡 Recomendaciones disponibles en el sistema completo.`;
+                        `💡 Recomendaciones completas disponibles en el sistema.`;
             
             if (navigator.share) {
                 navigator.share({
-                    title: 'Evaluación Clínica',
+                    title: 'Evaluación Clínica Integral',
                     text: text,
                     url: window.location.href
                 });
@@ -2675,4 +2946,4 @@
         }
     </script>
 </body>
-                    </html>
+                                                       </html>
