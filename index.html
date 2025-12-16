@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Evaluación de Ayuda Técnica (Índice IIM)</title>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.21/jspdf.plugin.autotable.min.js"></script>
 
     <style>
         /* =================================================================
-           1. CSS: Estilos y Diseño Responsivo (Punto 3)
+           1. CSS: Estilos y Diseño Responsivo
            ================================================================= */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -32,34 +33,60 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
             margin-bottom: 20px;
         }
-
-        h1, h2, h3 {
-            color: #004a99;
+        
+        /* ESTILOS DE AUTENTICACIÓN */
+        #login-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            background-color: #f4f7f9;
         }
 
-        /* INPUTS Y FORMULARIOS */
-        input[type="text"], input[type="number"] {
+        #login-form {
+            max-width: 350px;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* INPUTS Y BOTONES GENERALES */
+        input[type="text"], input[type="email"], input[type="number"], input[type="password"] {
             width: 100%;
             padding: 12px;
             margin-bottom: 15px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            box-sizing: border-box; /* Crucial para responsividad */
+            box-sizing: border-box; 
         }
 
-        input[type="checkbox"] {
-            margin-right: 10px;
+        .main-button {
+            background-color: #007bff;
+            color: white;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
         }
 
-        .note {
-            font-size: 0.9em;
-            color: #666;
-            margin-top: -10px;
-            margin-bottom: 15px;
+        .main-button:hover {
+            background-color: #0056b3;
         }
 
-        /* BOTONES */
-        .main-button, .secondary-button {
+        /* RESTO DE ESTILOS DE LA APP (OCULTOS AL INICIO) */
+        .hidden {
+            display: none;
+        }
+        /* ... (otros estilos de la app) */
+        .secondary-button {
+            background-color: #e9ecef;
+            color: #343a40;
             width: 100%;
             padding: 15px;
             border: none;
@@ -70,69 +97,39 @@
             margin-bottom: 10px;
         }
 
-        .main-button {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .main-button:hover {
-            background-color: #0056b3;
-        }
-
-        .secondary-button {
-            background-color: #e9ecef;
-            color: #343a40;
-        }
-
-        .secondary-button:hover {
-            background-color: #d1d6db;
-        }
-
-        /* DISEÑO RESPONSIVO (Punto 3: Optimización Vertical) */
         .forms-wrapper {
             display: flex;
-            flex-direction: column; /* Por defecto, apila verticalmente en móviles */
+            flex-direction: column;
             gap: 15px;
         }
 
-        .test-card {
-            width: 100%;
-        }
-
-        /* Para tablets y escritorios (> 700px), distribuir en 3 columnas */
         @media (min-width: 700px) {
             .forms-wrapper {
                 flex-direction: row;
-                flex-wrap: nowrap; /* Mantiene la fila */
+                flex-wrap: nowrap;
             }
-
             .test-card {
-                width: calc(33.33% - 10px); /* 3 columnas con espacio */
+                width: calc(33.33% - 10px); 
             }
-        }
-
-        /* RESULTADOS */
-        .report-section {
-            border-top: 1px solid #e0e0e0;
-            margin-top: 20px;
-            padding-top: 15px;
-        }
-
-        .report-section span {
-            font-weight: bold;
-            color: #004a99;
-        }
-
-        .hidden {
-            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
+    
+    <div id="login-screen">
+        <div id="login-form">
+            <h2>Acceso Profesional IIM</h2>
+            <p>Simulación: Usuario: **profesional** | Clave: **1234**</p>
+            <input type="text" id="auth-user" placeholder="Usuario" required>
+            <input type="password" id="auth-pass" placeholder="Clave" required>
+            <button id="login-btn" class="main-button">INGRESAR</button>
+        </div>
+    </div>
+    
+    <div class="app-container hidden" id="main-app">
         <header>
             <h1>🩺 Evaluación de Ayuda Técnica (Índice IIM)</h1>
-            <p>Calculadora ponderada de riesgo para la indicación de ayudas técnicas. </p>
+            <p>Calculadora ponderada de riesgo para la indicación de ayudas técnicas.</p>
         </header>
 
         <section class="patient-data card">
@@ -146,7 +143,7 @@
                 <h3>Test de Tinetti (0-28)</h3>
                 <label for="no-apply-tinetti">
                     <input type="checkbox" id="no-apply-tinetti"> 
-                    No es posible aplicar el Test (Asigna 0, Máximo Riesgo)
+                    No es posible aplicar (Asigna 0)
                 </label>
                 <input type="number" id="tinetti-score" min="1" max="28" placeholder="Puntaje Tinetti (1-28)">
             </div>
@@ -184,7 +181,7 @@
     
     <script>
         // =================================================================
-        // 2. JAVASCRIPT: LÓGICA DE CÁLCULO Y FUNCIONALIDAD (Punto 2, 4, 5)
+        // 2. JAVASCRIPT: LÓGICA DE CÁLCULO Y FUNCIONALIDAD
         // =================================================================
 
         // --- I. PARÁMETROS DE LA ESCALA ---
@@ -193,24 +190,24 @@
         const MAX_NORTON = 20;
         const MAX_IRAT = 10;
         const MIN_IRAT = 0;
+        
+        // --- CREDENCIALES DE SIMULACIÓN (Autenticación) ---
+        const VALID_USER = "profesional";
+        const VALID_PASS = "1234";
 
         // --- II. FUNCIONES DE CÁLCULO (Motor IIM) ---
 
-        /**
-         * Normaliza el puntaje a 0-100, donde 100 es lo mejor.
-         */
         function normalizeScore(score, min, max, isInverted = false) {
             if (max <= min) return 0;
             let normalized = ((score - min) / (max - min)) * 100;
             if (isInverted) {
-                // Inversión para escalas de Riesgo (ej. IRAT: puntaje alto es MALO)
                 normalized = 100 - normalized;
             }
             return Math.max(0, Math.min(100, normalized));
         }
 
         function calculateTinettiNorm(tinettiScore, noApply) {
-            if (noApply || tinettiScore === 0) return 0; // Máximo Riesgo
+            if (noApply || tinettiScore === 0) return 0; 
             return normalizeScore(tinettiScore, 0, MAX_TINETTI, false);
         }
 
@@ -219,11 +216,10 @@
         }
 
         function calculateIratNorm(iratScore) {
-            return normalizeScore(iratScore, MIN_IRAT, MAX_IRAT, true); // INVERSA
+            return normalizeScore(iratScore, MIN_IRAT, MAX_IRAT, true);
         }
 
         function calculateIIM(iratNorm, tinettiNorm, nortonNorm) {
-            // Ponderación: (IRAT * 40%) + (Tinetti * 40%) + (Norton * 20%)
             const iim = (iratNorm * 0.40) + (tinettiNorm * 0.40) + (nortonNorm * 0.20);
             return Math.round(iim * 100) / 100;
         }
@@ -237,7 +233,7 @@
             } else if (iimScore > 30 && iimScore <= 60) {
                 return {
                     riskLevel: "MODERADO",
-                    recommendation: "Ayuda de Soporte para la Movilidad: Andador de 4 ruedas con frenos (rollator) o andador fijo, cojín de gel estándar, barras de apoyo fijas en el baño/ducha. "
+                    recommendation: "Ayuda de Soporte para la Movilidad: Andador de 4 ruedas con frenos (rollator) o andador fijo, cojín de gel estándar, barras de apoyo fijas en el baño/ducha."
                 };
             } else if (iimScore > 60 && iimScore <= 85) {
                 return {
@@ -252,7 +248,23 @@
             }
         }
 
-        // --- III. MANEJO DE LA INTERFAZ Y EVENTOS ---
+        // --- III. LÓGICA DE AUTENTICACIÓN (NUEVA FUNCIÓN) ---
+        
+        function authenticateUser() {
+            const user = document.getElementById('auth-user').value;
+            const pass = document.getElementById('auth-pass').value;
+            
+            if (user === VALID_USER && pass === VALID_PASS) {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                document.body.style.height = 'auto';
+            } else {
+                alert('Credenciales inválidas. Intente de nuevo. (Usuario: profesional | Clave: 1234)');
+            }
+        }
+
+
+        // --- IV. MANEJO DE EVENTOS ---
 
         document.addEventListener('DOMContentLoaded', () => {
             const tinettiScoreInput = document.getElementById('tinetti-score');
@@ -262,8 +274,17 @@
             const actions = document.getElementById('actions');
             const downloadPdfBtn = document.getElementById('download-pdf-btn');
             const sendDataBtn = document.getElementById('send-data-btn');
+            const loginBtn = document.getElementById('login-btn');
+            
+            let lastReportData = null; 
 
-            let lastReportData = null; // Almacena el último cálculo para el PDF/envío
+            // Manejo del Login
+            loginBtn.addEventListener('click', authenticateUser);
+            document.getElementById('auth-pass').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    authenticateUser();
+                }
+            });
 
             // Lógica para el checkbox "No Aplica Tinetti"
             noApplyTinettiCheckbox.addEventListener('change', () => {
@@ -280,20 +301,17 @@
                 const rawIrat = parseFloat(document.getElementById('irat-score').value);
                 const rawNorton = parseFloat(document.getElementById('norton-score').value);
                 
-                // Validación de entrada
                 if (isNaN(rawIrat) || isNaN(rawNorton) || (isNaN(rawTinetti) && !noApplyTinettiCheckbox.checked)) {
-                     alert('⚠️ Error: Por favor, ingrese valores numéricos válidos en todos los campos de las pruebas.');
+                     alert('⚠️ Error: Por favor, ingrese valores numéricos válidos en todos los campos.');
                      return;
                 }
 
-                // 1. Cálculo del IIM
                 const tinettiNorm = calculateTinettiNorm(rawTinetti, noApplyTinettiCheckbox.checked);
                 const iratNorm = calculateIratNorm(rawIrat);
                 const nortonNorm = calculateNortonNorm(rawNorton);
                 const iimScore = calculateIIM(iratNorm, tinettiNorm, nortonNorm);
                 const result = getRecommendation(iimScore);
 
-                // 2. Almacenar el informe completo
                 lastReportData = {
                     patientName: document.getElementById('patient-name').value || 'Paciente No Especificado',
                     professionalEmail: document.getElementById('professional-email').value || 'email@no-enviado.com',
@@ -304,17 +322,15 @@
                     timestamp: new Date().toLocaleString()
                 };
 
-                // 3. Mostrar resultados en la interfaz
                 document.getElementById('iim-display').textContent = lastReportData.iimScore;
                 document.getElementById('risk-level-display').textContent = lastReportData.riskLevel;
-                document.getElementById('recommendation-display').textContent = lastReportData.recommendation.replace(/\[Image of.*\]/g, '').trim(); // Limpia la etiqueta de imagen
+                document.getElementById('recommendation-display').textContent = lastReportData.recommendation; 
                 
-                // 4. Mostrar botones de acción
                 finalReport.classList.remove('hidden');
                 actions.classList.remove('hidden');
             });
 
-            // --- IV. GENERACIÓN Y ENVÍO DE DATOS (Punto 4) ---
+            // --- V. GENERACIÓN Y ENVÍO DE DATOS ---
 
             downloadPdfBtn.addEventListener('click', () => {
                 if (!lastReportData) return alert('Debe calcular el IIM primero.');
@@ -328,14 +344,13 @@
         });
 
         /**
-         * Genera y descarga el PDF profesional (Punto 4).
+         * Genera y descarga el PDF profesional.
          */
         function generateProfessionalPDF(data) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             let y = 20;
 
-            // Título y datos principales
             doc.setFontSize(18);
             doc.text("INFORME PROFESIONAL DE AYUDA TÉCNICA (IIM)", 105, y, null, null, "center");
             y += 10;
@@ -361,9 +376,7 @@
             doc.text("2. Recomendación de Ayuda Técnica (Generada)", 15, y);
             y += 8;
             doc.setFontSize(12);
-            // Asegura que la recomendación no contenga la etiqueta de imagen
-            const cleanRecommendation = data.recommendation.replace(/\[Image of.*\]/g, '').trim();
-            const lines = doc.splitTextToSize(cleanRecommendation, 180);
+            const lines = doc.splitTextToSize(data.recommendation, 180);
             doc.text(lines, 15, y);
             y += (lines.length * 7) + 5;
             
@@ -372,7 +385,6 @@
             doc.text("3. Detalle de Puntajes Normalizados", 15, y);
             y += 8;
             
-            // Tabla de Puntajes
             const tableData = [
                 ["Test", "Puntaje Crudo", "Puntaje Normalizado (0-100)", "Ponderación en IIM"],
                 ["Tinetti", data.rawScores.Tinetti, data.normalizedScores.Tinetti, "40%"],
@@ -388,18 +400,14 @@
                 styles: { fontSize: 10, cellPadding: 2 }
             });
             
-            // Descarga
             doc.save(`Informe_IIM_${data.patientName.replace(/\s/g, '_')}.pdf`);
         }
 
         /**
-         * Simula el envío de datos a un servidor (Base de Datos y Email) (Punto 4).
+         * Simula el envío de datos a un servidor (Base de Datos y Email).
          */
         function simulateDataTransfer(data) {
-            // En un entorno de producción, aquí se haría la llamada fetch() a tu API de backend
-            // para guardar 'data' en una DB y activar el servicio de envío de email (ej. SendGrid).
-            
-            const message = `✅ Informe listo para envío.\n\nSimulación:\n1. Datos JSON enviados a la Base de Datos.\n2. Email de informe enviado a: ${data.professionalEmail}`;
+            const message = `✅ Proceso Iniciado.\n\nSimulación:\n1. Datos JSON enviados a la Base de Datos.\n2. Email de informe enviado a: ${data.professionalEmail}`;
             alert(message);
         }
     </script>
