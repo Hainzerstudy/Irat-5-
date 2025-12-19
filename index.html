@@ -2,899 +2,1242 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistema Integrado IRAT-5 + Tinetti + Norton | Ayuda Técnica Progresiva</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Prescriptor de Ayudas Técnicas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ===== VARIABLES GLOBALES ALGORITMO ===== */
         :root {
-            --color-minimo: #4caf50;
-            --color-leve: #8bc34a;
-            --color-moderado: #ffeb3b;
-            --color-alto: #ff9800;
-            --color-muy-alto: #f44336;
-            --color-extremo: #d32f2f;
-            --primary: #1a237e;
-            --primary-light: #534bae;
-            --secondary: #00acc1;
-            --light: #f5f5f5;
+            --primary: #2196f3;
+            --primary-dark: #1976d2;
+            --secondary: #9c27b0;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --info: #00bcd4;
             --gray: #757575;
-            --dark: #212121;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --light: #f5f5f5;
+            --dark: #333;
             --radius: 8px;
-            --transition: all 0.3s ease;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-
-        /* ===== RESET Y BASE ===== */
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
+        
         body {
-            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             color: var(--dark);
-            line-height: 1.5;
             min-height: 100vh;
-            padding: 0;
-            font-size: 16px;
-            -webkit-font-smoothing: antialiased;
+            padding: 20px;
         }
-
-        /* ===== CONTAINER PRINCIPAL ===== */
+        
         .container {
-            max-width: 100%;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
         }
-
-        /* ===== HEADER ALGORÍTMICO ===== */
-        .header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
-            padding: 20px 15px;
+            padding: 25px 40px;
             text-align: center;
-            border-bottom: 4px solid var(--secondary);
         }
-
-        .header h1 {
-            font-size: 1.6rem;
-            font-weight: 400;
-            margin-bottom: 8px;
-        }
-
-        .header h1 span {
-            font-weight: 600;
-            background: linear-gradient(45deg, #ffffff, #e3f2fd);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .header p {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* ===== MAIN CONTENT ===== */
-        .main-content {
-            padding: 20px 15px;
-            flex: 1;
-        }
-
-        /* ===== SECCIÓN DE DATOS ===== */
-        .data-section {
-            margin-bottom: 25px;
-        }
-
-        .section-title {
-            font-size: 1.3rem;
-            color: var(--primary);
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid rgba(26, 35, 126, 0.2);
+        
+        .logo-container {
             display: flex;
             align-items: center;
-            gap: 10px;
-        }
-
-        /* ===== FORM GRID ===== */
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr;
+            justify-content: center;
             gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            background: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+        
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .auth-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            min-height: 500px;
+        }
+        
+        .auth-card {
+            background: white;
+            padding: 40px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .auth-title {
+            color: var(--primary);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .auth-subtitle {
+            color: var(--gray);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
             margin-bottom: 20px;
         }
-
-        @media (min-width: 768px) {
-            .form-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        /* ===== FORM CONTROLS ===== */
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-label {
+        
+        label {
             display: block;
             margin-bottom: 8px;
-            color: var(--primary);
-            font-weight: 500;
-            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--dark);
         }
-
-        .form-control {
+        
+        input, select, textarea {
             width: 100%;
             padding: 12px 15px;
             border: 2px solid #e0e0e0;
             border-radius: var(--radius);
             font-size: 1rem;
-            transition: var(--transition);
-            background: #fafafa;
+            transition: border-color 0.3s;
         }
-
-        .select-wrapper {
-            position: relative;
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
         }
-
-        .select-wrapper::after {
-            content: '▼';
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--primary);
-            pointer-events: none;
-            font-size: 0.7rem;
-        }
-
-        .form-control.select {
-            padding-right: 40px;
-            appearance: none;
-        }
-
-        /* ===== TARJETA DE EVALUACIÓN ===== */
-        .evaluation-card {
-            background: white;
-            border-radius: var(--radius);
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-            border-left: 5px solid var(--primary);
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .card-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            color: white;
-            background: var(--primary);
-        }
-
-        .card-title {
-            font-size: 1.2rem;
-            color: var(--primary);
-            font-weight: 500;
-        }
-
-        /* ===== PUNTAJES ===== */
-        .score-display {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: white;
-            padding: 20px;
-            border-radius: var(--radius);
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .score-value {
-            font-size: 3rem;
-            font-weight: 700;
-            margin: 10px 0;
-            line-height: 1;
-        }
-
-        .score-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            margin-bottom: 5px;
-        }
-
-        /* ===== MATRIZ IIM ===== */
-        .iim-matrix {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            margin: 20px 0;
-        }
-
-        .iim-level {
-            padding: 15px;
-            border-radius: var(--radius);
-            text-align: center;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: var(--transition);
-            cursor: help;
-            border: 2px solid transparent;
-        }
-
-        .iim-level:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-
-        /* ===== RESULTADOS IIM ===== */
-        .iim-results {
-            background: white;
-            border-radius: var(--radius);
-            padding: 25px;
-            margin: 25px 0;
-            box-shadow: var(--shadow);
-            border-top: 5px solid;
-        }
-
-        .iim-calculations {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .calculation-item {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: var(--radius);
-            text-align: center;
-        }
-
-        /* ===== RECOMENDACIONES ===== */
-        .recommendations-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin: 25px 0;
-        }
-
-        @media (min-width: 768px) {
-            .recommendations-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        .recommendation-card {
-            background: white;
-            padding: 20px;
-            border-radius: var(--radius);
-            border-left: 5px solid;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-        }
-
-        .recommendation-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        /* ===== BOTONES ===== */
+        
         .btn {
-            padding: 14px 24px;
-            border: none;
-            border-radius: var(--radius);
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            text-transform: uppercase;
-            width: 100%;
-            margin-bottom: 10px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
         }
-
+        
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            background: var(--primary);
             color: white;
         }
-
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
         .btn-success {
-            background: linear-gradient(135deg, var(--color-minimo) 0%, #66bb6a 100%);
+            background: var(--success);
             color: white;
         }
-
-        .btn-secondary {
-            background: #e0e0e0;
-            color: var(--dark);
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
         }
-
-        /* ===== ACTION BAR ===== */
-        .action-bar {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-            margin: 30px 0;
-        }
-
-        @media (min-width: 480px) {
-            .action-bar {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .btn {
-                width: auto;
-                margin-bottom: 0;
-            }
-        }
-
-        /* ===== TABLAS ===== */
-        .algorithm-table {
+        
+        .btn-block {
             width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            font-size: 0.9rem;
         }
-
-        .algorithm-table th,
-        .algorithm-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
+        
+        .toggle-auth {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--gray);
         }
-
-        .algorithm-table th {
-            background: #f5f5f5;
+        
+        .toggle-auth a {
+            color: var(--primary);
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .user-display {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: var(--radius);
+        }
+        
+        .main-app {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-app {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .section {
+            background: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .section-header {
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 15px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-subtitle {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .scale-section {
+            margin-bottom: 30px;
+        }
+        
+        .scale-header {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            padding: 15px;
+            border-radius: var(--radius);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .scale-title {
             font-weight: 600;
             color: var(--primary);
         }
-
-        .algorithm-table tr:hover {
-            background: #f8f9fa;
+        
+        .question-group {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #fafafa;
+            border-radius: var(--radius);
+            border-left: 4px solid var(--primary);
         }
-
-        /* ===== UTILITIES ===== */
-        .hidden { display: none !important; }
-        .text-center { text-align: center; }
-        .mt-1 { margin-top: 10px; }
-        .mt-2 { margin-top: 20px; }
-        .mt-3 { margin-top: 30px; }
-        .mb-1 { margin-bottom: 10px; }
-        .mb-2 { margin-bottom: 20px; }
-        .mb-3 { margin-bottom: 30px; }
-        .flex { display: flex; }
-        .flex-col { flex-direction: column; }
-        .items-center { align-items: center; }
-        .justify-between { justify-content: space-between; }
-        .gap-1 { gap: 10px; }
-        .gap-2 { gap: 20px; }
-        .w-full { width: 100%; }
-
-        /* ===== RESPONSIVE ===== */
-        @media (min-width: 768px) {
-            .container {
-                max-width: 768px;
-                margin: 10px auto;
-                border-radius: var(--radius);
-                box-shadow: var(--shadow);
-            }
-            
-            .main-content {
-                padding: 30px;
-            }
+        
+        .question-text {
+            margin-bottom: 10px;
+            font-weight: 500;
         }
-
-        @media (min-width: 1024px) {
-            .container {
-                max-width: 1000px;
-            }
-            
-            .action-bar {
-                grid-template-columns: repeat(3, 1fr);
-            }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
+        
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: white;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .option:hover {
+            background: #f0f0f0;
+        }
+        
+        .option input[type="radio"] {
+            width: auto;
+            cursor: pointer;
+        }
+        
+        .puntaje-display {
+            text-align: center;
+            padding: 10px;
+            background: var(--light);
+            border-radius: var(--radius);
+            margin: 15px 0;
+        }
+        
+        .puntaje-numero {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .results-container {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: var(--radius);
+            padding: 25px;
+            margin-top: 20px;
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .recomendacion-especifica {
+            background: white;
+            border-left: 4px solid var(--success);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+        }
+        
+        .history-list {
+            list-style: none;
+        }
+        
+        .history-item {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: var(--radius);
+            border-left: 4px solid var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: var(--radius);
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: var(--success);
+            color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            z-index: 1001;
+            display: none;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .action-bar {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .tinetti-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .factores-criticos {
+            background: #fff3e0;
+            border: 2px solid #ff9800;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .factores-criticos h4 {
+            color: #e65100;
+            margin-bottom: 15px;
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .iim-indicator {
+            text-align: center;
+            padding: 20px;
+            border-radius: var(--radius);
+            margin: 20px 0;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        }
+        
+        .iim-value {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .iim-level {
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        /* Colores para niveles IIM */
+        .iim-minimo { background-color: #a5d6a7; color: #1b5e20; }
+        .iim-leve { background-color: #c8e6c9; color: #2e7d32; }
+        .iim-moderado { background-color: #fff9c4; color: #f57f17; }
+        .iim-alto { background-color: #ffcc80; color: #e65100; }
+        .iim-muy-alto { background-color: #ffab91; color: #bf360c; }
+        .iim-extremo { background-color: #ef9a9a; color: #b71c1c; }
     </style>
 </head>
 <body>
-    <!-- CONTENEDOR PRINCIPAL -->
+    <!-- NOTIFICACIÓN -->
+    <div class="notification" id="notification"></div>
+
+    <!-- MODAL COMPARTIR -->
+    <div class="modal" id="share-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-envelope"></i> Enviar por Correo</h3>
+                <button onclick="closeModal('share-modal')" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
+            </div>
+            <div class="form-group">
+                <label>Correo destinatario:</label>
+                <input type="email" id="share-email" placeholder="ejemplo@hospital.cl">
+            </div>
+            <div class="form-group">
+                <label>Asunto:</label>
+                <input type="text" id="share-subject" value="Prescripción de Ayudas Técnicas" readonly>
+            </div>
+            <div class="form-group">
+                <label>Mensaje adicional:</label>
+                <textarea id="share-message" rows="4" placeholder="Escriba un mensaje adicional..."></textarea>
+            </div>
+            <div class="action-bar">
+                <button class="btn btn-primary" onclick="sendEmail()">
+                    <i class="fas fa-paper-plane"></i> Enviar
+                </button>
+                <button class="btn btn-danger" onclick="closeModal('share-modal')">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
-        <!-- HEADER -->
-        <div class="header">
-            <h1>Sistema Integrado <span>IRAT-5 + Tinetti + Norton</span></h1>
-            <p>Algoritmo de Ayuda Técnica Progresiva - Índice IIM (0-10)</p>
+        <!-- ENCABEZADO -->
+        <header>
+            <div class="logo-container">
+                <div class="logo">
+                    <i class="fas fa-wheelchair"></i>
+                </div>
+                <div>
+                    <h1>SISTEMA PRESCRIPTOR DE AYUDAS TÉCNICAS</h1>
+                    <p class="subtitle">Evaluación Integral IRAT-5 + Tinetti + Norton con Índice IIM</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- SECCIÓN DE AUTENTICACIÓN -->
+        <div id="auth-section" class="auth-section">
+            <div class="auth-card">
+                <h2 id="auth-title" class="auth-title">Acceso Profesional</h2>
+                <p id="auth-subtitle" class="auth-subtitle">Ingrese sus credenciales para acceder al sistema</p>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Correo Electrónico</label>
+                    <input type="email" id="auth-email" placeholder="profesional@institucion.cl">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Contraseña</label>
+                    <input type="password" id="auth-password" placeholder="Ingrese su contraseña">
+                </div>
+                
+                <button id="auth-button" class="btn btn-primary btn-block" onclick="handleAuth()">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span id="auth-button-text">Iniciar Sesión</span>
+                </button>
+                
+                <div class="toggle-auth">
+                    <p id="toggle-auth-text">¿No tiene una cuenta? <a onclick="toggleAuthMode()">Crear nueva cuenta</a></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- INFORMACIÓN DE USUARIO -->
+        <div id="user-display" class="user-display hidden">
+            <div>
+                <i class="fas fa-user-md"></i>
+                <span id="current-user-email">usuario@correo.com</span>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Salir
+            </button>
         </div>
 
         <!-- APLICACIÓN PRINCIPAL -->
-        <section class="main-content">
-            <!-- DATOS DEL PACIENTE -->
-            <div class="data-section">
-                <h2 class="section-title">
-                    <i class="fas fa-user-injured"></i> Datos del Paciente
-                </h2>
-                
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Nombre Completo *</label>
-                        <input type="text" id="nombre" class="form-control" placeholder="Nombre y apellidos" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Fecha de Evaluación *</label>
-                        <input type="date" id="fecha" class="form-control" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Edad</label>
-                        <input type="number" id="edad" class="form-control" placeholder="Años" min="0" max="120">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Evaluador *</label>
-                        <input type="text" id="evaluador" class="form-control" placeholder="Nombre del profesional" required>
-                    </div>
+        <div id="main-app" class="main-app hidden">
+            <!-- SECCIÓN EVALUACIÓN -->
+            <section class="section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-user-md"></i> Evaluación del Paciente
+                    </h2>
+                    <p class="section-subtitle">Complete todos los datos para generar la prescripción</p>
                 </div>
-            </div>
 
-            <!-- FACTORES CONTEXTUALES -->
-            <div class="evaluation-card">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-clipboard-check"></i>
+                <!-- DATOS DEL PACIENTE -->
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Nombre Completo *</label>
+                        <input type="text" id="nombre" placeholder="Nombre y Apellido" required>
                     </div>
-                    <div>
-                        <h3 class="card-title">Factores Contextuales Críticos</h3>
-                        <p style="color: var(--gray); font-size: 0.9rem;">Modifican la clasificación final</p>
+                    <div class="form-group">
+                        <label><i class="fas fa-id-card"></i> RUT/Identificación</label>
+                        <input type="text" id="rut" placeholder="XX.XXX.XXX-X">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-birthday-cake"></i> Edad</label>
+                        <input type="number" id="edad" placeholder="Edad en años">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Fecha de Evaluación *</label>
+                        <input type="date" id="fecha" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-stethoscope"></i> Evaluador *</label>
+                        <input type="text" id="evaluador" placeholder="Nombre del profesional" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-hospital"></i> Institución</label>
+                        <input type="text" id="institucion" placeholder="Nombre de la institución">
                     </div>
                 </div>
-                
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Caídas recientes (últimos 3 meses)</label>
-                        <div class="select-wrapper">
-                            <select id="caidas" class="form-control select">
-                                <option value="0">0 caídas</option>
-                                <option value="1">1 caída</option>
-                                <option value="2">2 o más caídas</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Alteración cognitiva</label>
-                        <div class="select-wrapper">
-                            <select id="cognitiva" class="form-control select">
-                                <option value="0">No presenta</option>
-                                <option value="1">Leve (olvidos frecuentes)</option>
-                                <option value="2">Moderada (desorientación)</option>
-                                <option value="3">Severa (dependencia total)</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Situación de vivienda</label>
-                        <div class="select-wrapper">
-                            <select id="vivienda" class="form-control select">
-                                <option value="0">Vive con familia/cuidador</option>
-                                <option value="1">Vive solo con visitas</option>
-                                <option value="2">Vive solo sin apoyo</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Fuerza superior miembros</label>
-                        <div class="select-wrapper">
-                            <select id="fuerza" class="form-control select">
-                                <option value="0">Normal/bilateral</option>
-                                <option value="1">Unilateral reducida</option>
-                                <option value="2">Bilateral reducida</option>
-                                <option value="3">Muy reducida</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- IRAT-5 -->
-            <div class="evaluation-card">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-walking"></i>
-                    </div>
-                    <div>
-                        <h3 class="card-title">IRAT-5 Modificado</h3>
-                        <p style="color: var(--gray); font-size: 0.9rem;">Escala: 0-24 puntos (mayor = más riesgo)</p>
-                    </div>
-                </div>
-                
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">1. Equilibrio Unipodal</label>
-                        <div class="select-wrapper">
-                            <select id="irat-equilibrio" class="form-control select" onchange="calcularIRAT()">
-                                <option value="0">≥30 seg (0 pts)</option>
-                                <option value="1">15-29 seg (1 pt)</option>
-                                <option value="2">5-14 seg (2 pts)</option>
-                                <option value="3"><5 seg (3 pts)</option>
-                                <option value="4">No puede (4 pts)</option>
-                            </select>
-                        </div>
+                <!-- ESCALA IRAT-5 -->
+                <div class="scale-section">
+                    <div class="scale-header">
+                        <i class="fas fa-walking" style="color: var(--primary);"></i>
+                        <h3 class="scale-title">ESCALA IRAT-5 MODIFICADA</h3>
                     </div>
                     
-                    <div class="form-group">
-                        <label class="form-label">2. Tipo de Amputación</label>
-                        <div class="select-wrapper">
-                            <select id="irat-amputacion" class="form-control select" onchange="calcularIRAT()">
-                                <option value="0">Sin amputaciones (0 pts)</option>
-                                <option value="1">Transmetatarsiana (1 pt)</option>
-                                <option value="3">Unilat infracondílea (3 pts)</option>
-                                <option value="4">Bilat infracondílea (4 pts)</option>
-                                <option value="5">Unilat supracondílea (5 pts)</option>
-                                <option value="6">Bilat supracondílea (6 pts)</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">3. Función de Brazos</label>
-                        <div class="select-wrapper">
-                            <select id="irat-brazos" class="form-control select" onchange="calcularIRAT()">
-                                <option value="0">Ambos normales (0 pts)</option>
-                                <option value="1">Problemas un brazo (1 pt)</option>
-                                <option value="2">Problemas ambos (2 pts)</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">4. Situación Social</label>
-                        <div class="select-wrapper">
-                            <select id="irat-social" class="form-control select" onchange="calcularIRAT()">
-                                <option value="0">Cuidador profesional (0 pts)</option>
-                                <option value="1">Cuidador informal (1 pt)</option>
-                                <option value="2">Vive solo (2 pts)</option>
-                                <option value="3">Cuida a otro (3 pts)</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">5. Nivel Cooperación</label>
-                        <div class="select-wrapper">
-                            <select id="irat-cooperacion" class="form-control select" onchange="calcularIRAT()">
-                                <option value="0">Excelente (0 pts)</option>
-                                <option value="1">Buena (1 pt)</option>
-                                <option value="2">Moderada (2 pts)</option>
-                                <option value="3">Mala (3 pts)</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="score-display">
-                    <div class="score-label">Puntaje Total IRAT-5</div>
-                    <div class="score-value" id="puntaje-irat">0</div>
-                    <div class="score-label">/ 24 puntos</div>
-                </div>
-            </div>
-
-            <!-- TINETTI COMPLETO -->
-            <div class="evaluation-card">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-person-walking"></i>
-                    </div>
-                    <div>
-                        <h3 class="card-title">Test de Tinetti</h3>
-                        <p style="color: var(--gray); font-size: 0.9rem;">Escala: 0-28 puntos (mayor = mejor)</p>
-                    </div>
-                </div>
-                
-                <!-- Opción No Evaluable -->
-                <div class="form-group">
-                    <label class="form-label">Items No Evaluables (NE)</label>
-                    <div class="select-wrapper">
-                        <select id="tinetti-ne" class="form-control select" onchange="calcularTinetti()">
-                            <option value="0">0 items NE (test completo)</option>
-                            <option value="1">1 item NE</option>
-                            <option value="2">2 items NE</option>
-                            <option value="3">3 items NE</option>
-                            <option value="4">4 items NE</option>
-                            <option value="5">5 o más items NE</option>
+                    <div class="question-group">
+                        <div class="question-text">1. Equilibrio en sedestación (mantenerse sentado)</div>
+                        <select class="form-control" id="equilibrio" onchange="calcularIRAT()">
+                            <option value="">Seleccione...</option>
+                            <option value="0">Normal (4)</option>
+                            <option value="1">Leve (3)</option>
+                            <option value="2">Moderado (2)</option>
+                            <option value="3">Severo (1)</option>
+                            <option value="4">Muy severo (0)</option>
                         </select>
                     </div>
-                    <small style="color: var(--gray); display: block; margin-top: 5px;">
-                        Si hay items NE, el sistema ajusta automáticamente el puntaje
-                    </small>
+                    
+                    <div class="question-group">
+                        <div class="question-text">2. Estado de amputación de miembros inferiores</div>
+                        <select class="form-control" id="amputacion" onchange="calcularIRAT()">
+                            <option value="">Seleccione...</option>
+                            <option value="0">No (0)</option>
+                            <option value="1">Transmetatarsiana (1)</option>
+                            <option value="2">Unilateral transtibial (2)</option>
+                            <option value="3">Unilateral infracondílea (3)</option>
+                            <option value="4">Bilateral infracondílea (4)</option>
+                            <option value="5">Supracondílea unilateral (5)</option>
+                            <option value="6">Supracondílea bilateral (6)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question-group">
+                        <div class="question-text">3. Fuerza y funcionalidad de miembros superiores</div>
+                        <select class="form-control" id="brazos" onchange="calcularIRAT()">
+                            <option value="">Seleccione...</option>
+                            <option value="0">Normal (4)</option>
+                            <option value="1">Leve (3)</option>
+                            <option value="2">Moderado (2)</option>
+                            <option value="3">Severo (1)</option>
+                            <option value="4">Muy severo (0)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question-group">
+                        <div class="question-text">4. Situación sociofamiliar</div>
+                        <select class="form-control" id="social" onchange="calcularIRAT()">
+                            <option value="">Seleccione...</option>
+                            <option value="0">Excelente (4)</option>
+                            <option value="1">Buena (3)</option>
+                            <option value="2">Regular (2)</option>
+                            <option value="3">Deficiente (1)</option>
+                            <option value="4">Muy deficiente (0)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="question-group">
+                        <div class="question-text">5. Cooperación y motivación del paciente</div>
+                        <select class="form-control" id="cooperacion" onchange="calcularIRAT()">
+                            <option value="">Seleccione...</option>
+                            <option value="0">Excelente (4)</option>
+                            <option value="1">Buena (3)</option>
+                            <option value="2">Regular (2)</option>
+                            <option value="3">Deficiente (1)</option>
+                            <option value="4">Muy deficiente (0)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="puntaje-display">
+                        <div>PUNTAJE IRAT-5</div>
+                        <div class="puntaje-numero" id="puntaje-irat">0</div>
+                        <div style="font-size: 0.9rem;">(Máximo: 20 puntos)</div>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Puntaje Tinetti Bruto</label>
-                    <input type="number" id="tinetti-bruto" class="form-control" 
-                           min="0" max="28" placeholder="0-28" 
-                           onchange="calcularTinetti()">
-                    <small style="color: var(--gray); display: block; margin-top: 5px;">
-                        Ingrese el puntaje obtenido en la evaluación
-                    </small>
-                </div>
-                
-                <div class="score-display" style="background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);">
-                    <div class="score-label">Puntaje Tinetti Ajustado</div>
-                    <div class="score-value" id="puntaje-tinetti-ajust">0</div>
-                    <div class="score-label">/ 28 puntos</div>
-                </div>
-            </div>
 
-            <!-- ESCALA NORTON -->
-            <div class="evaluation-card">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-bed"></i>
+                <!-- TEST DE TINETTI -->
+                <div class="scale-section">
+                    <div class="scale-header">
+                        <i class="fas fa-balance-scale" style="color: var(--warning);"></i>
+                        <h3 class="scale-title">TEST DE TINETTI (Equilibrio y Marcha)</h3>
                     </div>
-                    <div>
-                        <h3 class="card-title">Escala Norton Modificada</h3>
-                        <p style="color: var(--gray); font-size: 0.9rem;">Escala: 5-20 puntos (menor = más riesgo)</p>
+                    
+                    <div class="form-group">
+                        <label>¿Aplica test de Tinetti?</label>
+                        <select class="form-control" id="tinetti-aplica" onchange="toggleTinetti()">
+                            <option value="aplica">Sí, aplicar Tinetti completo</option>
+                            <option value="no-aplica">No aplica (paciente no deambula)</option>
+                        </select>
+                    </div>
+                    
+                    <div id="tinetti-questions" style="display: block;">
+                        <div class="tinetti-grid">
+                            <!-- Equilibrio (9 ítems) -->
+                            <div>
+                                <h4 style="color: var(--primary); margin-bottom: 10px;">Equilibrio (9 ítems)</h4>
+                                <div class="form-group">
+                                    <label>1. Equilibrio sentado</label>
+                                    <select class="form-control tinetti-option" onchange="calcularTinetti()">
+                                        <option value="">Seleccione...</option>
+                                        <option value="0">0 - Inestable o se cae</option>
+                                        <option value="1">1 - Estable</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>2. Levántase</label>
+                                    <select class="form-control tinetti-option" onchange="calcularTinetti()">
+                                        <option value="">Seleccione...</option>
+                                        <option value="0">0 - Necesita ayuda</option>
+                                        <option value="1">1 - Independiente</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>3. Intento de levantarse</label>
+                                    <select class="form-control tinetti-option" onchange="calcularTinetti()">
+                                        <option value="">Seleccione...</option>
+                                        <option value="0">0 - Necesita ayuda</option>
+                                        <option value="1">1 - Independiente</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>4. Equilibrio inmediato al levantarse</label>
+                                    <select class="form-control tinetti-option" onchange="calcularTinetti()">
+                                        <option value="">Seleccione...</option>
+                                        <option value="0">0 - Inestable</option>
+                                        <option value="1">1 - Estable</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>5. Equilibrio de pie</label>
+                                    <select class="form-control tinetti-option" onchange="calcularTinetti()">
+                                        <option value="">Seleccione...</option>
+                                        <option value="0">0 - Inestable</option>
+                                        <option value="1">1 - Estable</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>6. Equilibrio con ojos cerrados</label>
+                                    <select class="form-control tinetti-option" onchange="calcularTinetti()">
+                                        <option value="">Seleccione...</option>
+                                        <option value="0">0 - Inestable</option>
+                                        <option value="1">1 - Estable</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>7. Giro 360°</label>
+                                    <select class="form-control tinetti-option" onchange="calcularTinetti()">
+                                        <option value="">Seleccione...</option>
+                                        <option value="0">0 - Pasos discontinuos</option>
+                                        <option value="1">1 - Continuos</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>8. Sentarse</label>
+                                    <select class="form-control tinetti-option" onchange="calcularTinetti()">
+                                        <option value="">Seleccione...</option>
+                                        <option value="0">0 - Inseguro</option>
+                                        <option value="1">1 - Seguro</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Marcha (7 ítems) -->
+                            <div>
+                                <h4 style="color: var(--primary); margin-bottom: 10px;">Marcha (7 ítems)</h4>
+                                <div class="form-group">
+                                    <label>9. Inicio de marcha</label>
+                                    <select class="form-control tinetti-option" onchange="calcularTinetti()">
+                                        <option value="">Seleccione...</option>
+                                        <option value="0">0 - Duda o varios intentos</option>
+                                        <option value="1">1 - Inicio inmediato</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>10. Longitud de paso</label>
+                                    <select class="form-control tinetti-option" onchange="calcularTinetti()">
+                                        <option value="">Seleccione...</option>
+                                        <option value="0">0 - Lado derecho</option>
+                                        <option value="1">1 - Lado izquierdo</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>11. Altura del paso</label>
+                                    <select class="form-control tinetti-option" onchange="calcularTinetti()">
+                                        <option value="">Seleccione...</option>
+                                        <option value="0">0 - Lado derecho</option>
+                                        <option value="1">1 - Lado izquierdo</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>12. Simetría del paso</label>
+                                    <select class="form-control tinetti-option" onchange="calcularTinetti()">
+                                        <option value="">Seleccione...</option>
+                                        <option value="0">0 - Asimétrico</option>
+                                        <option value="1">1 - Simétrico</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>13. Continuidad del paso</label>
+                                    <select class="form-control tinetti-option" onchange="calcularTinetti()">
+                                        <option value="">Seleccione...</option>
+                                        <option value="0">0 - Interrumpido</option>
+                                        <option value="1">1 - Continuo</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>14. Desviación</label>
+                                    <select class="form-control tinetti-option" onchange="calcularTinetti()">
+                                        <option value="">Seleccione...</option>
+                                        <option value="0">0 - Marcada</option>
+                                        <option value="1">1 - Leve o ninguna</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>15. Tronco</label>
+                                    <select class="form-control tinetti-option" onchange="calcularTinetti()">
+                                        <option value="">Seleccione...</option>
+                                        <option value="0">0 - Inestable</option>
+                                        <option value="1">1 - Estable</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>16. Marcha</label>
+                                    <select class="form-control tinetti-option" onchange="calcularTinetti()">
+                                        <option value="">Seleccione...</option>
+                                        <option value="0">0 - Inestable</option>
+                                        <option value="1">1 - Estable</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Opción NE para Tinetti -->
+                        <div class="form-group">
+                            <label>Número de ítems No Evaluables (NE) en Tinetti:</label>
+                            <select class="form-control" id="tinetti-ne" onchange="calcularTinetti()">
+                                <option value="0">0 - Todos evaluables</option>
+                                <option value="1">1 ítem NE</option>
+                                <option value="2">2 ítems NE</option>
+                                <option value="3">3 ítems NE</option>
+                                <option value="4">4 ítems NE</option>
+                                <option value="5">5 ítems NE</option>
+                            </select>
+                            <small style="color: var(--gray);">Seleccione cuántos ítems no se pueden evaluar</small>
+                        </div>
+                        
+                        <div class="puntaje-display">
+                            <div>PUNTAJE TINETTI</div>
+                            <div class="puntaje-numero" id="puntaje-tinetti">0</div>
+                            <div style="font-size: 0.9rem;" id="tinetti-ajustado-info">Bruto: 0 | Ajustado: 0 | Máximo: 28 puntos</div>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Estado Físico General</label>
-                        <div class="select-wrapper">
-                            <select id="norton-fisica" class="form-control select" onchange="calcularNorton()">
-                                <option value="4">Bueno (4 pts)</option>
-                                <option value="3">Regular (3 pts)</option>
-                                <option value="2">Malo (2 pts)</option>
-                                <option value="1">Muy malo (1 pt)</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Estado Mental</label>
-                        <div class="select-wrapper">
-                            <select id="norton-mental" class="form-control select" onchange="calcularNorton()">
-                                <option value="4">Alerta/orientado (4 pts)</option>
-                                <option value="3">Apatía/confusión leve (3 pts)</option>
-                                <option value="2">Confuso/desorientado (2 pts)</option>
-                                <option value="1">Estuporoso/comatoso (1 pt)</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Actividad</label>
-                        <div class="select-wrapper">
-                            <select id="norton-actividad" class="form-control select" onchange="calcularNorton()">
-                                <option value="4">Deambula solo (4 pts)</option>
-                                <option value="3">Deambula con ayuda (3 pts)</option>
-                                <option value="2">Solo sentado (2 pts)</option>
-                                <option value="1">Encamado (1 pt)</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Movilidad</label>
-                        <div class="select-wrapper">
-                            <select id="norton-movilidad" class="form-control select" onchange="calcularNorton()">
-                                <option value="4">Completa (4 pts)</option>
-                                <option value="3">Ligeramente limitada (3 pts)</option>
-                                <option value="2">Muy limitada (2 pts)</option>
-                                <option value="1">Inmóvil (1 pt)</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Incontinencia</label>
-                        <div class="select-wrapper">
-                            <select id="norton-incontinencia" class="form-control select" onchange="calcularNorton()">
-                                <option value="4">Ninguna (4 pts)</option>
-                                <option value="3">Ocasional (3 pts)</option>
-                                <option value="2">Urinaria (2 pts)</option>
-                                <option value="1">Urinaria y fecal (1 pt)</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="score-display" style="background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);">
-                    <div class="score-label">Puntaje Total Norton</div>
-                    <div class="score-value" id="puntaje-norton">20</div>
-                    <div class="score-label">/ 20 puntos</div>
-                </div>
-            </div>
 
-            <!-- MATRIZ IIM -->
-            <div class="evaluation-card">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-calculator"></i>
+                <!-- ESCALA NORTON -->
+                <div class="scale-section">
+                    <div class="scale-header">
+                        <i class="fas fa-bed" style="color: var(--success);"></i>
+                        <h3 class="scale-title">ESCALA NORTON MODIFICADA</h3>
                     </div>
-                    <div>
-                        <h3 class="card-title">Clasificación por Índice IIM</h3>
-                        <p style="color: var(--gray); font-size: 0.9rem;">Escala 0-10: IRAT(40%) + Tinetti(40%) + Norton(20%)</p>
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Estado físico general</label>
+                            <select class="form-control" id="norton-fisica" onchange="calcularNorton()">
+                                <option value="4">Bueno</option>
+                                <option value="3">Regular</option>
+                                <option value="2">Malo</option>
+                                <option value="1">Muy malo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Estado mental</label>
+                            <select class="form-control" id="norton-mental" onchange="calcularNorton()">
+                                <option value="4">Alerta</option>
+                                <option value="3">Apatía</option>
+                                <option value="2">Confusión</option>
+                                <option value="1">Estupor</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Actividad</label>
+                            <select class="form-control" id="norton-actividad" onchange="calcularNorton()">
+                                <option value="4">Deambula</option>
+                                <option value="3">Deambula con ayuda</option>
+                                <option value="2">Silla de ruedas</option>
+                                <option value="1">Encamado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Movilidad</label>
+                            <select class="form-control" id="norton-movilidad" onchange="calcularNorton()">
+                                <option value="4">Completa</option>
+                                <option value="3">Ligera limitación</option>
+                                <option value="2">Muy limitada</option>
+                                <option value="1">Inmóvil</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Incontinencia</label>
+                            <select class="form-control" id="norton-incontinencia" onchange="calcularNorton()">
+                                <option value="4">Ninguna</option>
+                                <option value="3">Ocasional</option>
+                                <option value="2">Urinaria</option>
+                                <option value="1">Urinaria y fecal</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="puntaje-display">
+                        <div>PUNTAJE NORTON</div>
+                        <div class="puntaje-numero" id="puntaje-norton">20</div>
+                        <div style="font-size: 0.9rem;">(Mínimo: 5, Máximo: 20 puntos)</div>
                     </div>
                 </div>
-                
-                <div class="iim-matrix">
-                    <div class="iim-level" style="background: var(--color-minimo); color: white;" 
-                         title="0.0 - 2.5: Riesgo insignificante - Funcionalidad preservada">
-                        <div style="font-weight: bold;">MÍNIMO</div>
-                        <div>0.0 - 2.5</div>
-                    </div>
-                    
-                    <div class="iim-level" style="background: var(--color-leve); color: white;"
-                         title="2.6 - 4.0: Riesgo bajo - Prevención básica">
-                        <div style="font-weight: bold;">LEVE</div>
-                        <div>2.6 - 4.0</div>
-                    </div>
-                    
-                    <div class="iim-level" style="background: var(--color-moderado);"
-                         title="4.1 - 5.5: Riesgo moderado - Intervención recomendada">
-                        <div style="font-weight: bold;">MODERADO</div>
-                        <div>4.1 - 5.5</div>
-                    </div>
-                    
-                    <div class="iim-level" style="background: var(--color-alto); color: white;"
-                         title="5.6 - 7.0: Riesgo alto - Intervención necesaria">
-                        <div style="font-weight: bold;">ALTO</div>
-                        <div>5.6 - 7.0</div>
-                    </div>
-                    
-                    <div class="iim-level" style="background: var(--color-muy-alto); color: white;"
-                         title="7.1 - 8.5: Riesgo muy alto - Intervención urgente">
-                        <div style="font-weight: bold;">MUY ALTO</div>
-                        <div>7.1 - 8.5</div>
-                    </div>
-                    
-                    <div class="iim-level" style="background: var(--color-extremo); color: white;"
-                         title="8.6 - 10.0: Riesgo crítico - Intervención inmediata">
-                        <div style="font-weight: bold;">EXTREMO</div>
-                        <div>8.6 - 10.0</div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- BOTONES DE ACCIÓN -->
-            <div class="action-bar">
-                <button class="btn btn-success" onclick="calcularIIM()">
-                    <i class="fas fa-calculator"></i> Calcular Índice IIM
-                </button>
-                <button class="btn btn-secondary" onclick="resetForm()">
-                    <i class="fas fa-eraser"></i> Limpiar Formulario
-                </button>
-            </div>
+                <!-- FACTORES CRÍTICOS -->
+                <div class="factores-criticos">
+                    <h4><i class="fas fa-exclamation-triangle"></i> FACTORES CRÍTICOS ADICIONALES</h4>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="factor-caidas" value="caidas">
+                            <label for="factor-caidas">2 o más caídas en último mes</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="factor-cognitivo" value="cognitivo">
+                            <label for="factor-cognitivo">Alteración cognitiva significativa</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="factor-vive-solo" value="vive-solo">
+                            <label for="factor-vive-solo">Vive solo sin apoyo familiar</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="factor-entorno" value="entorno">
+                            <label for="factor-entorno">Entorno con obstáculos/riesgos</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="factor-fuerza" value="fuerza">
+                            <label for="factor-fuerza">Fuerza superior preservada</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="factor-vision" value="vision">
+                            <label for="factor-vision">Alteración visual importante</label>
+                        </div>
+                    </div>
+                </div>
 
-            <!-- RESULTADOS IIM -->
-            <div id="iim-results-container" class="hidden">
-                <div class="iim-results" id="iim-results-card">
-                    <!-- Los resultados se generan dinámicamente aquí -->
+                <!-- BOTONES DE ACCIÓN -->
+                <div class="action-bar">
+                    <button class="btn btn-primary" onclick="calcularIIM()">
+                        <i class="fas fa-calculator"></i> Calcular Índice IIM
+                    </button>
+                    <button class="btn btn-success" onclick="generarResultados()">
+                        <i class="fas fa-file-medical"></i> Generar Prescripción
+                    </button>
+                    <button class="btn btn-warning" onclick="resetForm()">
+                        <i class="fas fa-redo"></i> Nueva Evaluación
+                    </button>
                 </div>
-                
-                <!-- CÁLCULOS DETALLADOS -->
-                <div class="evaluation-card">
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div>
-                            <h3 class="card-title">Cálculos Detallados del Algoritmo</h3>
-                            <p style="color: var(--gray); font-size: 0.9rem;">Proceso matemático completo</p>
-                        </div>
-                    </div>
-                    
-                    <div class="iim-calculations" id="iim-calculations">
-                        <!-- Los cálculos se generan dinámicamente aquí -->
-                    </div>
-                    
-                    <table class="algorithm-table">
-                        <thead>
-                            <tr>
-                                <th>Paso</th>
-                                <th>Fórmula</th>
-                                <th>Cálculo</th>
-                                <th>Resultado</th>
-                            </tr>
-                        </thead>
-                        <tbody id="algorithm-steps">
-                            <!-- Pasos del algoritmo se generan aquí -->
-                        </tbody>
-                    </table>
+            </section>
+
+            <!-- SECCIÓN RESULTADOS -->
+            <section id="results-section" class="section hidden">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-chart-bar"></i> Resultados y Prescripción
+                    </h2>
+                    <p class="section-subtitle">Resultados de la evaluación integral y recomendaciones</p>
                 </div>
-                
-                <!-- RECOMENDACIONES DE AYUDA TÉCNICA -->
-                <div class="evaluation-card">
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <i class="fas fa-wheelchair"></i>
-                        </div>
-                        <div>
-                            <h3 class="card-title">Ayuda Técnica Prescrita</h3>
-                            <p style="color: var(--gray); font-size: 0.9rem;">Según clasificación IIM + Factores críticos</p>
-                        </div>
-                    </div>
-                    
-                    <div class="recommendations-grid" id="technical-aids-grid">
-                        <!-- Ayudas técnicas se generan aquí -->
+
+                <!-- DATOS DEL PACIENTE EN RESULTADOS -->
+                <div class="result-card">
+                    <h3 style="color: var(--primary); margin-bottom: 15px;">
+                        <i class="fas fa-user-injured"></i> Datos del Paciente
+                    </h3>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                        <div><strong>Nombre:</strong> <span id="res-nombre">-</span></div>
+                        <div><strong>Edad:</strong> <span id="res-edad">-</span></div>
+                        <div><strong>Evaluador:</strong> <span id="res-evaluador">-</span></div>
+                        <div><strong>Fecha:</strong> <span id="res-fecha">-</span></div>
                     </div>
                 </div>
-                
-                <!-- RECOMENDACIONES CLÍNICAS -->
-                <div class="evaluation-card">
-                    <div class="card-header">
-                        <div class="card-icon">
-                            <i class="fas fa-stethoscope"></i>
+
+                <!-- ÍNDICE IIM -->
+                <div class="iim-indicator">
+                    <div style="font-size: 1rem; margin-bottom: 10px;">ÍNDICE IIM (Integrado Multidimensional)</div>
+                    <div class="iim-value" id="iim-valor">0.0</div>
+                    <div class="iim-level" id="iim-nivel">-</div>
+                    <div style="margin-top: 10px; font-size: 0.9rem;" id="iim-interpretacion"></div>
+                </div>
+
+                <!-- PUNTAJES DE ESCALAS -->
+                <div>
+                    <h4 style="color: #7b1fa2; margin-bottom: 15px;">
+                        <i class="fas fa-chart-bar"></i> Resultados de Escalas
+                    </h4>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                        <div style="text-align: center; padding: 15px; background: #f5f5f5; border-radius: var(--radius);">
+                            <div style="font-size: 0.9rem; color: var(--gray);">IRAT-5</div>
+                            <div style="font-size: 1.8rem; font-weight: bold; color: var(--primary);" id="res-irat">0</div>
+                            <div style="font-size: 0.8rem;" id="res-irat-riesgo">-</div>
                         </div>
-                        <div>
-                            <h3 class="card-title">Recomendaciones Clínicas</h3>
-                            <p style="color: var(--gray); font-size: 0.9rem;">Plan de intervención integral</p>
+                        <div style="text-align: center; padding: 15px; background: #f5f5f5; border-radius: var(--radius);">
+                            <div style="font-size: 0.9rem; color: var(--gray);">Tinetti</div>
+                            <div style="font-size: 1.8rem; font-weight: bold; color: var(--warning);" id="res-tinetti">0</div>
+                            <div style="font-size: 0.8rem;" id="res-tinetti-riesgo">-</div>
                         </div>
-                    </div>
-                    
-                    <div class="recommendations-grid" id="clinical-recommendations">
-                        <!-- Recomendaciones se generan aquí -->
+                        <div style="text-align: center; padding: 15px; background: #f5f5f5; border-radius: var(--radius);">
+                            <div style="font-size: 0.9rem; color: var(--gray);">Norton</div>
+                            <div style="font-size: 1.8rem; font-weight: bold; color: var(--success);" id="res-norton">20</div>
+                            <div style="font-size: 0.8rem;" id="res-norton-riesgo">-</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
+
+                <!-- AYUDA TÉCNICA PRESCRITA -->
+                <div class="result-card" style="margin-top: 20px;">
+                    <h3 style="color: var(--primary); margin-bottom: 15px;">
+                        <i class="fas fa-wheelchair"></i> Ayuda Técnica Prescrita
+                    </h3>
+                    <div style="text-align: center; padding: 20px; background: #e8f5e9; border-radius: var(--radius);">
+                        <div style="font-size: 1.8rem; font-weight: bold; color: var(--success);" id="ayuda-principal">-</div>
+                        <div style="font-size: 1rem; margin-top: 10px;" id="ayuda-caracteristicas"></div>
+                        <div style="font-size: 0.9rem; color: var(--gray); margin-top: 5px;">
+                            Nivel de riesgo: <span id="nivel-riesgo" style="font-weight: bold;">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RECOMENDACIONES -->
+                <div id="recomendaciones-container" class="result-card hidden">
+                    <h3 style="color: var(--primary); margin-bottom: 15px;">
+                        <i class="fas fa-clipboard-list"></i> Recomendaciones Adicionales
+                    </h3>
+                    <div id="recomendaciones-lista"></div>
+                </div>
+
+                <!-- FACTORES CRÍTICOS APLICADOS -->
+                <div id="factores-aplicados-container" class="result-card hidden">
+                    <h3 style="color: #ff9800; margin-bottom: 15px;">
+                        <i class="fas fa-exclamation-circle"></i> Factores Críticos Aplicados
+                    </h3>
+                    <ul id="factores-aplicados-lista"></ul>
+                </div>
+
+                <!-- BOTONES DE ACCIÓN -->
+                <div class="action-bar" style="margin: 30px 0;">
+                    <button class="btn btn-primary" onclick="generarPDFProfesional()">
+                        <i class="fas fa-file-pdf"></i> Generar PDF
+                    </button>
+                    <button class="btn btn-success" onclick="saveToDatabase()">
+                        <i class="fas fa-cloud-upload-alt"></i> Guardar en Base de Datos
+                    </button>
+                    <button class="btn btn-warning" onclick="shareByEmail()">
+                        <i class="fas fa-envelope"></i> Enviar por Correo
+                    </button>
+                </div>
+            </section>
+        </div>
     </div>
 
     <!-- SCRIPTS -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
     <script>
         // ============================================
-        // ALGORITMO DEL SISTEMA INTEGRADO
+        // CONFIGURACIÓN FIREBASE
         // ============================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDJbtRuEwWVAsC1Nz6LbeF5a99LcUfAz4g",
+            authDomain: "irat-5-evaluaciones.firebaseapp.com",
+            databaseURL: "https://irat-5-evaluaciones-default-rtdb.firebaseio.com",
+            projectId: "irat-5-evaluaciones",
+            storageBucket: "irat-5-evaluaciones.firebasestorage.app",
+            messagingSenderId: "487279274410",
+            appId: "1:487279274410:web:146e9c35a0bf795c5423d3",
+            measurementId: "G-WSXJY5QHJS"
+        };
         
-        // Variables globales
+        let app, db, auth;
+        let authMode = 'login';
+        let currentUser = null;
+        let currentUserId = null;
         let lastReportData = {};
         
         // ============================================
         // INICIALIZACIÓN
         // ============================================
-        function init() {
-            // Configurar fecha actual
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('fecha').value = today;
-            
-            // Inicializar cálculos
-            calcularIRAT();
-            calcularTinetti();
-            calcularNorton();
-            
-            console.log("✅ Sistema Integrado IRAT-5 + Tinetti + Norton inicializado");
+        function initFirebase() {
+            try {
+                app = firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                db = firebase.firestore();
+                console.log("✅ Firebase inicializado correctamente");
+                setupAuthStateListener();
+                
+                // Configurar fecha actual
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('fecha').value = today;
+                
+                // Inicializar Tinetti
+                toggleTinetti();
+                
+            } catch (e) {
+                console.error("❌ Error al inicializar Firebase:", e);
+                showNotification('Error de conexión con el servidor', 'error');
+            }
         }
         
-        window.onload = init;
+        window.onload = initFirebase;
         
         // ============================================
-        // FUNCIONES DE CÁLCULO BÁSICAS
+        // SISTEMA DE AUTENTICACIÓN
+        // ============================================
+        function toggleAuthMode() {
+            const authTitle = document.getElementById('auth-title');
+            const authSubtitle = document.getElementById('auth-subtitle');
+            const authButtonText = document.getElementById('auth-button-text');
+            const toggleAuthText = document.getElementById('toggle-auth-text');
+            
+            if (authMode === 'login') {
+                authMode = 'register';
+                authTitle.textContent = 'Crear Nueva Cuenta';
+                authSubtitle.textContent = 'Registre una nueva cuenta profesional';
+                authButtonText.textContent = 'Registrarse';
+                toggleAuthText.textContent = 'Ya tengo una cuenta';
+            } else {
+                authMode = 'login';
+                authTitle.textContent = 'Acceso Profesional';
+                authSubtitle.textContent = 'Ingrese sus credenciales para acceder al sistema';
+                authButtonText.textContent = 'Iniciar Sesión';
+                toggleAuthText.textContent = 'Crear nueva cuenta';
+            }
+        }
+        
+        async function handleAuth() {
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value;
+            
+            if (!email || !password) {
+                showNotification('Ingrese correo y contraseña', 'warning');
+                return;
+            }
+            
+            const button = document.getElementById('auth-button');
+            const originalContent = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            button.disabled = true;
+            
+            try {
+                if (authMode === 'register') {
+                    await auth.createUserWithEmailAndPassword(email, password);
+                    showNotification('✅ Cuenta creada exitosamente', 'success');
+                } else {
+                    await auth.signInWithEmailAndPassword(email, password);
+                }
+            } catch (error) {
+                let message = 'Error de autenticación';
+                switch(error.code) {
+                    case 'auth/user-not-found': message = 'Usuario no encontrado'; break;
+                    case 'auth/wrong-password': message = 'Contraseña incorrecta'; break;
+                    case 'auth/email-already-in-use': message = 'El correo ya está registrado'; break;
+                    case 'auth/weak-password': message = 'La contraseña es muy débil'; break;
+                    case 'auth/invalid-email': message = 'Correo electrónico inválido'; break;
+                }
+                showNotification(`❌ ${message}`, 'error');
+                button.innerHTML = originalContent;
+                button.disabled = false;
+            }
+        }
+        
+        function logout() {
+            auth.signOut();
+        }
+        
+        function setupAuthStateListener() {
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    currentUser = user;
+                    currentUserId = user.uid;
+                    
+                    document.getElementById('auth-section').style.display = 'none';
+                    document.getElementById('main-app').classList.remove('hidden');
+                    document.getElementById('user-display').classList.remove('hidden');
+                    document.getElementById('current-user-email').textContent = user.email;
+                    
+                    loadHistorial();
+                    showNotification(`👋 Bienvenido/a ${user.email}`, 'success');
+                    
+                } else {
+                    currentUser = null;
+                    currentUserId = null;
+                    
+                    document.getElementById('auth-section').style.display = 'flex';
+                    document.getElementById('main-app').classList.add('hidden');
+                    document.getElementById('user-display').classList.add('hidden');
+                    
+                    authMode = 'login';
+                    document.getElementById('auth-title').textContent = 'Acceso Profesional';
+                    document.getElementById('auth-button-text').textContent = 'Iniciar Sesión';
+                    document.getElementById('toggle-auth-text').textContent = 'Crear nueva cuenta';
+                }
+            });
+        }
+        
+        // ============================================
+        // FUNCIONES PARA TINETTI
+        // ============================================
+        function toggleTinetti() {
+            const aplica = document.getElementById('tinetti-aplica').value;
+            const questionsDiv = document.getElementById('tinetti-questions');
+            
+            if (aplica === 'no-aplica') {
+                questionsDiv.style.display = 'none';
+                document.querySelectorAll('.tinetti-option').forEach(select => {
+                    select.disabled = true;
+                    select.value = '';
+                });
+                document.getElementById('tinetti-ne').value = '0';
+                calcularTinetti();
+            } else {
+                questionsDiv.style.display = 'block';
+                document.querySelectorAll('.tinetti-option').forEach(select => {
+                    select.disabled = false;
+                });
+            }
+        }
+        
+        // ============================================
+        // CÁLCULO DE PUNTAJES INDIVIDUALES
         // ============================================
         function calcularIRAT() {
-            const campos = ['irat-equilibrio', 'irat-amputacion', 'irat-brazos', 'irat-social', 'irat-cooperacion'];
+            const campos = ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'];
             let total = 0;
             
             campos.forEach(id => {
@@ -907,23 +1250,41 @@
         }
         
         function calcularTinetti() {
-            const tinettiBruto = parseInt(document.getElementById('tinetti-bruto').value) || 0;
-            const ne = parseInt(document.getElementById('tinetti-ne').value) || 0;
+            let total = 0;
+            let neCount = 0;
+            const selects = document.querySelectorAll('.tinetti-option');
             
-            // Aplicar fórmula de ajuste para items NE
-            let tinettiAjustado;
-            if (ne === 0) {
-                tinettiAjustado = tinettiBruto;
-            } else {
-                const itemsEval = 28 - ne;
-                tinettiAjustado = itemsEval > 0 ? (tinettiBruto / itemsEval) * 28 : 0;
+            // Contar NE (No Evaluables)
+            selects.forEach(select => {
+                if (select.value === '') {
+                    neCount++;
+                } else {
+                    total += parseInt(select.value) || 0;
+                }
+            });
+            
+            // Actualizar selector NE
+            document.getElementById('tinetti-ne').value = neCount.toString();
+            
+            // Calcular Tinetti ajustado si hay NE
+            let tinettiAjustado = total;
+            let infoText = `Bruto: ${total} | Máximo: 28`;
+            
+            if (neCount > 0) {
+                const itemsEvaluables = 16 - neCount; // Tinetti tiene 16 ítems total
+                if (itemsEvaluables > 0) {
+                    tinettiAjustado = (total / itemsEvaluables) * 16;
+                    infoText = `Bruto: ${total} | Ajustado: ${tinettiAjustado.toFixed(1)} | Máximo: 16`;
+                }
             }
             
-            document.getElementById('puntaje-tinetti-ajust').textContent = tinettiAjustado.toFixed(1);
+            document.getElementById('puntaje-tinetti').textContent = total;
+            document.getElementById('tinetti-ajustado-info').textContent = infoText;
+            
             return {
-                bruto: tinettiBruto,
+                bruto: total,
                 ajustado: tinettiAjustado,
-                ne: ne
+                ne: neCount
             };
         }
         
@@ -940,626 +1301,943 @@
         }
         
         // ============================================
-        // ALGORITMO PRINCIPAL - CÁLCULO IIM
+        // CÁLCULO DEL ÍNDICE IIM (ALGORITMO NUEVO)
         // ============================================
         function calcularIIM() {
-            console.log("🚀 Ejecutando algoritmo IIM...");
+            console.log("🔢 Calculando Índice IIM...");
             
-            // Validar datos básicos
-            if (!document.getElementById('nombre').value || !document.getElementById('evaluador').value) {
-                alert('Complete los datos del paciente y evaluador');
-                return;
+            // Obtener puntajes brutos
+            const iratScore = calcularIRAT();
+            const tinettiData = calcularTinetti();
+            const nortonScore = calcularNorton();
+            
+            // Validar que todos los campos estén completos
+            const camposIRAT = ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'];
+            const iratIncompleto = camposIRAT.some(id => {
+                const select = document.getElementById(id);
+                return !select || select.value === '';
+            });
+            
+            if (iratIncompleto) {
+                showNotification('Complete todas las preguntas del IRAT-5', 'warning');
+                return null;
             }
             
-            // 1. OBTENER ENTRADAS
-            const irat = calcularIRAT();
-            const tinettiData = calcularTinetti();
-            const norton = calcularNorton();
+            // PASO A: AJUSTE TINETTI (si hay NE)
+            let tinettiAjustado = tinettiData.bruto;
+            if (tinettiData.ne > 0) {
+                const itemsEvaluables = 16 - tinettiData.ne; // Tinetti tiene 16 ítems
+                if (itemsEvaluables > 0) {
+                    tinettiAjustado = (tinettiData.bruto / itemsEvaluables) * 16;
+                }
+            }
+            
+            // PASO B: NORMALIZACIÓN A ESCALA 0-10
+            // IRAT: máximo teórico 20 puntos (4 puntos por 5 preguntas)
+            const IRAT_norm = (iratScore / 20) * 10; // Mayor = más riesgo
+            
+            // Tinetti: máximo 16 puntos (ajustado a 16 si hay NE)
+            const TINETTI_norm = (tinettiAjustado / 16) * 10; // Mayor = mejor
+            
+            // Norton: invertido (20 - norton) para que mayor = más riesgo
+            // Rango: 5-20 → invertido: 15-0
+            const NORTON_norm = ((20 - nortonScore) / 15) * 10; // Mayor = más riesgo
+            
+            // PASO C: CÁLCULO DEL ÍNDICE IIM (0-10)
+            // Pesos: IRAT 40%, Tinetti 40%, Norton 20%
+            const IIM = (IRAT_norm * 0.4) + (TINETTI_norm * 0.4) + (NORTON_norm * 0.2);
+            
+            // Clasificar por IIM
+            const clasificacion = clasificarPorIIM(IIM);
+            
+            // Determinar ayuda base
+            const ayudaBase = determinarAyudaBase(clasificacion.nivel);
             
             // Obtener factores críticos
-            const factoresCriticos = {
-                caidas: parseInt(document.getElementById('caidas').value),
-                cognitiva: parseInt(document.getElementById('cognitiva').value),
-                vivienda: parseInt(document.getElementById('vivienda').value),
-                fuerza: parseInt(document.getElementById('fuerza').value)
-            };
+            const factoresCriticos = obtenerFactoresCriticos();
             
-            // 2. AJUSTAR TINETTI (Paso A del algoritmo)
-            let tinettiAjustado = tinettiData.ajustado;
-            const tinettiNE = tinettiData.ne;
-            
-            // 3. NORMALIZACIÓN A ESCALA 0-10 (Paso B)
-            // IRAT: Mayor puntaje = más riesgo (0-24 → 0-10)
-            const iratNorm = (irat / 24) * 10;
-            
-            // Tinetti: Mayor puntaje = mejor (0-28 → 0-10)
-            const tinettiNorm = (tinettiAjustado / 28) * 10;
-            
-            // Norton: Invertir (menor puntaje = más riesgo) (5-20 → 0-10)
-            const nortonNorm = ((20 - norton) / 15) * 10;
-            
-            // 4. CALCULAR ÍNDICE IIM (Paso C)
-            // Pesos: IRAT 40% + Tinetti 40% + Norton 20%
-            const iim = (iratNorm * 0.4) + (tinettiNorm * 0.4) + (nortonNorm * 0.2);
-            
-            // 5. CLASIFICACIÓN POR IIM
-            const clasificacionBase = clasificarPorIIM(iim);
-            
-            // 6. DETERMINAR AYUDA BASE
-            let ayudaBase = determinarAyudaBase(clasificacionBase);
-            
-            // 7. APLICAR FACTORES CRÍTICOS
-            const { clasificacionFinal, ayudaFinal } = aplicarFactoresCriticos(
-                clasificacionBase, 
+            // Aplicar factores críticos
+            const resultadoFinal = aplicarFactoresCriticos(
+                clasificacion, 
                 ayudaBase, 
                 factoresCriticos, 
-                tinettiNE, 
-                norton
+                tinettiData.ne, 
+                nortonScore
             );
             
-            // 8. GENERAR RECOMENDACIONES
-            const recomendaciones = generarRecomendaciones(clasificacionFinal, iim, factoresCriticos);
+            // Mostrar resultados preliminares
+            mostrarResultadosIIM(IIM, clasificacion, resultadoFinal, {
+                irat: iratScore,
+                tinetti: tinettiData.bruto,
+                tinettiAjustado: tinettiAjustado,
+                norton: nortonScore,
+                iratNorm: IRAT_norm,
+                tinettiNorm: TINETTI_norm,
+                nortonNorm: NORTON_norm
+            });
             
-            // 9. GUARDAR DATOS
-            lastReportData = {
-                paciente: {
-                    nombre: document.getElementById('nombre').value,
-                    fecha: document.getElementById('fecha').value,
-                    edad: document.getElementById('edad').value,
-                    evaluador: document.getElementById('evaluador').value
-                },
+            return {
+                iim: IIM,
+                clasificacion: resultadoFinal.clasificacion,
+                ayudaTecnica: resultadoFinal.ayuda,
+                factoresAplicados: resultadoFinal.factoresAplicados,
                 puntajes: {
-                    irat: irat,
-                    tinetti: {
-                        bruto: tinettiData.bruto,
-                        ajustado: tinettiAjustado,
-                        ne: tinettiNE
-                    },
-                    norton: norton
-                },
-                normalizados: {
-                    irat: iratNorm,
-                    tinetti: tinettiNorm,
-                    norton: nortonNorm
-                },
-                iim: iim,
-                clasificacion: clasificacionFinal,
-                ayudaTecnica: ayudaFinal,
-                factoresCriticos: factoresCriticos,
-                recomendaciones: recomendaciones,
-                timestamp: new Date().toISOString()
+                    irat: iratScore,
+                    tinetti: tinettiData.bruto,
+                    tinettiAjustado: tinettiAjustado,
+                    norton: nortonScore,
+                    normalizados: {
+                        irat: IRAT_norm,
+                        tinetti: TINETTI_norm,
+                        norton: NORTON_norm
+                    }
+                }
             };
-            
-            // 10. MOSTRAR RESULTADOS
-            mostrarResultadosIIM();
-            
-            console.log("✅ Algoritmo ejecutado correctamente:", lastReportData);
         }
         
         // ============================================
-        // FUNCIONES AUXILIARES DEL ALGORITMO
+        // CLASIFICACIÓN POR IIM
         // ============================================
-        
-        // 5. CLASIFICAR POR IIM
         function clasificarPorIIM(iim) {
-            if (iim <= 2.5) return { nivel: "MÍNIMO", color: "var(--color-minimo)" };
-            if (iim <= 4.0) return { nivel: "LEVE", color: "var(--color-leve)" };
-            if (iim <= 5.5) return { nivel: "MODERADO", color: "var(--color-moderado)" };
-            if (iim <= 7.0) return { nivel: "ALTO", color: "var(--color-alto)" };
-            if (iim <= 8.5) return { nivel: "MUY ALTO", color: "var(--color-muy-alto)" };
-            return { nivel: "EXTREMO", color: "var(--color-extremo)" };
+            if (iim <= 2.5) {
+                return {
+                    nivel: "MÍNIMO",
+                    color: "#a5d6a7",
+                    textColor: "#1b5e20",
+                    interpretacion: "Riesgo insignificante - Funcionalidad preservada"
+                };
+            } else if (iim <= 4.0) {
+                return {
+                    nivel: "LEVE",
+                    color: "#c8e6c9",
+                    textColor: "#2e7d32",
+                    interpretacion: "Riesgo bajo - Prevención básica"
+                };
+            } else if (iim <= 5.5) {
+                return {
+                    nivel: "MODERADO",
+                    color: "#fff9c4",
+                    textColor: "#f57f17",
+                    interpretacion: "Riesgo moderado - Intervención recomendada"
+                };
+            } else if (iim <= 7.0) {
+                return {
+                    nivel: "ALTO",
+                    color: "#ffcc80",
+                    textColor: "#e65100",
+                    interpretacion: "Riesgo alto - Intervención necesaria"
+                };
+            } else if (iim <= 8.5) {
+                return {
+                    nivel: "MUY ALTO",
+                    color: "#ffab91",
+                    textColor: "#bf360c",
+                    interpretacion: "Riesgo muy alto - Intervención urgente"
+                };
+            } else {
+                return {
+                    nivel: "EXTREMO",
+                    color: "#ef9a9a",
+                    textColor: "#b71c1c",
+                    interpretacion: "Riesgo crítico - Intervención inmediata"
+                };
+            }
         }
         
-        // 6. DETERMINAR AYUDA BASE
-        function determinarAyudaBase(clasificacion) {
+        // ============================================
+        // DETERMINAR AYUDA BASE POR NIVEL
+        // ============================================
+        function determinarAyudaBase(nivel) {
             const ayudas = {
                 "MÍNIMO": {
                     principal: "Ninguna o bastón ocasional",
-                    caracteristicas: ["Bastón solo para distancias largas", "Uso preventivo"]
+                    caracteristicas: "• Bastón solo para distancias largas<br>• Uso esporádico"
                 },
                 "LEVE": {
                     principal: "Bastón simple",
-                    caracteristicas: ["Una mano", "Ajustable en altura", "Base antideslizante"]
+                    caracteristicas: "• Una mano<br>• Ajustable en altura<br>• Base antideslizante"
                 },
                 "MODERADO": {
                     principal: "Bastón multipunto o Andador fijo",
-                    caracteristicas: ["3 o 4 puntos de apoyo", "Mayor estabilidad", "Para uso constante"]
+                    caracteristicas: "• 3 o 4 puntos de apoyo<br>• Mayor estabilidad<br>• Para uso continuo"
                 },
                 "ALTO": {
                     principal: "Andador con ruedas (Rollator)",
-                    caracteristicas: ["Con asiento", "Frenos de seguridad", "Para desplazamientos"]
+                    caracteristicas: "• Con asiento y frenos<br>• Ruedas delanteras<br>• Para distancias medias"
                 },
                 "MUY ALTO": {
                     principal: "Silla de ruedas manual",
-                    caracteristicas: ["Ruedas antitumbo", "Para transferencias", "Asistencia parcial"]
+                    caracteristicas: "• Ruedas antitumbo<br>• Respaldo ajustable<br>• Para transferencias"
                 },
                 "EXTREMO": {
                     principal: "Silla de ruedas eléctrica",
-                    caracteristicas: ["Control electrónico", "Asistencia permanente", "Adaptaciones especiales"]
+                    caracteristicas: "• Control electrónico<br>• Asistencia permanente<br>• Comodidad máxima"
                 }
             };
             
-            return ayudas[clasificacion.nivel] || ayudas["MÍNIMO"];
+            return ayudas[nivel] || ayudas["MODERADO"];
         }
         
-        // 7. APLICAR FACTORES CRÍTICOS
-        function aplicarFactoresCriticos(clasificacion, ayuda, factores, tinettiNE, norton) {
-            let nuevaClasificacion = { ...clasificacion };
-            let nuevaAyuda = { ...ayuda };
+        // ============================================
+        // OBTENER FACTORES CRÍTICOS DEL FORMULARIO
+        // ============================================
+        function obtenerFactoresCriticos() {
+            const factores = {
+                caidas: document.getElementById('factor-caidas').checked,
+                cognitivo: document.getElementById('factor-cognitivo').checked,
+                viveSolo: document.getElementById('factor-vive-solo').checked,
+                entorno: document.getElementById('factor-entorno').checked,
+                fuerza: document.getElementById('factor-fuerza').checked,
+                vision: document.getElementById('factor-vision').checked
+            };
             
-            // REGLA 1: Si items NE Tinetti ≥ 3
+            return factores;
+        }
+        
+        // ============================================
+        // APLICAR FACTORES CRÍTICOS (ALGORITMO)
+        // ============================================
+        function aplicarFactoresCriticos(clasificacion, ayudaBase, factores, tinettiNE, nortonScore) {
+            let nivelActual = clasificacion.nivel;
+            let ayudaActual = ayudaBase;
+            const factoresAplicados = [];
+            
+            // 1. Si hay muchos ítems NE en Tinetti
             if (tinettiNE >= 3) {
-                nuevaClasificacion = { nivel: "MUY ALTO", color: "var(--color-muy-alto)" };
-                nuevaAyuda = {
+                nivelActual = "MUY ALTO";
+                ayudaActual = {
                     principal: "Silla de ruedas manual",
-                    caracteristicas: ["Ruedas antitumbo", "Transferencias asistidas", "NE Tinetti ≥ 3"]
+                    caracteristicas: "• Evaluación limitada requiere mayor seguridad<br>• Ruedas antitumbo<br>• Supervisión constante"
                 };
+                factoresAplicados.push("Tinetti con 3+ ítems no evaluables");
             }
             
-            // REGLA 2: Si Norton ≤ 12 y clasificación < ALTO
-            if (norton <= 12 && !["ALTO", "MUY ALTO", "EXTREMO"].includes(nuevaClasificacion.nivel)) {
-                nuevaClasificacion = { nivel: "ALTO", color: "var(--color-alto)" };
-                nuevaAyuda = {
+            // 2. Si Norton es muy bajo (≤12)
+            if (nortonScore <= 12 && !["ALTO", "MUY ALTO", "EXTREMO"].includes(nivelActual)) {
+                nivelActual = "ALTO";
+                ayudaActual = {
                     principal: "Andador con ruedas (Rollator)",
-                    caracteristicas: ["Con asiento", "Frenos seguridad", "Norton ≤ 12"]
+                    caracteristicas: "• Estado general deficiente<br>• Con asiento para descanso<br>• Frenos de seguridad"
                 };
+                factoresAplicados.push("Puntaje Norton bajo (≤12)");
             }
             
-            // REGLA 3: Si caídas ≥ 2
-            if (factores.caidas >= 2) {
-                nuevaClasificacion = subirUnNivel(nuevaClasificacion);
-                nuevaAyuda.caracteristicas.push("Caídas recientes ≥ 2");
+            // 3. Si tiene caídas recientes
+            if (factores.caidas) {
+                nivelActual = subirUnNivel(nivelActual);
+                ayudaActual = aumentarAyuda(ayudaActual);
+                factoresAplicados.push("2+ caídas en último mes");
             }
             
-            // REGLA 4: Si alteración cognitiva y ayuda = "Bastón simple"
-            if (factores.cognitiva >= 2 && ayuda.principal === "Bastón simple") {
-                nuevaAyuda = {
+            // 4. Si tiene alteración cognitiva y usa bastón simple
+            if (factores.cognitivo && ayudaActual.principal.includes("Bastón")) {
+                ayudaActual = {
                     principal: "Andador fijo",
-                    caracteristicas: ["Mayor seguridad", "Para alteración cognitiva"]
+                    caracteristicas: "• Mayor estabilidad por alteración cognitiva<br>• Sin ruedas para mayor seguridad"
                 };
+                factoresAplicados.push("Alteración cognitiva");
             }
             
-            // REGLA 5: Si vive solo
-            if (factores.vivienda >= 1) {
-                nuevaAyuda.caracteristicas.push("Vive solo - seguridad aumentada");
+            // 5. Si vive solo
+            if (factores.viveSolo) {
+                ayudaActual = aumentarSeguridad(ayudaActual);
+                factoresAplicados.push("Vive solo sin apoyo");
             }
             
-            // REGLA 6: Si NO fuerza superior y ayuda = "Silla manual"
-            if (factores.fuerza >= 2 && nuevaAyuda.principal === "Silla de ruedas manual") {
-                nuevaAyuda = {
+            // 6. Si NO tiene fuerza superior y necesita silla manual
+            if (!factores.fuerza && ayudaActual.principal.includes("Silla de ruedas manual")) {
+                ayudaActual = {
                     principal: "Silla de ruedas eléctrica",
-                    caracteristicas: ["Control electrónico", "Fuerza superior reducida"]
+                    caracteristicas: "• Fuerza superior limitada<br>• Control electrónico<br>• Asistencia para propulsión"
                 };
+                factoresAplicados.push("Fuerza superior limitada");
+            }
+            
+            // 7. Si tiene alteración visual
+            if (factores.vision) {
+                ayudaActual = aumentarSeguridad(ayudaActual);
+                factoresAplicados.push("Alteración visual importante");
             }
             
             return {
-                clasificacionFinal: nuevaClasificacion,
-                ayudaFinal: nuevaAyuda
+                clasificacion: {
+                    ...clasificacion,
+                    nivel: nivelActual
+                },
+                ayuda: ayudaActual,
+                factoresAplicados: factoresAplicados
             };
         }
         
-        // Función: SUBIR_UN_NIVEL
-        function subirUnNivel(clasificacion) {
+        // ============================================
+        // FUNCIONES AUXILIARES PARA FACTORES CRÍTICOS
+        // ============================================
+        function subirUnNivel(nivel) {
             const niveles = ["MÍNIMO", "LEVE", "MODERADO", "ALTO", "MUY ALTO", "EXTREMO"];
-            const colores = [
-                "var(--color-minimo)",
-                "var(--color-leve)",
-                "var(--color-moderado)",
-                "var(--color-alto)",
-                "var(--color-muy-alto)",
-                "var(--color-extremo)"
-            ];
-            
-            const indexActual = niveles.indexOf(clasificacion.nivel);
-            const nuevoIndex = Math.min(indexActual + 1, niveles.length - 1);
-            
+            const index = niveles.indexOf(nivel);
+            return index < niveles.length - 1 ? niveles[index + 1] : "EXTREMO";
+        }
+        
+        function aumentarAyuda(ayuda) {
+            // Simplificación: cambiar a siguiente nivel de ayuda
+            if (ayuda.principal.includes("Bastón")) {
+                return {
+                    principal: "Bastón multipunto",
+                    caracteristicas: ayuda.caracteristicas + "<br>• Mayor estabilidad por riesgo de caídas"
+                };
+            } else if (ayuda.principal.includes("Andador fijo")) {
+                return {
+                    principal: "Andador con ruedas (Rollator)",
+                    caracteristicas: ayuda.caracteristicas + "<br>• Con frenos de seguridad adicionales"
+                };
+            } else if (ayuda.principal.includes("Andador con ruedas")) {
+                return {
+                    principal: "Silla de ruedas manual",
+                    caracteristicas: ayuda.caracteristicas + "<br>• Ruedas antitumbo por historial de caídas"
+                };
+            }
+            return ayuda;
+        }
+        
+        function aumentarSeguridad(ayuda) {
             return {
-                nivel: niveles[nuevoIndex],
-                color: colores[nuevoIndex]
+                principal: ayuda.principal,
+                caracteristicas: ayuda.caracteristicas + "<br>• Elementos de seguridad reforzados (vive solo)"
             };
         }
         
-        // 8. GENERAR RECOMENDACIONES
-        function generarRecomendaciones(clasificacion, iim, factores) {
-            const recomendacionesBase = {
+        // ============================================
+        // MOSTRAR RESULTADOS IIM EN INTERFAZ
+        // ============================================
+        function mostrarResultadosIIM(iim, clasificacion, resultadoFinal, puntajes) {
+            // Actualizar valor IIM
+            document.getElementById('iim-valor').textContent = iim.toFixed(1);
+            
+            // Actualizar nivel IIM con color
+            const nivelElement = document.getElementById('iim-nivel');
+            nivelElement.textContent = resultadoFinal.clasificacion.nivel;
+            nivelElement.className = 'iim-level iim-' + resultadoFinal.clasificacion.nivel.toLowerCase().replace('í', 'i').replace('á', 'a').replace(' ', '-');
+            nivelElement.style.backgroundColor = resultadoFinal.clasificacion.color;
+            nivelElement.style.color = resultadoFinal.clasificacion.textColor;
+            
+            // Interpretación
+            document.getElementById('iim-interpretacion').textContent = resultadoFinal.clasificacion.interpretacion;
+            
+            // Mostrar puntajes de escalas
+            document.getElementById('res-irat').textContent = puntajes.irat;
+            document.getElementById('res-tinetti').textContent = puntajes.tinetti;
+            document.getElementById('res-norton').textContent = puntajes.norton;
+            
+            // Mostrar riesgos individuales
+            document.getElementById('res-irat-riesgo').textContent = getIRATRiesgo(puntajes.irat);
+            document.getElementById('res-tinetti-riesgo').textContent = getTinettiRiesgo(puntajes.tinetti);
+            document.getElementById('res-norton-riesgo').textContent = getNortonRiesgo(puntajes.norton);
+            
+            // Mostrar ayuda técnica
+            document.getElementById('ayuda-principal').textContent = resultadoFinal.ayuda.principal;
+            document.getElementById('ayuda-caracteristicas').innerHTML = resultadoFinal.ayuda.caracteristicas;
+            document.getElementById('nivel-riesgo').textContent = resultadoFinal.clasificacion.nivel;
+            
+            // Mostrar factores aplicados si los hay
+            const factoresContainer = document.getElementById('factores-aplicados-container');
+            const factoresLista = document.getElementById('factores-aplicados-lista');
+            
+            if (resultadoFinal.factoresAplicados.length > 0) {
+                factoresContainer.classList.remove('hidden');
+                factoresLista.innerHTML = '';
+                
+                resultadoFinal.factoresAplicados.forEach(factor => {
+                    const li = document.createElement('li');
+                    li.textContent = `• ${factor}`;
+                    li.style.marginBottom = '5px';
+                    factoresLista.appendChild(li);
+                });
+            } else {
+                factoresContainer.classList.add('hidden');
+            }
+            
+            // Guardar datos para reporte
+            lastReportData = {
+                iim: iim,
+                clasificacion: resultadoFinal.clasificacion,
+                ayudaTecnica: resultadoFinal.ayuda,
+                factoresAplicados: resultadoFinal.factoresAplicados,
+                puntajes: puntajes,
+                timestamp: new Date().toISOString()
+            };
+            
+            showNotification('✅ Índice IIM calculado correctamente', 'success');
+        }
+        
+        // ============================================
+        // GENERAR RESULTADOS COMPLETOS CON RECOMENDACIONES
+        // ============================================
+        function generarResultados() {
+            console.log("📝 Generando resultados completos...");
+            
+            // Validar datos básicos
+            const nombre = document.getElementById('nombre').value;
+            const fecha = document.getElementById('fecha').value;
+            const evaluador = document.getElementById('evaluador').value;
+            
+            if (!nombre || !fecha || !evaluador) {
+                showNotification('Complete los datos obligatorios del paciente', 'warning');
+                return;
+            }
+            
+            // Calcular IIM primero
+            const resultadoIIM = calcularIIM();
+            if (!resultadoIIM) {
+                showNotification('No se pudo calcular el índice IIM', 'error');
+                return;
+            }
+            
+            // Generar recomendaciones basadas en el nivel
+            const recomendaciones = generarRecomendacionesIIM(resultadoIIM.clasificacion.nivel);
+            
+            // Actualizar datos del paciente en resultados
+            document.getElementById('res-nombre').textContent = nombre;
+            document.getElementById('res-edad').textContent = document.getElementById('edad').value || 'N/A';
+            document.getElementById('res-evaluador').textContent = evaluador;
+            document.getElementById('res-fecha').textContent = fecha;
+            
+            // Mostrar recomendaciones
+            const container = document.getElementById('recomendaciones-container');
+            const lista = document.getElementById('recomendaciones-lista');
+            
+            container.classList.remove('hidden');
+            lista.innerHTML = '';
+            
+            recomendaciones.forEach(rec => {
+                const recDiv = document.createElement('div');
+                recDiv.className = 'recomendacion-especifica';
+                recDiv.style.borderLeftColor = rec.color;
+                recDiv.innerHTML = `
+                    <h4>${rec.titulo}</h4>
+                    <p>${rec.descripcion}</p>
+                    <div style="margin-top: 8px; font-size: 0.85rem;">
+                        <span style="background: ${rec.color}; color: white; padding: 3px 8px; border-radius: 12px;">
+                            ${rec.categoria}
+                        </span>
+                    </div>
+                `;
+                lista.appendChild(recDiv);
+            });
+            
+            // Completar lastReportData con datos del paciente
+            lastReportData.paciente = {
+                nombre: nombre,
+                rut: document.getElementById('rut').value,
+                fecha: fecha,
+                edad: document.getElementById('edad').value,
+                evaluador: evaluador,
+                institucion: document.getElementById('institucion').value
+            };
+            
+            lastReportData.recomendaciones = recomendaciones;
+            
+            // Mostrar sección de resultados
+            document.getElementById('results-section').classList.remove('hidden');
+            document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
+            
+            showNotification('✅ Prescripción generada exitosamente', 'success');
+            console.log("📊 Resultados generados:", lastReportData);
+        }
+        
+        // ============================================
+        // GENERAR RECOMENDACIONES POR NIVEL IIM
+        // ============================================
+        function generarRecomendacionesIIM(nivel) {
+            const recomendacionesPorNivel = {
                 "MÍNIMO": [
-                    "Educación en prevención de caídas",
-                    "Ejercicio de mantenimiento 3x/semana",
-                    "Evaluación anual de funcionalidad",
-                    "Revisión de calzado adecuado"
+                    {
+                        titulo: "Educación en prevención de caídas",
+                        descripcion: "Programa educativo sobre factores de riesgo y medidas preventivas.",
+                        categoria: "Educación",
+                        color: "#4caf50"
+                    },
+                    {
+                        titulo: "Ejercicio de mantenimiento",
+                        descripcion: "Rutina básica de ejercicios para mantener fuerza y equilibrio.",
+                        categoria: "Ejercicio",
+                        color: "#4caf50"
+                    },
+                    {
+                        titulo: "Evaluación anual",
+                        descripcion: "Control anual para monitorear cambios en funcionalidad.",
+                        categoria: "Seguimiento",
+                        color: "#2196f3"
+                    }
                 ],
                 "LEVE": [
-                    "Programa de ejercicios de equilibrio",
-                    "Adaptación del calzado antideslizante",
-                    "Control trimestral por kinesiólogo",
-                    "Evaluación domiciliaria básica"
+                    {
+                        titulo: "Programa de ejercicios de equilibrio",
+                        descripcion: "Ejercicios específicos para mejorar estabilidad postural.",
+                        categoria: "Kinesiología",
+                        color: "#4caf50"
+                    },
+                    {
+                        titulo: "Adaptación del calzado",
+                        descripcion: "Evaluación y recomendación de calzado adecuado.",
+                        categoria: "Prevención",
+                        color: "#ff9800"
+                    },
+                    {
+                        titulo: "Control trimestral",
+                        descripcion: "Evaluaciones cada 3 meses para ajustar intervenciones.",
+                        categoria: "Seguimiento",
+                        color: "#2196f3"
+                    }
                 ],
                 "MODERADO": [
-                    "Derivación a kinesiología especializada",
-                    "Evaluación domiciliaria completa",
-                    "Protección de caderas recomendada",
-                    "Terapia ocupacional inicial"
+                    {
+                        titulo: "Derivación a kinesiología",
+                        descripcion: "Evaluación especializada y plan de tratamiento.",
+                        categoria: "Intervención",
+                        color: "#ff9800"
+                    },
+                    {
+                        titulo: "Evaluación domiciliaria",
+                        descripcion: "Visita al hogar para identificar y eliminar riesgos.",
+                        categoria: "Seguridad",
+                        color: "#ff9800"
+                    },
+                    {
+                        titulo: "Protección de caderas",
+                        descripcion: "Considerar protectores de cadera si hay riesgo alto de caída.",
+                        categoria: "Protección",
+                        color: "#f44336"
+                    }
                 ],
                 "ALTO": [
-                    "Evaluación multidisciplinaria urgente",
-                    "Adaptaciones domiciliarias necesarias",
-                    "Supervisión diaria recomendada",
-                    "Plan de ejercicios supervisado"
+                    {
+                        titulo: "Evaluación multidisciplinaria",
+                        descripcion: "Consulta con geriatra, kinesiólogo y terapeuta ocupacional.",
+                        categoria: "Evaluación",
+                        color: "#f44336"
+                    },
+                    {
+                        titulo: "Adaptaciones domiciliarias",
+                        descripcion: "Instalación de barras, iluminación, eliminación de alfombras.",
+                        categoria: "Hogar",
+                        color: "#f44336"
+                    },
+                    {
+                        titulo: "Supervisión frecuente",
+                        descripcion: "Visitas regulares de familiar o cuidador.",
+                        categoria: "Cuidados",
+                        color: "#9c27b0"
+                    }
                 ],
                 "MUY ALTO": [
-                    "Derivación urgente a geriatría",
-                    "Considerar ingreso hospitalario",
-                    "Plan de cuidados intensivos",
-                    "Asistencia domiciliaria diaria"
+                    {
+                        titulo: "Derivación urgente a especialista",
+                        descripcion: "Consulta geriátrica inmediata para evaluación integral.",
+                        categoria: "Urgencia",
+                        color: "#9c27b0"
+                    },
+                    {
+                        titulo: "Considerar ingreso hospitalario",
+                        descripcion: "Evaluar necesidad de hospitalización para estabilización.",
+                        categoria: "Hospitalización",
+                        color: "#9c27b0"
+                    },
+                    {
+                        titulo: "Plan de cuidados intensivos",
+                        descripcion: "Desarrollo de plan de cuidados con supervisión constante.",
+                        categoria: "Cuidados",
+                        color: "#9c27b0"
+                    }
                 ],
                 "EXTREMO": [
-                    "Hospitalización inmediata",
-                    "Cuidados paliativos si corresponde",
-                    "Soporte familiar permanente",
-                    "Equipo multidisciplinario 24/7"
+                    {
+                        titulo: "Hospitalización",
+                        descripcion: "Ingreso hospitalario para evaluación y estabilización.",
+                        categoria: "Urgencia",
+                        color: "#b71c1c"
+                    },
+                    {
+                        titulo: "Cuidados paliativos",
+                        descripcion: "Evaluación por equipo de cuidados paliativos si corresponde.",
+                        categoria: "Cuidados",
+                        color: "#b71c1c"
+                    },
+                    {
+                        titulo: "Soporte familiar permanente",
+                        descripcion: "Organización de apoyo familiar o cuidadores 24/7.",
+                        categoria: "Apoyo",
+                        color: "#b71c1c"
+                    }
                 ]
             };
             
-            let recomendaciones = [...(recomendacionesBase[clasificacion.nivel] || [])];
-            
-            // Añadir recomendaciones por factores críticos
-            if (factores.caidas >= 2) {
-                recomendaciones.push("⚠️ ALERTA: Historial de caídas múltiples - riesgo aumentado");
-            }
-            
-            if (factores.cognitiva >= 2) {
-                recomendaciones.push("🧠 Evaluación neuropsicológica recomendada");
-            }
-            
-            if (factores.vivienda >= 1) {
-                recomendaciones.push("🏠 Adaptación domiciliaria URGENTE por vivir solo");
-            }
-            
-            if (factores.fuerza >= 2) {
-                recomendaciones.push("💪 Programa de fortalecimiento superior priorizado");
-            }
-            
-            return recomendaciones;
+            return recomendacionesPorNivel[nivel] || recomendacionesPorNivel["MODERADO"];
         }
         
         // ============================================
-        // INTERFAZ DE USUARIO - MOSTRAR RESULTADOS
+        // FUNCIONES DE INTERPRETACIÓN INDIVIDUAL
         // ============================================
-        function mostrarResultadosIIM() {
-            const data = lastReportData;
-            if (!data.iim) return;
+        function getIRATRiesgo(puntaje) {
+            if (puntaje <= 6) return 'Bajo riesgo';
+            if (puntaje <= 9) return 'Riesgo moderado';
+            if (puntaje <= 12) return 'Alto riesgo';
+            return 'Muy alto riesgo';
+        }
+        
+        function getTinettiRiesgo(puntaje) {
+            if (puntaje >= 25) return 'Bajo riesgo';
+            if (puntaje >= 19) return 'Riesgo moderado';
+            return 'Alto riesgo';
+        }
+        
+        function getNortonRiesgo(puntaje) {
+            if (puntaje >= 16) return 'Bajo riesgo';
+            if (puntaje >= 12) return 'Riesgo';
+            return 'Alto riesgo';
+        }
+        
+        // ============================================
+        // GENERAR PDF PROFESIONAL
+        // ============================================
+        async function generarPDFProfesional() {
+            if (!lastReportData.paciente || !lastReportData.paciente.nombre) {
+                showNotification('Primero genere los resultados con el botón "Calcular"', 'warning');
+                return;
+            }
             
-            // Mostrar contenedor de resultados
-            document.getElementById('iim-results-container').classList.remove('hidden');
-            
-            // 1. MOSTRAR TARJETA PRINCIPAL DE RESULTADOS
-            const resultsCard = document.getElementById('iim-results-card');
-            const clasificacion = data.clasificacion;
-            
-            resultsCard.innerHTML = `
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <div style="font-size: 0.9rem; color: var(--gray); margin-bottom: 10px;">
-                        ÍNDICE IIM INTEGRADO
-                    </div>
-                    <div style="font-size: 4rem; font-weight: bold; color: ${clasificacion.color}; margin: 10px 0;">
-                        ${data.iim.toFixed(2)}
-                    </div>
-                    <div style="font-size: 1.2rem; font-weight: 500; color: ${clasificacion.color}; margin-bottom: 10px;">
-                        ${clasificacion.nivel}
-                    </div>
-                    <div style="background: ${clasificacion.color}; color: white; padding: 8px 15px; border-radius: 20px; display: inline-block;">
-                        Escala 0-10
-                    </div>
-                </div>
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
                 
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 25px;">
-                    <div style="text-align: center;">
-                        <div style="font-size: 0.85rem; color: var(--gray);">IRAT-5</div>
-                        <div style="font-size: 1.8rem; font-weight: bold; color: var(--primary);">
-                            ${data.puntajes.irat}/24
-                        </div>
-                        <div style="font-size: 0.8rem;">${(data.normalizados.irat).toFixed(2)}/10</div>
-                    </div>
+                // Configurar
+                doc.setProperties({
+                    title: `Prescripción IIM - ${lastReportData.paciente.nombre}`,
+                    subject: 'Prescripción Integrada IRAT+Tinetti+Norton',
+                    author: lastReportData.paciente.evaluador,
+                    creator: 'Sistema IIM de Ayudas Técnicas'
+                });
+                
+                let y = 20;
+                const margin = 20;
+                const pageWidth = doc.internal.pageSize.width;
+                
+                // Logo y Encabezado
+                doc.setFontSize(16);
+                doc.setTextColor(33, 150, 243);
+                doc.text('SISTEMA INTEGRADO IRAT + TINETTI + NORTON', pageWidth / 2, y, { align: 'center' });
+                y += 8;
+                
+                doc.setFontSize(10);
+                doc.setTextColor(100, 100, 100);
+                doc.text('Índice IIM - Ayuda Técnica Progresiva', pageWidth / 2, y, { align: 'center' });
+                y += 20;
+                
+                // Datos del Paciente
+                doc.setFontSize(12);
+                doc.setTextColor(33, 150, 243);
+                doc.text('DATOS DEL PACIENTE', margin, y);
+                y += 10;
+                
+                doc.setFontSize(10);
+                doc.setTextColor(50, 50, 50);
+                doc.text(`Nombre: ${lastReportData.paciente.nombre}`, margin, y);
+                y += 7;
+                doc.text(`RUT: ${lastReportData.paciente.rut || 'No especificado'}`, margin, y);
+                y += 7;
+                doc.text(`Edad: ${lastReportData.paciente.edad || 'N/A'} años`, margin, y);
+                y += 7;
+                doc.text(`Fecha: ${lastReportData.paciente.fecha}`, margin, y);
+                y += 7;
+                doc.text(`Evaluador: ${lastReportData.paciente.evaluador}`, margin, y);
+                y += 7;
+                doc.text(`Institución: ${lastReportData.paciente.institucion || 'No especificada'}`, margin, y);
+                y += 15;
+                
+                // Resultados del Índice IIM
+                doc.setFontSize(12);
+                doc.setTextColor(156, 39, 176);
+                doc.text('RESULTADO DEL ÍNDICE IIM', margin, y);
+                y += 10;
+                
+                doc.setFontSize(24);
+                doc.setTextColor(lastReportData.clasificacion.textColor || '#000');
+                doc.text(`IIM: ${lastReportData.iim.toFixed(1)}/10`, margin, y);
+                y += 12;
+                
+                doc.setFontSize(14);
+                doc.text(`Nivel: ${lastReportData.clasificacion.nivel}`, margin, y);
+                y += 8;
+                
+                doc.setFontSize(10);
+                doc.setTextColor(100, 100, 100);
+                doc.text(lastReportData.clasificacion.interpretacion, margin, y);
+                y += 15;
+                
+                // Puntajes individuales
+                doc.setFontSize(12);
+                doc.setTextColor(33, 150, 243);
+                doc.text('PUNTAJES INDIVIDUALES', margin, y);
+                y += 10;
+                
+                doc.autoTable({
+                    startY: y,
+                    head: [['Escala', 'Puntaje Bruto', 'Normalizado', 'Interpretación']],
+                    body: [
+                        ['IRAT-5', lastReportData.puntajes.irat, lastReportData.puntajes.normalizados.irat.toFixed(1), getIRATRiesgo(lastReportData.puntajes.irat)],
+                        ['Tinetti', lastReportData.puntajes.tinetti, lastReportData.puntajes.normalizados.tinetti.toFixed(1), getTinettiRiesgo(lastReportData.puntajes.tinetti)],
+                        ['Norton', lastReportData.puntajes.norton, lastReportData.puntajes.normalizados.norton.toFixed(1), getNortonRiesgo(lastReportData.puntajes.norton)]
+                    ],
+                    theme: 'striped',
+                    headStyles: { fillColor: [33, 150, 243] },
+                    margin: { left: margin, right: margin }
+                });
+                
+                y = doc.lastAutoTable.finalY + 15;
+                
+                // Ayuda Técnica Prescrita
+                doc.setFontSize(12);
+                doc.setTextColor(76, 175, 80);
+                doc.text('AYUDA TÉCNICA PRESCRITA', margin, y);
+                y += 10;
+                
+                doc.setFontSize(14);
+                doc.setTextColor(50, 50, 50);
+                doc.text(lastReportData.ayudaTecnica.principal, margin, y);
+                y += 8;
+                
+                doc.setFontSize(10);
+                const caracteristicas = lastReportData.ayudaTecnica.caracteristicas.split('<br>');
+                caracteristicas.forEach(caract => {
+                    if (y > 270) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                    doc.text(`• ${caract.replace('• ', '')}`, margin + 5, y);
+                    y += 6;
+                });
+                
+                y += 10;
+                
+                // Factores Críticos Aplicados
+                if (lastReportData.factoresAplicados && lastReportData.factoresAplicados.length > 0) {
+                    doc.setFontSize(12);
+                    doc.setTextColor(255, 152, 0);
+                    doc.text('FACTORES CRÍTICOS APLICADOS', margin, y);
+                    y += 10;
                     
-                    <div style="text-align: center;">
-                        <div style="font-size: 0.85rem; color: var(--gray);">TINETTI</div>
-                        <div style="font-size: 1.8rem; font-weight: bold; color: #ff9800;">
-                            ${data.puntajes.tinetti.ajustado.toFixed(1)}/28
-                        </div>
-                        <div style="font-size: 0.8rem;">${(data.normalizados.tinetti).toFixed(2)}/10</div>
-                    </div>
+                    doc.setFontSize(10);
+                    doc.setTextColor(50, 50, 50);
+                    lastReportData.factoresAplicados.forEach(factor => {
+                        if (y > 270) {
+                            doc.addPage();
+                            y = 20;
+                        }
+                        doc.text(`• ${factor}`, margin, y);
+                        y += 6;
+                    });
                     
-                    <div style="text-align: center;">
-                        <div style="font-size: 0.85rem; color: var(--gray);">NORTON</div>
-                        <div style="font-size: 1.8rem; font-weight: bold; color: #4caf50;">
-                            ${data.puntajes.norton}/20
-                        </div>
-                        <div style="font-size: 0.8rem;">${(data.normalizados.norton).toFixed(2)}/10</div>
-                    </div>
+                    y += 10;
+                }
+                
+                // Recomendaciones
+                if (lastReportData.recomendaciones && lastReportData.recomendaciones.length > 0) {
+                    doc.setFontSize(12);
+                    doc.setTextColor(156, 39, 176);
+                    doc.text('RECOMENDACIONES ADICIONALES', margin, y);
+                    y += 10;
                     
-                    <div style="text-align: center;">
-                        <div style="font-size: 0.85rem; color: var(--gray);">FACTORES</div>
-                        <div style="font-size: 1.8rem; font-weight: bold; color: #9c27b0;">
-                            ${Object.values(data.factoresCriticos).filter(v => v > 0).length}
-                        </div>
-                        <div style="font-size: 0.8rem;">críticos aplicados</div>
-                    </div>
-                </div>
-            `;
-            
-            resultsCard.style.borderTopColor = clasificacion.color;
-            
-            // 2. MOSTRAR CÁLCULOS DETALLADOS
-            mostrarCalculosDetallados(data);
-            
-            // 3. MOSTRAR AYUDA TÉCNICA
-            mostrarAyudaTecnica(data);
-            
-            // 4. MOSTRAR RECOMENDACIONES CLÍNICAS
-            mostrarRecomendacionesClinicas(data);
-            
-            // Scroll a resultados
-            resultsCard.scrollIntoView({ behavior: 'smooth' });
-        }
-        
-        function mostrarCalculosDetallados(data) {
-            const calculationsDiv = document.getElementById('iim-calculations');
-            const stepsTable = document.getElementById('algorithm-steps');
-            
-            // Mostrar cálculos en tarjetas
-            calculationsDiv.innerHTML = `
-                <div class="calculation-item">
-                    <div style="font-size: 0.9rem; color: var(--gray);">IRAT Normalizado</div>
-                    <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary);">
-                        ${(data.normalizados.irat).toFixed(2)}/10
-                    </div>
-                    <div style="font-size: 0.8rem;">(${data.puntajes.irat}/24 × 10)</div>
-                </div>
+                    doc.setFontSize(10);
+                    lastReportData.recomendaciones.forEach(rec => {
+                        if (y > 270) {
+                            doc.addPage();
+                            y = 20;
+                        }
+                        
+                        doc.setTextColor(50, 50, 50);
+                        doc.setFont(undefined, 'bold');
+                        doc.text(`• ${rec.titulo}`, margin, y);
+                        y += 6;
+                        
+                        doc.setFont(undefined, 'normal');
+                        const lines = doc.splitTextToSize(rec.descripcion, pageWidth - margin * 2 - 10);
+                        doc.text(lines, margin + 5, y);
+                        y += lines.length * 5 + 5;
+                    });
+                }
                 
-                <div class="calculation-item">
-                    <div style="font-size: 0.9rem; color: var(--gray);">Tinetti Normalizado</div>
-                    <div style="font-size: 1.5rem; font-weight: bold; color: #ff9800;">
-                        ${(data.normalizados.tinetti).toFixed(2)}/10
-                    </div>
-                    <div style="font-size: 0.8rem;">(${data.puntajes.tinetti.ajustado.toFixed(1)}/28 × 10)</div>
-                </div>
+                // Firma y pie de página
+                y = 270;
+                doc.setDrawColor(200, 200, 200);
+                doc.line(margin, y, pageWidth - margin, y);
+                y += 10;
                 
-                <div class="calculation-item">
-                    <div style="font-size: 0.9rem; color: var(--gray);">Norton Normalizado</div>
-                    <div style="font-size: 1.5rem; font-weight: bold; color: #4caf50;">
-                        ${(data.normalizados.norton).toFixed(2)}/10
-                    </div>
-                    <div style="font-size: 0.8rem;">((20-${data.puntajes.norton})/15 × 10)</div>
-                </div>
+                doc.setFontSize(10);
+                doc.setTextColor(100, 100, 100);
+                doc.text(`Firma del Evaluador: ___________________________`, margin, y);
+                y += 7;
+                doc.text(`${lastReportData.paciente.evaluador}`, margin + 40, y);
+                y += 15;
                 
-                <div class="calculation-item">
-                    <div style="font-size: 0.9rem; color: var(--gray);">ÍNDICE IIM</div>
-                    <div style="font-size: 1.5rem; font-weight: bold; color: #9c27b0;">
-                        ${data.iim.toFixed(2)}/10
-                    </div>
-                    <div style="font-size: 0.8rem;">IRAT(40%) + Tinetti(40%) + Norton(20%)</div>
-                </div>
-            `;
-            
-            // Mostrar pasos del algoritmo en tabla
-            const tinettiAjustFormula = data.puntajes.tinetti.ne > 0 
-                ? `(${data.puntajes.tinetti.bruto}/(28-${data.puntajes.tinetti.ne}))×28`
-                : `${data.puntajes.tinetti.bruto}`;
-            
-            stepsTable.innerHTML = `
-                <tr>
-                    <td>Paso A</td>
-                    <td>Tinetti ajustado para NE</td>
-                    <td>${tinettiAjustFormula}</td>
-                    <td>${data.puntajes.tinetti.ajustado.toFixed(1)}</td>
-                </tr>
-                <tr>
-                    <td>Paso B1</td>
-                    <td>IRAT normalizado = (IRAT/24)×10</td>
-                    <td>(${data.puntajes.irat}/24)×10</td>
-                    <td>${data.normalizados.irat.toFixed(2)}</td>
-                </tr>
-                <tr>
-                    <td>Paso B2</td>
-                    <td>Tinetti normalizado = (Tinetti/28)×10</td>
-                    <td>(${data.puntajes.tinetti.ajustado.toFixed(1)}/28)×10</td>
-                    <td>${data.normalizados.tinetti.toFixed(2)}</td>
-                </tr>
-                <tr>
-                    <td>Paso B3</td>
-                    <td>Norton normalizado = ((20-Norton)/15)×10</td>
-                    <td>((20-${data.puntajes.norton})/15)×10</td>
-                    <td>${data.normalizados.norton.toFixed(2)}</td>
-                </tr>
-                <tr>
-                    <td>Paso C</td>
-                    <td>IIM = IRAT(40%) + Tinetti(40%) + Norton(20%)</td>
-                    <td>(${data.normalizados.irat.toFixed(2)}×0.4) + (${data.normalizados.tinetti.toFixed(2)}×0.4) + (${data.normalizados.norton.toFixed(2)}×0.2)</td>
-                    <td><strong>${data.iim.toFixed(2)}</strong></td>
-                </tr>
-            `;
-        }
-        
-        function mostrarAyudaTecnica(data) {
-            const grid = document.getElementById('technical-aids-grid');
-            const ayuda = data.ayudaTecnica;
-            
-            grid.innerHTML = `
-                <div class="recommendation-card" style="border-left-color: ${data.clasificacion.color};">
-                    <h4 style="color: ${data.clasificacion.color}; margin-bottom: 15px; font-size: 1.1rem;">
-                        <i class="fas fa-prescription"></i> Ayuda Técnica Principal
-                    </h4>
-                    <div style="font-size: 1.3rem; font-weight: bold; margin-bottom: 10px;">
-                        ${ayuda.principal}
-                    </div>
-                    <ul style="padding-left: 20px; color: var(--gray);">
-                        ${ayuda.caracteristicas.map(c => `<li style="margin-bottom: 8px;">${c}</li>`).join('')}
-                    </ul>
-                </div>
+                // Pie de página
+                const fechaGen = new Date().toLocaleDateString('es-ES', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
                 
-                <div class="recommendation-card" style="border-left-color: var(--primary);">
-                    <h4 style="color: var(--primary); margin-bottom: 15px; font-size: 1.1rem;">
-                        <i class="fas fa-cogs"></i> Factores Aplicados
-                    </h4>
-                    <div style="color: var(--gray); font-size: 0.95rem;">
-                        ${Object.entries(data.factoresCriticos)
-                            .filter(([_, value]) => value > 0)
-                            .map(([key, value]) => {
-                                const textos = {
-                                    caidas: value >= 2 ? 'Caídas recientes (≥2)' : '1 caída reciente',
-                                    cognitiva: value === 1 ? 'Alteración cognitiva leve' : 
-                                              value === 2 ? 'Alteración cognitiva moderada' :
-                                              'Alteración cognitiva severa',
-                                    vivienda: value === 1 ? 'Vive solo con visitas' : 'Vive solo sin apoyo',
-                                    fuerza: value === 1 ? 'Fuerza superior unilateral reducida' :
-                                            value === 2 ? 'Fuerza superior bilateral reducida' :
-                                            'Fuerza superior muy reducida'
-                                };
-                                return `<div style="margin-bottom: 8px;">
-                                    <span style="color: var(--primary); font-weight: 500;">${textos[key]}</span>
-                                </div>`;
-                            }).join('') || '<div style="color: var(--gray);">No se aplicaron factores críticos</div>'}
-                    </div>
-                </div>
-            `;
-        }
-        
-        function mostrarRecomendacionesClinicas(data) {
-            const grid = document.getElementById('clinical-recommendations');
-            
-            grid.innerHTML = `
-                <div class="recommendation-card" style="border-left-color: #4caf50;">
-                    <h4 style="color: #4caf50; margin-bottom: 15px; font-size: 1.1rem;">
-                        <i class="fas fa-user-md"></i> Recomendaciones Clínicas
-                    </h4>
-                    <ul style="padding-left: 20px; color: var(--gray);">
-                        ${data.recomendaciones.map(rec => `
-                            <li style="margin-bottom: 10px; padding-left: 10px; border-left: 3px solid #4caf50;">
-                                ${rec}
-                            </li>
-                        `).join('')}
-                    </ul>
-                </div>
+                doc.setFontSize(8);
+                doc.setTextColor(150, 150, 150);
+                doc.text(`Documento generado el ${fechaGen} - Sistema IIM v2.0`, pageWidth / 2, 285, { align: 'center' });
                 
-                <div class="recommendation-card" style="border-left-color: #9c27b0;">
-                    <h4 style="color: #9c27b0; margin-bottom: 15px; font-size: 1.1rem;">
-                        <i class="fas fa-calendar-check"></i> Plan de Seguimiento
-                    </h4>
-                    <div style="color: var(--gray); font-size: 0.95rem;">
-                        <div style="margin-bottom: 15px;">
-                            <strong style="color: #9c27b0;">Próxima evaluación:</strong><br>
-                            ${obtenerProximaEvaluacion(data.clasificacion.nivel)}
-                        </div>
-                        <div style="margin-bottom: 15px;">
-                            <strong style="color: #9c27b0;">Derivaciones recomendadas:</strong><br>
-                            ${obtenerDerivaciones(data.clasificacion.nivel)}
-                        </div>
-                        <div>
-                            <strong style="color: #9c27b0;">Prioridad de intervención:</strong><br>
-                            ${obtenerPrioridad(data.clasificacion.nivel)}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        function obtenerProximaEvaluacion(nivel) {
-            const plazos = {
-                "MÍNIMO": "12 meses",
-                "LEVE": "6 meses",
-                "MODERADO": "3 meses",
-                "ALTO": "1 mes",
-                "MUY ALTO": "15 días",
-                "EXTREMO": "Inmediata (hospitalización)"
-            };
-            return plazos[nivel] || "3 meses";
-        }
-        
-        function obtenerDerivaciones(nivel) {
-            const derivaciones = {
-                "MÍNIMO": "Control médico general",
-                "LEVE": "Kinesiología preventiva",
-                "MODERADO": "Kinesiología + Terapia ocupacional",
-                "ALTO": "Geriatría + Equipo multidisciplinario",
-                "MUY ALTO": "Hospital de día + Evaluación integral",
-                "EXTREMO": "Hospitalización + Cuidados intensivos"
-            };
-            return derivaciones[nivel] || "Evaluación médica";
-        }
-        
-        function obtenerPrioridad(nivel) {
-            const prioridades = {
-                "MÍNIMO": "Baja",
-                "LEVE": "Media-baja",
-                "MODERADO": "Media",
-                "ALTO": "Alta",
-                "MUY ALTO": "Muy alta",
-                "EXTREMO": "Crítica (inmediata)"
-            };
-            return prioridades[nivel] || "Media";
+                // Guardar PDF
+                const fileName = `IIM_${lastReportData.paciente.nombre.replace(/\s/g, '_')}_${lastReportData.paciente.fecha}.pdf`;
+                doc.save(fileName);
+                
+                showNotification('✅ PDF profesional generado exitosamente', 'success');
+                
+            } catch (error) {
+                console.error("❌ Error generando PDF:", error);
+                showNotification('Error al generar el PDF', 'error');
+            }
         }
         
         // ============================================
-        // UTILIDADES
+        // FUNCIONES DE BASE DE DATOS
         // ============================================
+        async function saveToDatabase() {
+            if (!currentUser) {
+                showNotification('Debe iniciar sesión para guardar', 'error');
+                return;
+            }
+            
+            if (!lastReportData.paciente || !lastReportData.paciente.nombre) {
+                showNotification('Primero genere los resultados', 'warning');
+                return;
+            }
+            
+            try {
+                const report = {
+                    ...lastReportData,
+                    userId: currentUserId,
+                    userEmail: currentUser.email,
+                    firestoreTimestamp: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                await db.collection('prescripciones_iim').add(report);
+                showNotification('✅ Prescripción guardada en base de datos', 'success');
+                
+            } catch (error) {
+                console.error("❌ Error al guardar:", error);
+                showNotification('Error al guardar en base de datos', 'error');
+            }
+        }
+        
+        async function loadHistorial() {
+            if (!currentUserId) return;
+            
+            // Implementación básica de historial
+            console.log("Cargando historial...");
+        }
+        
+        // ============================================
+        // FUNCIONES UTILITARIAS
+        // ============================================
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+        
+        function shareByEmail() {
+            if (!lastReportData.paciente) {
+                showNotification('Primero genere los resultados', 'warning');
+                return;
+            }
+            openModal('share-modal');
+        }
+        
+        async function sendEmail() {
+            const email = document.getElementById('share-email').value.trim();
+            const subject = document.getElementById('share-subject').value;
+            const message = document.getElementById('share-message').value;
+            
+            if (!email) {
+                showNotification('Ingrese un correo destinatario', 'warning');
+                return;
+            }
+            
+            try {
+                // Simular envío de correo
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                closeModal('share-modal');
+                showNotification('✅ Correo enviado exitosamente', 'success');
+                
+                // Limpiar formulario
+                document.getElementById('share-email').value = '';
+                document.getElementById('share-message').value = '';
+                
+            } catch (error) {
+                console.error("Error enviando correo:", error);
+                showNotification('Error al enviar el correo', 'error');
+            }
+        }
+        
+        function showNotification(message, type, duration = 4000) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification`;
+            notification.style.background = type === 'success' ? '#4caf50' : 
+                                          type === 'warning' ? '#ff9800' : 
+                                          type === 'error' ? '#f44336' : '#2196f3';
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, duration);
+        }
+        
         function resetForm() {
-            if (confirm('¿Reiniciar formulario? Se perderán los datos no guardados.')) {
-                // Limpiar inputs
-                document.querySelectorAll('input[type="text"], input[type="number"], input[type="date"]').forEach(input => {
+            if (confirm('¿Comenzar una nueva evaluación? Los datos no guardados se perderán.')) {
+                // Limpiar formulario
+                document.querySelectorAll('input[type="text"], input[type="number"], input[type="email"]').forEach(input => {
                     input.value = '';
                 });
                 
-                // Restaurar fecha
+                // Restaurar fecha actual
                 document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
                 
-                // Restaurar selects
+                // Restaurar selects a valores por defecto
                 document.querySelectorAll('select').forEach(select => {
                     select.selectedIndex = 0;
                 });
                 
-                // Ocultar resultados
-                document.getElementById('iim-results-container').classList.add('hidden');
+                // Restaurar Tinetti
+                document.getElementById('tinetti-aplica').selectedIndex = 0;
+                toggleTinetti();
                 
-                // Recalcular
+                // Limpiar checkboxes
+                document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                    cb.checked = false;
+                });
+                
+                // Ocultar resultados
+                document.getElementById('results-section').classList.add('hidden');
+                document.getElementById('recomendaciones-container').classList.add('hidden');
+                document.getElementById('factores-aplicados-container').classList.add('hidden');
+                
+                // Recalcular puntajes
                 calcularIRAT();
                 calcularTinetti();
                 calcularNorton();
                 
-                console.log("🔄 Formulario reiniciado");
+                showNotification('✅ Formulario reiniciado', 'success');
             }
-        }
-        
-        // ============================================
-        // EXPORTACIÓN (opcional - para implementar)
-        // ============================================
-        function exportarPDF() {
-            if (!lastReportData.iim) {
-                alert('Primero calcule el índice IIM');
-                return;
-            }
-            
-            // Aquí iría la lógica para exportar a PDF
-            alert('Función de exportación a PDF - Próximamente');
-        }
-        
-        function exportarJSON() {
-            if (!lastReportData.iim) {
-                alert('Primero calcule el índice IIM');
-                return;
-            }
-            
-            const dataStr = JSON.stringify(lastReportData, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = `IIM_${lastReportData.paciente.nombre}_${lastReportData.paciente.fecha}.json`;
-            
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
-            
-            console.log("📄 Datos exportados a JSON");
         }
     </script>
 </body>
-                            </html>
+</html>
