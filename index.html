@@ -429,6 +429,55 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* ===== TINETTI GRID ===== */
+        .tinetti-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .tinetti-category {
+            background: #f8f9fa;
+            border-radius: var(--radius);
+            padding: 20px;
+            border: 2px solid #ffe0b2;
+        }
+
+        .tinetti-category h4 {
+            color: var(--warning);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ffe0b2;
+        }
+
+        .question-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .question-row:hover {
+            border-left-color: var(--warning);
+            transform: translateX(5px);
+        }
+
+        .question-label {
+            flex: 1;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .question-input {
+            width: 200px;
+        }
     </style>
 </head>
 <body>
@@ -601,7 +650,7 @@
                                 <div class="card-body text-center">
                                     <i class="fas fa-walking fa-3x text-primary mb-3"></i>
                                     <h5>IRAT-5 Modificado</h5>
-                                    <p>Evaluación de riesgo de amputación y caídas</p>
+                                    <p>Evaluación de riesgo de amputación y caídas (5 preguntas)</p>
                                     <button class="btn btn-primary" onclick="navigateTo('irat-5')">
                                         <i class="fas fa-play"></i> Comenzar
                                     </button>
@@ -614,7 +663,7 @@
                                 <div class="card-body text-center">
                                     <i class="fas fa-person-walking fa-3x text-warning mb-3"></i>
                                     <h5>Test de Tinetti</h5>
-                                    <p>Evaluación de marcha y equilibrio</p>
+                                    <p>Evaluación de marcha y equilibrio (16 items)</p>
                                     <button class="btn btn-warning" onclick="navigateTo('tinetti')">
                                         <i class="fas fa-play"></i> Comenzar
                                     </button>
@@ -627,7 +676,7 @@
                                 <div class="card-body text-center">
                                     <i class="fas fa-bed fa-3x text-success mb-3"></i>
                                     <h5>Escala Norton</h5>
-                                    <p>Riesgo de úlceras por presión</p>
+                                    <p>Riesgo de úlceras por presión (5 criterios)</p>
                                     <button class="btn btn-success" onclick="navigateTo('norton')">
                                         <i class="fas fa-play"></i> Comenzar
                                     </button>
@@ -691,7 +740,7 @@
                     </div>
                 </section>
 
-                <!-- IRAT-5 -->
+                <!-- IRAT-5 COMPLETO -->
                 <section class="content-section" id="iratSection" style="display: none;">
                     <div class="section-header">
                         <div class="section-icon">
@@ -699,12 +748,12 @@
                         </div>
                         <div>
                             <h2 class="section-title">IRAT-5 Modificado</h2>
-                            <p class="section-subtitle">Evaluación de riesgo de amputación y caídas</p>
+                            <p class="section-subtitle">Evaluación de riesgo de amputación y caídas (Puntaje máximo: 18)</p>
                         </div>
                     </div>
                     
                     <div class="mb-3">
-                        <label class="form-label">1. Equilibrio Unipodal *</label>
+                        <label class="form-label">1. Equilibrio Unipodal (máximo tiempo sostenido) *</label>
                         <select id="equilibrio" class="form-select" onchange="calcularIRAT()">
                             <option value="">Seleccione una opción</option>
                             <option value="0">≥ 30 segundos (0 puntos)</option>
@@ -776,48 +825,202 @@
                     </div>
                 </section>
 
-                <!-- TINETTI -->
+                <!-- TINETTI COMPLETO -->
                 <section class="content-section" id="tinettiSection" style="display: none;">
                     <div class="section-header">
                         <div class="section-icon">
                             <i class="fas fa-person-walking"></i>
                         </div>
                         <div>
-                            <h2 class="section-title">Test de Tinetti</h2>
-                            <p class="section-subtitle">Evaluación de marcha y equilibrio</p>
+                            <h2 class="section-title">Test de Tinetti Completo</h2>
+                            <p class="section-subtitle">Evaluación de marcha y equilibrio (Puntaje máximo: 28 puntos)</p>
                         </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <label class="form-label">1. Sentado sin apoyo</label>
-                        <select class="form-select tinetti-option" onchange="calcularTinetti()">
-                            <option value="1">1 - Estable, seguro</option>
-                            <option value="0">0 - Se cae o se desliza</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">2. Levantarse</label>
-                        <select class="form-select tinetti-option" onchange="calcularTinetti()">
-                            <option value="2">2 - Capaz sin usar brazos</option>
-                            <option value="1">1 - Capaz, usa brazos para ayudarse</option>
-                            <option value="0">0 - Incapaz sin ayuda</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">3. Intentos de levantarse</label>
-                        <select class="form-select tinetti-option" onchange="calcularTinetti()">
-                            <option value="2">2 - Capaz, se levanta con un intento</option>
-                            <option value="1">1 - Capaz, requiere más de un intento</option>
-                            <option value="0">0 - Incapaz sin ayuda</option>
-                        </select>
+                    <div class="tinetti-grid">
+                        <!-- EQUILIBRIO -->
+                        <div class="tinetti-category">
+                            <h4><i class="fas fa-balance-scale"></i> I. EQUILIBRIO (Máx. 16 pts)</h4>
+                            
+                            <div class="question-row">
+                                <div class="question-label">1. Sentado sin apoyo</div>
+                                <div class="question-input">
+                                    <select class="form-select tinetti-option" data-category="balance" data-question="1" onchange="calcularTinetti()">
+                                        <option value="1">1 - Estable, seguro</option>
+                                        <option value="0">0 - Se cae o se desliza</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="question-row">
+                                <div class="question-label">2. Levantarse</div>
+                                <div class="question-input">
+                                    <select class="form-select tinetti-option" data-category="balance" data-question="2" onchange="calcularTinetti()">
+                                        <option value="2">2 - Capaz sin usar brazos</option>
+                                        <option value="1">1 - Capaz, usa brazos para ayudarse</option>
+                                        <option value="0">0 - Incapaz sin ayuda</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="question-row">
+                                <div class="question-label">3. Intentos de levantarse</div>
+                                <div class="question-input">
+                                    <select class="form-select tinetti-option" data-category="balance" data-question="3" onchange="calcularTinetti()">
+                                        <option value="2">2 - Capaz, se levanta con un intento</option>
+                                        <option value="1">1 - Capaz, requiere más de un intento</option>
+                                        <option value="0">0 - Incapaz sin ayuda</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="question-row">
+                                <div class="question-label">4. Equilibrio inmediato al levantarse</div>
+                                <div class="question-input">
+                                    <select class="form-select tinetti-option" data-category="balance" data-question="4" onchange="calcularTinetti()">
+                                        <option value="2">2 - Estable sin apoyo</option>
+                                        <option value="1">1 - Estable pero usa bastón/andador</option>
+                                        <option value="0">0 - Inestable (se tambalea, mueve pies)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="question-row">
+                                <div class="question-label">5. Equilibrio de pie</div>
+                                <div class="question-input">
+                                    <select class="form-select tinetti-option" data-category="balance" data-question="5" onchange="calcularTinetti()">
+                                        <option value="2">2 - Estable sin apoyo estrecho</option>
+                                        <option value="1">1 - Estable con apoyo amplio o usa bastón/andador</option>
+                                        <option value="0">0 - Inestable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="question-row">
+                                <div class="question-label">6. Equilibrio con ojos cerrados</div>
+                                <div class="question-input">
+                                    <select class="form-select tinetti-option" data-category="balance" data-question="6" onchange="calcularTinetti()">
+                                        <option value="1">1 - Estable</option>
+                                        <option value="0">0 - Inestable</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="question-row">
+                                <div class="question-label">7. Girar 360 grados</div>
+                                <div class="question-input">
+                                    <select class="form-select tinetti-option" data-category="balance" data-question="7" onchange="calcularTinetti()">
+                                        <option value="2">2 - Continuo y estable</option>
+                                        <option value="1">1 - Pasos continuos</option>
+                                        <option value="0">0 - Pasos discontinuos</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="question-row">
+                                <div class="question-label">8. Sentarse</div>
+                                <div class="question-input">
+                                    <select class="form-select tinetti-option" data-category="balance" data-question="8" onchange="calcularTinetti()">
+                                        <option value="2">2 - Seguro, movimientos suaves</option>
+                                        <option value="1">1 - Usa brazos o no es suave</option>
+                                        <option value="0">0 - Inseguro (mal alineamiento, distancia)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- MARCHA -->
+                        <div class="tinetti-category">
+                            <h4><i class="fas fa-shoe-prints"></i> II. MARCHA (Máx. 12 pts)</h4>
+                            
+                            <div class="question-row">
+                                <div class="question-label">9. Inicio de la marcha</div>
+                                <div class="question-input">
+                                    <select class="form-select tinetti-option" data-category="gait" data-question="9" onchange="calcularTinetti()">
+                                        <option value="1">1 - Sin vacilación</option>
+                                        <option value="0">0 - Cualquier vacilación o múltiples intentos</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="question-row">
+                                <div class="question-label">10. Longitud y altura del paso (pie derecho)</div>
+                                <div class="question-input">
+                                    <select class="form-select tinetti-option" data-category="gait" data-question="10" onchange="calcularTinetti()">
+                                        <option value="1">1 - Pasa al derecho</option>
+                                        <option value="0">0 - Pie izquierdo no pasa al derecho</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="question-row">
+                                <div class="question-label">11. Longitud y altura del paso (pie izquierdo)</div>
+                                <div class="question-input">
+                                    <select class="form-select tinetti-option" data-category="gait" data-question="11" onchange="calcularTinetti()">
+                                        <option value="1">1 - Pasa al izquierdo</option>
+                                        <option value="0">0 - Pie derecho no pasa al izquierdo</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="question-row">
+                                <div class="question-label">12. Simetría del paso</div>
+                                <div class="question-input">
+                                    <select class="form-select tinetti-option" data-category="gait" data-question="12" onchange="calcularTinetti()">
+                                        <option value="1">1 - Simétrico</option>
+                                        <option value="0">0 - Asimétrico</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="question-row">
+                                <div class="question-label">13. Continuidad del paso</div>
+                                <div class="question-input">
+                                    <select class="form-select tinetti-option" data-category="gait" data-question="13" onchange="calcularTinetti()">
+                                        <option value="1">1 - Continuo</option>
+                                        <option value="0">0 - Interrumpido o discontinuo</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="question-row">
+                                <div class="question-label">14. Desviación de la marcha</div>
+                                <div class="question-input">
+                                    <select class="form-select tinetti-option" data-category="gait" data-question="14" onchange="calcularTinetti()">
+                                        <option value="2">2 - Sin desviación</option>
+                                        <option value="1">1 - Se desvía levemente/usa dispositivo</option>
+                                        <option value="0">0 - Se desvía marcadamente</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="question-row">
+                                <div class="question-label">15. Tronco</div>
+                                <div class="question-input">
+                                    <select class="form-select tinetti-option" data-category="gait" data-question="15" onchange="calcularTinetti()">
+                                        <option value="2">2 - Sin oscilación, sin flexión</option>
+                                        <option value="1">1 - Sin oscilación pero flexión rodillas/espalda</option>
+                                        <option value="0">0 - Marcada oscilación o usa dispositivo</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="question-row">
+                                <div class="question-label">16. Base de sustentación</div>
+                                <div class="question-input">
+                                    <select class="form-select tinetti-option" data-category="gait" data-question="16" onchange="calcularTinetti()">
+                                        <option value="1">1 - Talones casi juntos al caminar</option>
+                                        <option value="0">0 - Talones separados al caminar</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="score-display" style="background: linear-gradient(135deg, var(--warning) 0%, #ffb74d 100%);">
                         <div class="score-label">Puntaje Total Tinetti</div>
                         <div class="score-value" id="puntajeTinetti">0</div>
-                        <div class="score-label">≥25 (Bajo riesgo) | 19-24 (Riesgo moderado) | ≤18 (Alto riesgo)</div>
+                        <div class="score-label">Interpretación: ≥25 (Bajo riesgo) | 19-24 (Riesgo moderado) | ≤18 (Alto riesgo)</div>
                     </div>
                     
                     <div class="d-flex justify-content-between mt-4">
@@ -830,7 +1033,7 @@
                     </div>
                 </section>
 
-                <!-- NORTON -->
+                <!-- NORTON COMPLETO -->
                 <section class="content-section" id="nortonSection" style="display: none;">
                     <div class="section-header">
                         <div class="section-icon">
@@ -838,7 +1041,7 @@
                         </div>
                         <div>
                             <h2 class="section-title">Escala Norton Modificada</h2>
-                            <p class="section-subtitle">Evaluación de riesgo de úlceras por presión</p>
+                            <p class="section-subtitle">Evaluación de riesgo de úlceras por presión (Puntaje máximo: 20 puntos)</p>
                         </div>
                     </div>
                     
@@ -897,7 +1100,7 @@
                     <div class="score-display" style="background: linear-gradient(135deg, var(--success) 0%, #66bb6a 100%);">
                         <div class="score-label">Puntaje Total Norton</div>
                         <div class="score-value" id="puntajeNorton">20</div>
-                        <div class="score-label">20-16 (Bajo riesgo) | 15-12 (Riesgo) | ≤11 (Alto riesgo)</div>
+                        <div class="score-label">Interpretación: 20-16 (Bajo riesgo) | 15-12 (Riesgo) | ≤11 (Alto riesgo)</div>
                     </div>
                     
                     <div class="d-flex justify-content-between mt-4">
@@ -1087,8 +1290,8 @@
                 'inicio': 'Inicio - Evaluador Clínico',
                 'datos-paciente': 'Datos del Paciente',
                 'irat-5': 'IRAT-5 Modificado',
-                'tinetti': 'Test de Tinetti',
-                'norton': 'Escala Norton',
+                'tinetti': 'Test de Tinetti Completo',
+                'norton': 'Escala Norton Modificada',
                 'resultados': 'Resultados Integrales',
                 'historial': 'Historial de Evaluaciones'
             };
@@ -1096,9 +1299,9 @@
             const subtitles = {
                 'inicio': 'Sistema integrado de evaluación clínica',
                 'datos-paciente': 'Complete la información del paciente',
-                'irat-5': 'Evaluación de riesgo de amputación y caídas',
-                'tinetti': 'Evaluación de marcha y equilibrio',
-                'norton': 'Evaluación de riesgo de úlceras por presión',
+                'irat-5': 'Evaluación de riesgo de amputación y caídas (5 preguntas)',
+                'tinetti': 'Evaluación de marcha y equilibrio (16 items)',
+                'norton': 'Evaluación de riesgo de úlceras por presión (5 criterios)',
                 'resultados': 'Análisis combinado de las tres escalas',
                 'historial': 'Acceda a evaluaciones anteriores'
             };
@@ -1176,7 +1379,7 @@
         }
 
         // ============================================
-        // CÁLCULOS
+        // CÁLCULOS COMPLETOS
         // ============================================
         function calcularIRAT() {
             const campos = ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'];
@@ -1304,31 +1507,31 @@
             
             if (iratRiesgo === 'ALTO' || iratRiesgo === 'MUY ALTO') {
                 recomendaciones.push({
-                    titulo: 'Evaluación de Riesgo de Caídas',
-                    texto: 'El paciente presenta alto riesgo de caídas. Se recomienda evaluación kinesiológica urgente.',
+                    titulo: '🚨 Evaluación de Riesgo de Caídas',
+                    texto: 'El paciente presenta alto riesgo de caídas. Se recomienda evaluación kinesiológica urgente, adaptaciones domiciliarias y posible uso de dispositivo de asistencia.',
                     tipo: 'danger'
                 });
             }
             
             if (tinettiRiesgo === 'ALTO') {
                 recomendaciones.push({
-                    titulo: 'Rehabilitación de Marcha',
-                    texto: 'Requiere programa intensivo de rehabilitación de marcha y equilibrio.',
+                    titulo: '📉 Rehabilitación de Marcha',
+                    texto: 'Requiere programa intensivo de rehabilitación de marcha y equilibrio. Considerar terapia física especializada.',
                     tipo: 'warning'
                 });
             }
             
             if (nortonRiesgo === 'ALTO') {
                 recomendaciones.push({
-                    titulo: 'Prevención de Úlceras',
-                    texto: 'Alto riesgo de úlceras por presión. Implementar protocolo de cambios posturales.',
+                    titulo: '🛏️ Prevención de Úlceras',
+                    texto: 'Alto riesgo de úlceras por presión. Implementar protocolo de cambios posturales cada 2 horas y uso de colchón antiescaras.',
                     tipo: 'warning'
                 });
             }
             
             if (riesgoGlobal === 'BAJO') {
                 recomendaciones.push({
-                    titulo: 'Seguimiento Rutinario',
+                    titulo: '✅ Seguimiento Rutinario',
                     texto: 'Riesgo bajo. Mantener actividades preventivas y seguimiento semestral.',
                     tipo: 'success'
                 });
@@ -1355,6 +1558,7 @@
                     <div class="badge ${getRiskClass(classification.iratRiesgo)}">
                         ${classification.iratRiesgo}
                     </div>
+                    <p class="mt-2">Puntaje máximo: 18</p>
                 </div>
                 
                 <div class="result-card tinetti">
@@ -1363,6 +1567,7 @@
                     <div class="badge ${getRiskClass(classification.tinettiRiesgo)}">
                         ${classification.tinettiRiesgo}
                     </div>
+                    <p class="mt-2">16 items evaluados</p>
                 </div>
                 
                 <div class="result-card norton">
@@ -1371,6 +1576,7 @@
                     <div class="badge ${getRiskClass(classification.nortonRiesgo)}">
                         ${classification.nortonRiesgo}
                     </div>
+                    <p class="mt-2">5 criterios evaluados</p>
                 </div>
                 
                 <div class="result-card" style="border-top-color: var(--danger);">
@@ -1378,13 +1584,14 @@
                     <div class="result-value ${getRiskColor(classification.riesgoGlobal)}">
                         ${classification.riesgoGlobal}
                     </div>
+                    <p class="mt-2">Evaluación integral</p>
                 </div>
             `;
             
             // Mostrar recomendaciones
             const recomendacionesContainer = document.getElementById('recomendacionesContainer');
             recomendacionesContainer.innerHTML = `
-                <h5 class="mt-4">Recomendaciones</h5>
+                <h5 class="mt-4">💡 Recomendaciones Clínicas</h5>
                 ${classification.recomendaciones.map(rec => `
                     <div class="alert ${getAlertClass(rec.tipo)} mt-2">
                         <strong>${rec.titulo}</strong><br>
@@ -1447,7 +1654,7 @@
             const paciente = lastReportData.paciente;
             const puntajes = lastReportData.puntajes;
             
-            return `📋 EVALUACIÓN CLÍNICA\n\n` +
+            return `📋 EVALUACIÓN CLÍNICA INTEGRAL\n\n` +
                    `👤 Paciente: ${paciente.nombre}\n` +
                    `📅 Fecha: ${paciente.fecha}\n` +
                    `👨‍⚕️ Evaluador: ${paciente.evaluador}\n\n` +
@@ -1565,22 +1772,28 @@
                 y += 15;
                 
                 // Recomendaciones
-                pdf.setFontSize(14);
-                pdf.setTextColor(26, 35, 126);
-                pdf.text('RECOMENDACIONES', 20, y);
-                y += 10;
-                
-                pdf.setFontSize(10);
-                lastReportData.recomendaciones.forEach((rec, index) => {
-                    pdf.text(`${index + 1}. ${rec.titulo}`, 25, y);
-                    y += 5;
-                    const lines = pdf.splitTextToSize(rec.texto, pageWidth - 40);
-                    lines.forEach(line => {
-                        pdf.text(line, 30, y);
+                if (lastReportData.recomendaciones && lastReportData.recomendaciones.length > 0) {
+                    pdf.setFontSize(14);
+                    pdf.setTextColor(26, 35, 126);
+                    pdf.text('RECOMENDACIONES', 20, y);
+                    y += 10;
+                    
+                    pdf.setFontSize(10);
+                    lastReportData.recomendaciones.forEach((rec, index) => {
+                        if (y > 250) {
+                            pdf.addPage();
+                            y = 20;
+                        }
+                        pdf.text(`${index + 1}. ${rec.titulo}`, 25, y);
+                        y += 5;
+                        const lines = pdf.splitTextToSize(rec.texto, pageWidth - 40);
+                        lines.forEach(line => {
+                            pdf.text(line, 30, y);
+                            y += 5;
+                        });
                         y += 5;
                     });
-                    y += 5;
-                });
+                }
                 
                 // Guardar
                 const fileName = `Evaluacion_${paciente.nombre.replace(/\s/g, '_')}.pdf`;
@@ -1658,7 +1871,8 @@
                             <small class="text-muted">
                                 ${fecha} | 
                                 IRAT: ${data.puntajes.irat} | 
-                                Tinetti: ${data.puntajes.tinetti}
+                                Tinetti: ${data.puntajes.tinetti} |
+                                Norton: ${data.puntajes.norton}
                             </small>
                         </div>
                         <div>
