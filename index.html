@@ -12,7 +12,6 @@
 <!-- jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<!-- Icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
@@ -24,31 +23,34 @@ body{margin:0;font-family:Segoe UI,Arial;background:#eef2f7}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
 button{padding:12px 18px;border:none;border-radius:8px;cursor:pointer;font-weight:600}
 .primary{background:#3949ab;color:white}
-.success{background:#2e7d32;color:white}
 .secondary{background:#546e7a;color:white}
 .danger{background:#c62828;color:white}
 input,select{width:100%;padding:8px;margin-top:5px}
 pre{background:#eceff1;padding:15px;border-radius:8px;white-space:pre-wrap}
 .hidden{display:none}
-.badge{padding:6px 10px;border-radius:20px;color:white;font-size:14px}
-.low{background:#2e7d32}
-.mid{background:#f9a825}
-.high{background:#c62828}
 </style>
 </head>
 
 <body>
 
-<div id="login" class="header">
+<!-- LOGIN -->
+<div id="login" class="container">
+<div class="header">
 <h1>ICAT</h1>
-<p>Índice Clínico de Ayuda Técnica</p>
-<button class="primary" onclick="loginGoogle()">
-<i class="fab fa-google"></i> Ingresar con Google
-</button>
+<p>Acceso profesional</p>
+</div>
+<div class="section">
+<div class="card">
+<input id="email" type="email" placeholder="Correo institucional">
+<input id="password" type="password" placeholder="Contraseña">
+<br><br>
+<button class="primary" onclick="login()">Ingresar</button>
+</div>
+</div>
 </div>
 
+<!-- APP -->
 <div id="app" class="container hidden">
-
 <div class="header">
 <h2>ICAT – Evaluación Clínica</h2>
 <p id="usuario"></p>
@@ -68,17 +70,17 @@ pre{background:#eceff1;padding:15px;border-radius:8px;white-space:pre-wrap}
 </div>
 
 <div class="card">
-<h3>IRAT – Independencia Funcional</h3>
+<h3>IRAT</h3>
 <div id="irat"></div>
 </div>
 
 <div class="card">
-<h3>Tinetti – Equilibrio y Marcha</h3>
+<h3>Tinetti</h3>
 <div id="tinetti"></div>
 </div>
 
 <div class="card">
-<h3>Norton – Riesgo de dependencia</h3>
+<h3>Norton</h3>
 <div id="norton"></div>
 </div>
 
@@ -88,12 +90,11 @@ pre{background:#eceff1;padding:15px;border-radius:8px;white-space:pre-wrap}
 <h3>Resultados</h3>
 <pre id="resumen"></pre>
 <button class="primary" onclick="generarPDF()">PDF</button>
-<button class="success" onclick="guardar()">Guardar</button>
-<button class="secondary" onclick="exportarCSV()">CSV</button>
+<button class="secondary" onclick="guardar()">Guardar</button>
 </div>
 
 <div class="card">
-<h3>Historial global de evaluaciones</h3>
+<h3>Historial global</h3>
 <ul id="historial"></ul>
 </div>
 
@@ -111,10 +112,12 @@ const auth=firebase.auth();
 const db=firebase.firestore();
 
 /* ================= AUTH ================= */
-const provider=new firebase.auth.GoogleAuthProvider();
+function login(){
+  const email=document.getElementById("email").value;
+  const password=document.getElementById("password").value;
 
-function loginGoogle(){
-  auth.signInWithPopup(provider);
+  auth.signInWithEmailAndPassword(email,password)
+    .catch(e=>alert("Error de acceso"));
 }
 
 function logout(){
@@ -141,80 +144,39 @@ auth.onAuthStateChanged(async user=>{
 });
 
 /* ================= CUESTIONARIOS ================= */
-function crearItems(id,n,max){
-  let h='';
+function crear(id,n,max){
+  let h="";
   for(let i=1;i<=n;i++){
     h+=`<label>Ítem ${i}</label>
-    <select>
-      ${[...Array(max+1).keys()].map(v=>`<option value="${v}">${v}</option>`).join('')}
-    </select><br><br>`;
+    <select>${[...Array(max+1).keys()].map(v=>`<option value="${v}">${v}</option>`).join("")}</select><br><br>`;
   }
   document.getElementById(id).innerHTML=h;
 }
-crearItems("irat",5,4);
-crearItems("tinetti",14,2);
-crearItems("norton",5,4);
+crear("irat",5,4);
+crear("tinetti",14,2);
+crear("norton",5,4);
 
 /* ================= CÁLCULO ================= */
 let evaluacion=null;
-
-function suma(id){
-  return [...document.querySelectorAll(`#${id} select`)]
-    .reduce((a,s)=>a+parseInt(s.value),0);
-}
+const suma=id=>[...document.querySelectorAll(`#${id} select`)]
+  .reduce((a,s)=>a+parseInt(s.value),0);
 
 function calcular(){
   const irat=suma("irat");
   const tinetti=suma("tinetti");
   const norton=suma("norton");
 
-  const iratN=(irat/(5*4))*100;
-  const tinettiN=((28-tinetti)/28)*100;
-  const nortonN=((20-norton)/20)*100;
-
-  const ICAT=(iratN*0.4+tinettiN*0.35+nortonN*0.25).toFixed(1);
-
-  let nivel,ayuda,f;
-  if(ICAT<20){nivel="Muy bajo";ayuda="Sin ayuda";f="Funcionalidad conservada."}
-  else if(ICAT<40){nivel="Bajo";ayuda="Bastón";f="Leve compromiso funcional."}
-  else if(ICAT<60){nivel="Moderado";ayuda="Andador";f="Riesgo funcional significativo."}
-  else if(ICAT<80){nivel="Alto";ayuda="Silla de ruedas";f="Alta dependencia funcional."}
-  else{nivel="Muy alto";ayuda="Ayuda técnica compleja";f="Dependencia severa."}
+  const ICAT=((irat/20)*40+((28-tinetti)/28)*35+((20-norton)/20)*25).toFixed(1);
 
   evaluacion={
-    instrumento:"ICAT",
-    version:"1.0",
     evaluador:{uid:auth.currentUser.uid,email:auth.currentUser.email},
     paciente:{codigo:codigo.value,edad:edad.value,sexo:sexo.value},
-    fecha:fecha.value,
     puntajes:{irat,tinetti,norton,ICAT},
-    nivel,ayuda,fundamento:f,
     timestamp:firebase.firestore.FieldValue.serverTimestamp()
   };
 
-  document.getElementById("resultados").classList.remove("hidden");
-  document.getElementById("resumen").textContent=
-`IRAT: ${irat}
-Tinetti: ${tinetti}
-Norton: ${norton}
-
-ICAT: ${ICAT}
-Nivel: ${nivel}
-Ayuda recomendada: ${ayuda}
-
-Fundamento clínico:
-${f}`;
-}
-
-/* ================= PDF ================= */
-function generarPDF(){
-  const {jsPDF}=window.jspdf;
-  const d=new jsPDF();
-  let y=20;
-  d.text("ICAT – Índice Clínico de Ayuda Técnica",105,y,{align:"center"});
-  y+=20;
-  d.text(JSON.stringify(evaluacion,null,2),10,y);
-  d.save("ICAT.pdf");
+  resultados.classList.remove("hidden");
+  resumen.textContent=`ICAT: ${ICAT}`;
 }
 
 /* ================= FIRESTORE ================= */
@@ -225,29 +187,23 @@ async function guardar(){
 }
 
 async function cargarHistorial(){
-  const ul=document.getElementById("historial");
-  ul.innerHTML="";
+  historial.innerHTML="";
   const snap=await db.collection("ICAT_evaluaciones")
     .orderBy("timestamp","desc").limit(20).get();
   snap.forEach(d=>{
     const e=d.data();
     const li=document.createElement("li");
-    li.textContent=`${e.paciente.codigo} – ICAT ${e.puntajes.ICAT} – ${e.ayuda}`;
-    ul.appendChild(li);
+    li.textContent=`${e.paciente.codigo} – ICAT ${e.puntajes.ICAT}`;
+    historial.appendChild(li);
   });
 }
 
-/* ================= CSV ================= */
-function exportarCSV(){
-  const rows=[];
-  Object.entries(evaluacion).forEach(([k,v])=>{
-    rows.push(`${k},${JSON.stringify(v)}`);
-  });
-  const b=new Blob([rows.join("\n")],{type:"text/csv"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(b);
-  a.download="ICAT.csv";
-  a.click();
+/* ================= PDF ================= */
+function generarPDF(){
+  const {jsPDF}=window.jspdf;
+  const d=new jsPDF();
+  d.text(JSON.stringify(evaluacion,null,2),10,10);
+  d.save("ICAT.pdf");
 }
 </script>
 
