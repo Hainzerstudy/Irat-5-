@@ -478,6 +478,80 @@
         .question-input {
             width: 200px;
         }
+
+        /* ===== LOADER ===== */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ===== HISTORY ITEMS ===== */
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: var(--radius);
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* ===== BADGES ===== */
+        .badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success { background: var(--success); color: white; }
+        .badge-warning { background: var(--warning); color: white; }
+        .badge-danger { background: var(--danger); color: white; }
+        .badge-secondary { background: #666; color: white; }
+
+        /* ===== ALERTS ===== */
+        .alert {
+            padding: 15px;
+            border-radius: var(--radius);
+            margin-bottom: 15px;
+            border-left: 4px solid transparent;
+        }
+
+        .alert-success {
+            background: rgba(76, 175, 80, 0.1);
+            border-left-color: var(--success);
+            color: #2e7d32;
+        }
+
+        .alert-warning {
+            background: rgba(255, 152, 0, 0.1);
+            border-left-color: var(--warning);
+            color: #ef6c00;
+        }
+
+        .alert-danger {
+            background: rgba(244, 67, 54, 0.1);
+            border-left-color: var(--danger);
+            color: #d32f2f;
+        }
     </style>
 </head>
 <body>
@@ -1190,12 +1264,13 @@
 
     <script>
         // ============================================
-        // CONFIGURACIÓN FIREBASE
+        // CONFIGURACIÓN FIREBASE - COMPLETA
         // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyDJbtRuEwWVAsC1Nz6LbeF5a99LcUfAz4g",
             authDomain: "irat-5-evaluaciones.firebaseapp.com",
             projectId: "irat-5-evaluaciones",
+            storageBucket: "irat-5-evaluaciones.appspot.com",
             messagingSenderId: "487279274410",
             appId: "1:487279274410:web:146e9c35a0bf795c5423d3"
         };
@@ -1207,26 +1282,71 @@
         let currentSection = 'inicio';
 
         // ============================================
-        // INICIALIZACIÓN
+        // INICIALIZACIÓN MEJORADA
         // ============================================
         function initApp() {
             try {
-                app = firebase.initializeApp(firebaseConfig);
+                // Inicializar Firebase
+                if (!firebase.apps.length) {
+                    app = firebase.initializeApp(firebaseConfig);
+                } else {
+                    app = firebase.app();
+                }
+                
                 auth = firebase.auth();
                 db = firebase.firestore();
+                
+                console.log("✅ Firebase inicializado correctamente");
                 
                 // Configurar fecha actual
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('fecha').value = today;
                 
+                // Configurar valores por defecto de Norton
+                document.getElementById('puntajeNorton').textContent = "20";
+                
                 // Escuchar cambios de autenticación
                 auth.onAuthStateChanged(handleAuthStateChange);
                 
-                console.log("✅ Sistema inicializado correctamente");
+                // Forzar mostrar sección IRAT-5 para pruebas (remover en producción)
+                // navigateTo('irat-5');
+                
+                // Agregar usuario de prueba temporal
+                createTestAccount();
+                
             } catch (error) {
                 console.error("❌ Error de inicialización:", error);
                 showNotification('Error de conexión con el servidor', 'error');
+                
+                // Modo offline para pruebas
+                setupOfflineMode();
             }
+        }
+
+        // Función para crear cuenta de prueba
+        async function createTestAccount() {
+            try {
+                // Intenta iniciar sesión con cuenta de prueba
+                await auth.signInWithEmailAndPassword("test@test.com", "123456");
+                showNotification("✅ Modo de prueba activado", "success");
+            } catch (error) {
+                console.log("Cuenta de prueba no existe, puedes crearla en la interfaz");
+            }
+        }
+
+        // Modo offline para desarrollo
+        function setupOfflineMode() {
+            console.log("🔧 Configurando modo offline para desarrollo");
+            
+            // Forzar mostrar aplicación sin autenticación
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('appSections').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'none';
+            
+            // Mostrar sección inicial
+            navigateTo('inicio');
+            
+            showNotification('Modo desarrollo: Funciones offline activadas', 'warning');
         }
 
         function handleAuthStateChange(user) {
@@ -1255,31 +1375,82 @@
         }
 
         // ============================================
-        // NAVEGACIÓN
+        // SISTEMA DE NAVEGACIÓN MEJORADO
         // ============================================
         function navigateTo(section) {
+            console.log(`🔄 Navegando a: ${section}`);
+            
             // Actualizar navegación activa
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.classList.remove('active');
             });
-            document.querySelector(`.nav-link[href="#${section}"]`).classList.add('active');
+            
+            const navLink = document.querySelector(`.nav-link[href="#${section}"]`);
+            if (navLink) {
+                navLink.classList.add('active');
+            }
             
             // Ocultar todas las secciones
             document.querySelectorAll('[id$="Section"]').forEach(sec => {
                 sec.style.display = 'none';
             });
             
+            // Determinar ID de la sección objetivo
+            let sectionId;
+            switch(section) {
+                case 'inicio':
+                    sectionId = 'inicioSection';
+                    break;
+                case 'datos-paciente':
+                    sectionId = 'datosPacienteSection';
+                    break;
+                case 'irat-5':
+                    sectionId = 'iratSection';
+                    break;
+                case 'tinetti':
+                    sectionId = 'tinettiSection';
+                    break;
+                case 'norton':
+                    sectionId = 'nortonSection';
+                    break;
+                case 'resultados':
+                    sectionId = 'resultadosSection';
+                    break;
+                case 'historial':
+                    sectionId = 'historialSection';
+                    break;
+                default:
+                    sectionId = 'inicioSection';
+            }
+            
+            console.log(`🔍 Buscando sección: ${sectionId}`);
+            
             // Mostrar sección seleccionada
-            const sectionId = section.replace('-', '') + 'Section';
             const targetSection = document.getElementById(sectionId);
             if (targetSection) {
                 targetSection.style.display = 'block';
+                console.log(`✅ Sección ${sectionId} mostrada`);
                 
                 // Actualizar título de página
                 updatePageTitle(section);
                 
                 // Scroll al inicio de la sección
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // Recalcular puntajes si es necesario
+                if (section === 'irat-5') {
+                    calcularIRAT();
+                } else if (section === 'tinetti') {
+                    calcularTinetti();
+                } else if (section === 'norton') {
+                    calcularNorton();
+                }
+            } else {
+                console.error(`❌ No se encontró la sección: ${sectionId}`);
+                showNotification(`Error: No se pudo cargar la sección ${section}`, 'error');
+                
+                // Fallback a inicio
+                navigateTo('inicio');
             }
             
             currentSection = section;
@@ -1311,20 +1482,31 @@
         }
 
         // ============================================
-        // AUTENTICACIÓN
+        // AUTENTICACIÓN MEJORADA
         // ============================================
         async function handleAuth() {
             const email = document.getElementById('authEmail').value.trim();
             const password = document.getElementById('authPassword').value;
             
-            if (!email || !password) {
-                showNotification('Ingrese correo y contraseña', 'warning');
+            if (!email) {
+                showNotification('Ingrese un correo electrónico', 'warning');
+                return;
+            }
+            
+            if (!password) {
+                showNotification('Ingrese una contraseña', 'warning');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showNotification('La contraseña debe tener al menos 6 caracteres', 'warning');
                 return;
             }
             
             const button = document.getElementById('authButton');
             const originalHTML = button.innerHTML;
-            button.innerHTML = '<div class="loader"></div>';
+            const originalText = button.querySelector('span').textContent;
+            button.innerHTML = '<div class="loader"></div> ' + originalText;
             button.disabled = true;
             
             try {
@@ -1349,9 +1531,11 @@
                 'auth/wrong-password': 'Contraseña incorrecta',
                 'auth/email-already-in-use': 'El correo ya está registrado',
                 'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres',
-                'auth/invalid-email': 'Correo electrónico inválido'
+                'auth/invalid-email': 'Correo electrónico inválido',
+                'auth/network-request-failed': 'Error de conexión a internet',
+                'auth/too-many-requests': 'Demasiados intentos, intente más tarde'
             };
-            return errors[code] || 'Error de autenticación';
+            return errors[code] || 'Error de autenticación. Código: ' + code;
         }
 
         function toggleAuthMode() {
@@ -1379,56 +1563,119 @@
         }
 
         // ============================================
-        // CÁLCULOS COMPLETOS
+        // CÁLCULOS COMPLETOS Y MEJORADOS
         // ============================================
         function calcularIRAT() {
+            console.log("🔄 Calculando IRAT-5...");
+            
             const campos = ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'];
-            let total = campos.reduce((sum, id) => {
-                const valor = parseInt(document.getElementById(id)?.value) || 0;
-                return sum + valor;
-            }, 0);
+            let total = 0;
             
+            campos.forEach(id => {
+                const elemento = document.getElementById(id);
+                if (elemento) {
+                    const valor = parseInt(elemento.value) || 0;
+                    total += valor;
+                    console.log(`${id}: ${valor} puntos`);
+                }
+            });
+            
+            // Punto extra por riesgo de caídas en amputación ≥3
             const amputacion = parseInt(document.getElementById('amputacion')?.value) || 0;
-            if (amputacion >= 3) total += 1;
+            if (amputacion >= 3) {
+                total += 1;
+                console.log("➕ Punto extra por riesgo de caídas (amputación ≥3)");
+            }
             
-            document.getElementById('puntajeIrat').textContent = total;
+            console.log(`📊 Puntaje total IRAT-5: ${total}`);
+            
+            // Actualizar display
+            const displayElement = document.getElementById('puntajeIrat');
+            if (displayElement) {
+                displayElement.textContent = total;
+            }
+            
             return total;
         }
 
         function calcularTinetti() {
-            const selects = document.querySelectorAll('.tinetti-option');
-            const total = Array.from(selects).reduce((sum, select) => {
-                return sum + (parseInt(select.value) || 0);
-            }, 0);
+            console.log("🔄 Calculando Tinetti...");
             
-            document.getElementById('puntajeTinetti').textContent = total;
+            const selects = document.querySelectorAll('.tinetti-option');
+            let total = 0;
+            
+            selects.forEach((select, index) => {
+                const valor = parseInt(select.value) || 0;
+                total += valor;
+                console.log(`Pregunta ${index + 1}: ${valor} puntos`);
+            });
+            
+            console.log(`📊 Puntaje total Tinetti: ${total}/28`);
+            
+            // Actualizar display
+            const displayElement = document.getElementById('puntajeTinetti');
+            if (displayElement) {
+                displayElement.textContent = total;
+            }
+            
             return total;
         }
 
         function calcularNorton() {
-            const campos = ['nortonFisica', 'nortonMental', 'nortonActividad', 'nortonMovilidad', 'nortonIncontinencia'];
-            const total = campos.reduce((sum, id) => {
-                return sum + (parseInt(document.getElementById(id)?.value) || 0);
-            }, 0);
+            console.log("🔄 Calculando Norton...");
             
-            document.getElementById('puntajeNorton').textContent = total;
+            const campos = ['nortonFisica', 'nortonMental', 'nortonActividad', 'nortonMovilidad', 'nortonIncontinencia'];
+            let total = 0;
+            
+            campos.forEach(id => {
+                const elemento = document.getElementById(id);
+                if (elemento) {
+                    const valor = parseInt(elemento.value) || 0;
+                    total += valor;
+                    console.log(`${id}: ${valor} puntos`);
+                }
+            });
+            
+            console.log(`📊 Puntaje total Norton: ${total}/20`);
+            
+            // Actualizar display
+            const displayElement = document.getElementById('puntajeNorton');
+            if (displayElement) {
+                displayElement.textContent = total;
+            }
+            
             return total;
         }
 
         // ============================================
-        // GENERACIÓN DE RESULTADOS
+        // GENERACIÓN DE RESULTADOS MEJORADA
         // ============================================
         function generarResultados() {
+            console.log("🚀 Generando resultados...");
+            
             // Validar campos obligatorios
             const requiredFields = ['nombre', 'fecha', 'evaluador'];
-            const missingFields = requiredFields.filter(field => {
-                const value = document.getElementById(field).value.trim();
-                return !value;
+            const missingFields = [];
+            
+            requiredFields.forEach(field => {
+                const elemento = document.getElementById(field);
+                if (elemento && !elemento.value.trim()) {
+                    missingFields.push(field);
+                }
             });
             
             if (missingFields.length > 0) {
                 showNotification('Complete los campos obligatorios (*) en Datos del Paciente', 'warning');
                 navigateTo('datos-paciente');
+                
+                // Resaltar campos faltantes
+                missingFields.forEach(field => {
+                    const elemento = document.getElementById(field);
+                    if (elemento) {
+                        elemento.style.borderColor = 'var(--danger)';
+                        elemento.focus();
+                    }
+                });
                 return;
             }
             
@@ -1436,6 +1683,8 @@
             const iratScore = calcularIRAT();
             const tinettiScore = calcularTinetti();
             const nortonScore = calcularNorton();
+            
+            console.log(`📈 Resultados calculados: IRAT=${iratScore}, Tinetti=${tinettiScore}, Norton=${nortonScore}`);
             
             // Clasificar resultados
             const classification = classifyResults(iratScore, tinettiScore, nortonScore);
@@ -1473,33 +1722,69 @@
         }
 
         function classifyResults(irat, tinetti, norton) {
+            console.log("📊 Clasificando resultados...");
+            
             // Clasificación IRAT-5
             let iratRiesgo = '';
-            if (irat <= 6) iratRiesgo = 'BAJO';
-            else if (irat <= 9) iratRiesgo = 'MODERADO';
-            else if (irat <= 12) iratRiesgo = 'ALTO';
-            else iratRiesgo = 'MUY ALTO';
+            let iratColor = '';
+            
+            if (irat <= 6) {
+                iratRiesgo = 'BAJO';
+                iratColor = 'success';
+            } else if (irat <= 9) {
+                iratRiesgo = 'MODERADO';
+                iratColor = 'warning';
+            } else if (irat <= 12) {
+                iratRiesgo = 'ALTO';
+                iratColor = 'danger';
+            } else {
+                iratRiesgo = 'MUY ALTO';
+                iratColor = 'danger';
+            }
             
             // Clasificación Tinetti
             let tinettiRiesgo = '';
-            if (tinetti >= 25) tinettiRiesgo = 'BAJO';
-            else if (tinetti >= 19) tinettiRiesgo = 'MODERADO';
-            else tinettiRiesgo = 'ALTO';
+            let tinettiColor = '';
+            
+            if (tinetti >= 25) {
+                tinettiRiesgo = 'BAJO';
+                tinettiColor = 'success';
+            } else if (tinetti >= 19) {
+                tinettiRiesgo = 'MODERADO';
+                tinettiColor = 'warning';
+            } else {
+                tinettiRiesgo = 'ALTO';
+                tinettiColor = 'danger';
+            }
             
             // Clasificación Norton
             let nortonRiesgo = '';
-            if (norton >= 16) nortonRiesgo = 'BAJO';
-            else if (norton >= 12) nortonRiesgo = 'MODERADO';
-            else nortonRiesgo = 'ALTO';
+            let nortonColor = '';
+            
+            if (norton >= 16) {
+                nortonRiesgo = 'BAJO';
+                nortonColor = 'success';
+            } else if (norton >= 12) {
+                nortonRiesgo = 'MODERADO';
+                nortonColor = 'warning';
+            } else {
+                nortonRiesgo = 'ALTO';
+                nortonColor = 'danger';
+            }
             
             // Clasificación Global
             let riesgoGlobal = 'BAJO';
+            let riesgoGlobalColor = 'success';
+            
             if (iratRiesgo === 'MUY ALTO' || tinettiRiesgo === 'ALTO') {
                 riesgoGlobal = 'CRÍTICO';
+                riesgoGlobalColor = 'danger';
             } else if (iratRiesgo === 'ALTO' || nortonRiesgo === 'ALTO') {
                 riesgoGlobal = 'ALTO';
+                riesgoGlobalColor = 'danger';
             } else if (iratRiesgo === 'MODERADO' || tinettiRiesgo === 'MODERADO') {
                 riesgoGlobal = 'MODERADO';
+                riesgoGlobalColor = 'warning';
             }
             
             // Generar recomendaciones
@@ -1537,103 +1822,101 @@
                 });
             }
             
+            // Recomendación general si no hay otras
+            if (recomendaciones.length === 0) {
+                recomendaciones.push({
+                    titulo: '📋 Evaluación Completa',
+                    texto: 'Paciente evaluado en todas las escalas. Continuar con seguimiento según protocolo institucional.',
+                    tipo: 'success'
+                });
+            }
+            
+            console.log("✅ Clasificación completada");
+            
             return {
                 iratRiesgo,
+                iratColor,
                 tinettiRiesgo,
+                tinettiColor,
                 nortonRiesgo,
+                nortonColor,
                 riesgoGlobal,
+                riesgoGlobalColor,
                 recomendaciones
             };
         }
 
         function displayResults(classification) {
+            console.log("🎨 Mostrando resultados...");
+            
             const container = document.getElementById('resultsGrid');
+            if (!container) {
+                console.error("❌ No se encontró el contenedor de resultados");
+                return;
+            }
+            
             const paciente = lastReportData.paciente;
             const puntajes = lastReportData.puntajes;
             
             container.innerHTML = `
                 <div class="result-card irat">
-                    <h5>IRAT-5</h5>
+                    <h5><i class="fas fa-walking"></i> IRAT-5</h5>
                     <div class="result-value">${puntajes.irat}</div>
-                    <div class="badge ${getRiskClass(classification.iratRiesgo)}">
+                    <div class="badge badge-${classification.iratColor} mt-2">
                         ${classification.iratRiesgo}
                     </div>
-                    <p class="mt-2">Puntaje máximo: 18</p>
+                    <p class="mt-2 small">Puntaje máximo: 18</p>
                 </div>
                 
                 <div class="result-card tinetti">
-                    <h5>Tinetti</h5>
+                    <h5><i class="fas fa-person-walking"></i> Tinetti</h5>
                     <div class="result-value">${puntajes.tinetti}/28</div>
-                    <div class="badge ${getRiskClass(classification.tinettiRiesgo)}">
+                    <div class="badge badge-${classification.tinettiColor} mt-2">
                         ${classification.tinettiRiesgo}
                     </div>
-                    <p class="mt-2">16 items evaluados</p>
+                    <p class="mt-2 small">16 items evaluados</p>
                 </div>
                 
                 <div class="result-card norton">
-                    <h5>Norton</h5>
+                    <h5><i class="fas fa-bed"></i> Norton</h5>
                     <div class="result-value">${puntajes.norton}/20</div>
-                    <div class="badge ${getRiskClass(classification.nortonRiesgo)}">
+                    <div class="badge badge-${classification.nortonColor} mt-2">
                         ${classification.nortonRiesgo}
                     </div>
-                    <p class="mt-2">5 criterios evaluados</p>
+                    <p class="mt-2 small">5 criterios evaluados</p>
                 </div>
                 
-                <div class="result-card" style="border-top-color: var(--danger);">
-                    <h5>Clasificación Global</h5>
-                    <div class="result-value ${getRiskColor(classification.riesgoGlobal)}">
+                <div class="result-card" style="border-top-color: var(--${classification.riesgoGlobalColor});">
+                    <h5><i class="fas fa-chart-line"></i> Clasificación Global</h5>
+                    <div class="result-value text-${classification.riesgoGlobalColor}">
                         ${classification.riesgoGlobal}
                     </div>
-                    <p class="mt-2">Evaluación integral</p>
+                    <div class="badge badge-${classification.riesgoGlobalColor} mt-2">
+                        RIESGO
+                    </div>
+                    <p class="mt-2 small">Evaluación integral</p>
                 </div>
             `;
             
             // Mostrar recomendaciones
             const recomendacionesContainer = document.getElementById('recomendacionesContainer');
-            recomendacionesContainer.innerHTML = `
-                <h5 class="mt-4">💡 Recomendaciones Clínicas</h5>
-                ${classification.recomendaciones.map(rec => `
-                    <div class="alert ${getAlertClass(rec.tipo)} mt-2">
-                        <strong>${rec.titulo}</strong><br>
-                        ${rec.texto}
-                    </div>
-                `).join('')}
-            `;
-        }
-
-        function getRiskClass(riesgo) {
-            const map = {
-                'BAJO': 'badge-success',
-                'MODERADO': 'badge-warning',
-                'ALTO': 'badge-danger',
-                'MUY ALTO': 'badge-danger',
-                'CRÍTICO': 'badge-danger'
-            };
-            return map[riesgo] || 'badge-secondary';
-        }
-
-        function getRiskColor(riesgo) {
-            const map = {
-                'BAJO': 'text-success',
-                'MODERADO': 'text-warning',
-                'ALTO': 'text-danger',
-                'MUY ALTO': 'text-danger',
-                'CRÍTICO': 'text-danger'
-            };
-            return map[riesgo] || 'text-primary';
-        }
-
-        function getAlertClass(tipo) {
-            const map = {
-                'success': 'alert-success',
-                'warning': 'alert-warning',
-                'danger': 'alert-danger'
-            };
-            return map[tipo] || 'alert-info';
+            if (recomendacionesContainer) {
+                recomendacionesContainer.innerHTML = `
+                    <h5 class="mt-4 mb-3"><i class="fas fa-lightbulb"></i> Recomendaciones Clínicas</h5>
+                    ${classification.recomendaciones.map((rec, index) => `
+                        <div class="alert alert-${rec.tipo} mt-2">
+                            <strong>${index + 1}. ${rec.titulo}</strong><br>
+                            ${rec.texto}
+                        </div>
+                    `).join('')}
+                `;
+            }
+            
+            console.log("✅ Resultados mostrados correctamente");
         }
 
         // ============================================
-        // SISTEMA DE COMPARTIR
+        // SISTEMA DE COMPARTIR MEJORADO
         // ============================================
         function openShareModal() {
             if (!lastReportData) {
@@ -1644,10 +1927,13 @@
             const text = generateShareText();
             document.getElementById('shareText').textContent = text;
             document.getElementById('shareModal').style.display = 'flex';
+            
+            console.log("📤 Modal de compartir abierto");
         }
 
         function closeShareModal() {
             document.getElementById('shareModal').style.display = 'none';
+            console.log("📤 Modal de compartir cerrado");
         }
 
         function generateShareText() {
@@ -1705,7 +1991,7 @@
                 }
             } catch (error) {
                 console.error('Error al copiar:', error);
-                showNotification('❌ Error al copiar', 'error');
+                showNotification('❌ Error al copiar al portapapeles', 'error');
             }
             
             closeShareModal();
@@ -1721,6 +2007,10 @@
                 showNotification('🔄 Generando PDF...', 'info');
                 
                 const { jsPDF } = window.jspdf;
+                if (!jsPDF) {
+                    throw new Error("jsPDF no está disponible");
+                }
+                
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const pageWidth = pdf.internal.pageSize.getWidth();
                 let y = 20;
@@ -1795,8 +2085,14 @@
                     });
                 }
                 
+                // Pie de página
+                pdf.setFontSize(8);
+                pdf.setTextColor(100, 100, 100);
+                pdf.text('Generado por Evaluador Clínico Integrado', pageWidth / 2, 290, { align: 'center' });
+                pdf.text(new Date().toLocaleString('es-ES'), pageWidth / 2, 295, { align: 'center' });
+                
                 // Guardar
-                const fileName = `Evaluacion_${paciente.nombre.replace(/\s/g, '_')}.pdf`;
+                const fileName = `Evaluacion_${paciente.nombre.replace(/\s/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
                 pdf.save(fileName);
                 
                 showNotification('✅ PDF generado exitosamente', 'success');
@@ -1804,13 +2100,13 @@
                 
             } catch (error) {
                 console.error('Error generando PDF:', error);
-                showNotification('❌ Error al generar PDF', 'error');
+                showNotification('❌ Error al generar PDF. Verifique la consola.', 'error');
                 closeShareModal();
             }
         }
 
         // ============================================
-        // BASE DE DATOS
+        // BASE DE DATOS - FUNCIONES MEJORADAS
         // ============================================
         async function saveReport() {
             if (!currentUser) {
@@ -1823,6 +2119,11 @@
                 return;
             }
             
+            const button = document.querySelector('button[onclick="saveReport()"]');
+            const originalHTML = button.innerHTML;
+            button.innerHTML = '<div class="loader"></div> Guardando...';
+            button.disabled = true;
+            
             try {
                 const report = {
                     ...lastReportData,
@@ -1832,25 +2133,41 @@
                 };
                 
                 await db.collection('evaluaciones').add(report);
+                
+                button.innerHTML = originalHTML;
+                button.disabled = false;
+                
                 showNotification('✅ Evaluación guardada en la nube', 'success');
                 loadHistorial();
+                
             } catch (error) {
                 console.error('Error al guardar:', error);
+                button.innerHTML = originalHTML;
+                button.disabled = false;
+                
                 showNotification('❌ Error al guardar la evaluación', 'error');
             }
         }
 
         async function loadHistorial() {
-            if (!currentUser) return;
+            if (!currentUser) {
+                console.log("No hay usuario autenticado, no se carga historial");
+                return;
+            }
             
             const container = document.getElementById('historialList');
-            container.innerHTML = '<div class="text-center p-3">Cargando historial...</div>';
+            if (!container) {
+                console.error("No se encontró el contenedor del historial");
+                return;
+            }
+            
+            container.innerHTML = '<div class="text-center p-3"><div class="loader"></div><p class="mt-2">Cargando historial...</p></div>';
             
             try {
                 const snapshot = await db.collection('evaluaciones')
                     .where('userId', '==', currentUser.uid)
                     .orderBy('savedAt', 'desc')
-                    .limit(10)
+                    .limit(20)
                     .get();
                 
                 if (snapshot.empty) {
@@ -1862,6 +2179,7 @@
                 snapshot.docs.forEach(doc => {
                     const data = doc.data();
                     const fecha = new Date(data.paciente.fecha).toLocaleDateString('es-ES');
+                    const savedDate = new Date(data.savedAt).toLocaleDateString('es-ES');
                     
                     const item = document.createElement('div');
                     item.className = 'history-item';
@@ -1869,10 +2187,11 @@
                         <div>
                             <strong>${data.paciente.nombre}</strong><br>
                             <small class="text-muted">
-                                ${fecha} | 
-                                IRAT: ${data.puntajes.irat} | 
-                                Tinetti: ${data.puntajes.tinetti} |
-                                Norton: ${data.puntajes.norton}
+                                <i class="fas fa-calendar"></i> ${fecha} | 
+                                <i class="fas fa-save"></i> ${savedDate}<br>
+                                <span class="badge badge-primary">IRAT: ${data.puntajes.irat}</span>
+                                <span class="badge badge-warning">Tinetti: ${data.puntajes.tinetti}</span>
+                                <span class="badge badge-success">Norton: ${data.puntajes.norton}</span>
                             </small>
                         </div>
                         <div>
@@ -1883,6 +2202,9 @@
                     `;
                     container.appendChild(item);
                 });
+                
+                console.log(`✅ Historial cargado: ${snapshot.size} evaluaciones`);
+                
             } catch (error) {
                 console.error('Error cargando historial:', error);
                 container.innerHTML = '<p class="text-center text-danger p-3">Error al cargar el historial</p>';
@@ -1905,7 +2227,15 @@
                     document.getElementById('institucion').value = paciente.institucion || '';
                     
                     // Mostrar resultados
-                    displayResults(lastReportData.puntajes);
+                    const classification = {
+                        iratRiesgo: lastReportData.puntajes.iratRiesgo,
+                        tinettiRiesgo: lastReportData.puntajes.tinettiRiesgo,
+                        nortonRiesgo: lastReportData.puntajes.nortonRiesgo,
+                        riesgoGlobal: lastReportData.puntajes.riesgoGlobal,
+                        recomendaciones: lastReportData.recomendaciones
+                    };
+                    
+                    displayResults(classification);
                     navigateTo('resultados');
                     
                     showNotification('✅ Evaluación cargada exitosamente', 'success');
@@ -1917,13 +2247,20 @@
         }
 
         // ============================================
-        // UTILIDADES
+        // UTILIDADES MEJORADAS
         // ============================================
         function showNotification(message, type = 'info', duration = 4000) {
             const notification = document.getElementById('notification');
+            if (!notification) {
+                console.error("No se encontró el elemento de notificación");
+                return;
+            }
+            
             notification.textContent = message;
             notification.className = `notification ${type}`;
             notification.style.display = 'block';
+            
+            console.log(`📢 Notificación: ${type} - ${message}`);
             
             setTimeout(() => {
                 notification.style.display = 'none';
@@ -1933,7 +2270,10 @@
         // ============================================
         // INICIALIZAR APLICACIÓN
         // ============================================
-        window.onload = initApp;
+        window.onload = function() {
+            console.log("🚀 Iniciando aplicación...");
+            initApp();
+        };
 
         // Cerrar modal al hacer clic fuera
         window.onclick = function(event) {
@@ -1949,6 +2289,17 @@
                 closeShareModal();
             }
         });
+
+        // Manejar envío de formularios con Enter
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                if (currentSection === 'auth') {
+                    handleAuth();
+                }
+            }
+        });
+
+        console.log("✅ Script cargado correctamente");
     </script>
 </body>
 </html>
