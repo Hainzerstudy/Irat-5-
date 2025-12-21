@@ -345,6 +345,70 @@
             margin: 10px 0;
         }
 
+        /* ===== INDICE DE AYUDA TECNICA ===== */
+        .ayuda-tecnica-card {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(106, 17, 203, 0.3);
+        }
+
+        .indice-ayuda {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin: 15px 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .recomendacion-ayuda {
+            font-size: 1.3rem;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+
+        .detalle-ayuda {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: var(--radius);
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        /* ===== PONDERACIÓN VISUAL ===== */
+        .ponderacion-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            gap: 10px;
+        }
+
+        .ponderacion-item {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: var(--radius);
+            border: 2px solid transparent;
+        }
+
+        .ponderacion-item.irat { border-color: var(--primary); }
+        .ponderacion-item.tinetti { border-color: var(--warning); }
+        .ponderacion-item.norton { border-color: var(--success); }
+
+        .ponderacion-porcentaje {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .ponderacion-valor {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
         /* ===== NOTIFICACIONES ===== */
         .notification {
             position: fixed;
@@ -427,6 +491,10 @@
             
             .results-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .ponderacion-container {
+                flex-direction: column;
             }
         }
 
@@ -526,6 +594,7 @@
         .badge-warning { background: var(--warning); color: white; }
         .badge-danger { background: var(--danger); color: white; }
         .badge-secondary { background: #666; color: white; }
+        .badge-info { background: var(--secondary); color: white; }
 
         /* ===== ALERTS ===== */
         .alert {
@@ -552,6 +621,52 @@
             border-left-color: var(--danger);
             color: #d32f2f;
         }
+
+        .alert-info {
+            background: rgba(0, 172, 193, 0.1);
+            border-left-color: var(--secondary);
+            color: #006064;
+        }
+
+        /* ===== TABLA DE AYUDAS TÉCNICAS ===== */
+        .ayudas-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .ayudas-table th {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .ayudas-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .ayudas-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .nivel-riesgo {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .nivel-bajo { background: #e8f5e9; color: #2e7d32; }
+        .nivel-moderado { background: #fff3e0; color: #ef6c00; }
+        .nivel-alto { background: #ffebee; color: #d32f2f; }
+        .nivel-critico { background: #fce4ec; color: #880e4f; }
     </style>
 </head>
 <body>
@@ -586,7 +701,7 @@
 
     <!-- CONTENEDOR PRINCIPAL CON ÍNDICE -->
     <div class="app-container">
-        <!-- ÍNDICE LATERAL (IMM) -->
+        <!-- ÍNDICE LATERAL -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">
@@ -1187,7 +1302,7 @@
                     </div>
                 </section>
 
-                <!-- RESULTADOS -->
+                <!-- RESULTADOS CON ÍNDICE DE AYUDA TÉCNICA -->
                 <section class="content-section" id="resultadosSection" style="display: none;">
                     <div class="section-header">
                         <div class="section-icon">
@@ -1199,14 +1314,90 @@
                         </div>
                     </div>
                     
+                    <!-- VISUALIZACIÓN DE PONDERACIÓN -->
+                    <div class="ponderacion-container">
+                        <div class="ponderacion-item irat">
+                            <div class="ponderacion-porcentaje">40%</div>
+                            <div class="ponderacion-valor">IRAT-5</div>
+                            <div class="ponderacion-puntaje" id="pondIrat">0 pts</div>
+                        </div>
+                        
+                        <div class="ponderacion-item tinetti">
+                            <div class="ponderacion-porcentaje">40%</div>
+                            <div class="ponderacion-valor">Tinetti</div>
+                            <div class="ponderacion-puntaje" id="pondTinetti">0 pts</div>
+                        </div>
+                        
+                        <div class="ponderacion-item norton">
+                            <div class="ponderacion-porcentaje">20%</div>
+                            <div class="ponderacion-valor">Norton</div>
+                            <div class="ponderacion-puntaje" id="pondNorton">0 pts</div>
+                        </div>
+                    </div>
+                    
+                    <!-- RESULTADOS PRINCIPALES -->
                     <div class="results-grid" id="resultsGrid">
                         <!-- Resultados se generan aquí -->
                     </div>
                     
+                    <!-- ÍNDICE DE AYUDA TÉCNICA -->
+                    <div class="ayuda-tecnica-card" id="ayudaTecnicaCard">
+                        <h3><i class="fas fa-wheelchair"></i> ÍNDICE DE AYUDA TÉCNICA</h3>
+                        <div class="indice-ayuda" id="indiceAyuda">0</div>
+                        <div class="recomendacion-ayuda" id="recomendacionAyuda">Cargando recomendación...</div>
+                        
+                        <div class="detalle-ayuda" id="detalleAyuda">
+                            <!-- Detalles de ayuda técnica se generan aquí -->
+                        </div>
+                    </div>
+                    
+                    <!-- TABLA DE AYUDAS TÉCNICAS -->
+                    <div class="mt-4">
+                        <h5><i class="fas fa-table"></i> Guía de Ayudas Técnicas por Nivel de Riesgo</h5>
+                        <table class="ayudas-table">
+                            <thead>
+                                <tr>
+                                    <th>Índice</th>
+                                    <th>Nivel de Riesgo</th>
+                                    <th>Ayuda Técnica Recomendada</th>
+                                    <th>Intervenciones Adicionales</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>0-3</td>
+                                    <td><span class="nivel-riesgo nivel-bajo">BAJO</span></td>
+                                    <td>Supervisión básica, bastón simple</td>
+                                    <td>Ejercicios preventivos, evaluación periódica</td>
+                                </tr>
+                                <tr>
+                                    <td>4-6</td>
+                                    <td><span class="nivel-riesgo nivel-moderado">MODERADO</span></td>
+                                    <td>Bastón con base amplia, andador sin ruedas</td>
+                                    <td>Rehabilitación ambulatoria, adaptación domiciliaria</td>
+                                </tr>
+                                <tr>
+                                    <td>7-9</td>
+                                    <td><span class="nivel-riesgo nivel-alto">ALTO</span></td>
+                                    <td>Andador con ruedas, silla de ruedas para distancias largas</td>
+                                    <td>Terapia intensiva, evaluación por equipo multidisciplinario</td>
+                                </tr>
+                                <tr>
+                                    <td>10+</td>
+                                    <td><span class="nivel-riesgo nivel-critico">CRÍTICO</span></td>
+                                    <td>Silla de ruedas eléctrica, dispositivo de transferencia</td>
+                                    <td>Hospitalización/rehabilitación intensiva, asistencia permanente</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- RECOMENDACIONES GENERALES -->
                     <div class="mt-4" id="recomendacionesContainer">
                         <!-- Recomendaciones se generan aquí -->
                     </div>
                     
+                    <!-- BOTONES DE ACCIÓN -->
                     <div class="d-flex gap-3 mt-4">
                         <button class="btn btn-primary" onclick="openShareModal()">
                             <i class="fas fa-share-alt"></i> Compartir
@@ -1282,11 +1473,10 @@
         let currentSection = 'inicio';
 
         // ============================================
-        // INICIALIZACIÓN MEJORADA
+        // INICIALIZACIÓN
         // ============================================
         function initApp() {
             try {
-                // Inicializar Firebase
                 if (!firebase.apps.length) {
                     app = firebase.initializeApp(firebaseConfig);
                 } else {
@@ -1302,48 +1492,40 @@
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('fecha').value = today;
                 
-                // Configurar valores por defecto de Norton
+                // Configurar valores por defecto
                 document.getElementById('puntajeNorton').textContent = "20";
                 
                 // Escuchar cambios de autenticación
                 auth.onAuthStateChanged(handleAuthStateChange);
                 
-                // Forzar mostrar sección IRAT-5 para pruebas (remover en producción)
-                // navigateTo('irat-5');
-                
-                // Agregar usuario de prueba temporal
+                // Crear cuenta de prueba si no existe
                 createTestAccount();
                 
             } catch (error) {
                 console.error("❌ Error de inicialización:", error);
                 showNotification('Error de conexión con el servidor', 'error');
                 
-                // Modo offline para pruebas
+                // Modo offline para desarrollo
                 setupOfflineMode();
             }
         }
 
-        // Función para crear cuenta de prueba
         async function createTestAccount() {
             try {
-                // Intenta iniciar sesión con cuenta de prueba
                 await auth.signInWithEmailAndPassword("test@test.com", "123456");
                 showNotification("✅ Modo de prueba activado", "success");
             } catch (error) {
-                console.log("Cuenta de prueba no existe, puedes crearla en la interfaz");
+                console.log("Cuenta de prueba no existe");
             }
         }
 
-        // Modo offline para desarrollo
         function setupOfflineMode() {
             console.log("🔧 Configurando modo offline para desarrollo");
             
-            // Forzar mostrar aplicación sin autenticación
             document.getElementById('authSection').style.display = 'none';
             document.getElementById('appSections').style.display = 'block';
             document.getElementById('userInfo').style.display = 'none';
             
-            // Mostrar sección inicial
             navigateTo('inicio');
             
             showNotification('Modo desarrollo: Funciones offline activadas', 'warning');
@@ -1353,19 +1535,16 @@
             currentUser = user;
             
             if (user) {
-                // Usuario autenticado
                 document.getElementById('authSection').style.display = 'none';
                 document.getElementById('appSections').style.display = 'block';
                 document.getElementById('userInfo').style.display = 'flex';
                 document.getElementById('currentUserEmail').textContent = user.email;
                 
-                // Mostrar sección inicial
                 navigateTo('inicio');
                 
                 loadHistorial();
                 showNotification(`👋 Bienvenido/a ${user.email}`, 'success');
             } else {
-                // Usuario no autenticado
                 document.getElementById('authSection').style.display = 'block';
                 document.getElementById('appSections').style.display = 'none';
                 document.getElementById('userInfo').style.display = 'none';
@@ -1375,12 +1554,11 @@
         }
 
         // ============================================
-        // SISTEMA DE NAVEGACIÓN MEJORADO
+        // NAVEGACIÓN
         // ============================================
         function navigateTo(section) {
             console.log(`🔄 Navegando a: ${section}`);
             
-            // Actualizar navegación activa
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.classList.remove('active');
             });
@@ -1390,12 +1568,10 @@
                 navLink.classList.add('active');
             }
             
-            // Ocultar todas las secciones
             document.querySelectorAll('[id$="Section"]').forEach(sec => {
                 sec.style.display = 'none';
             });
             
-            // Determinar ID de la sección objetivo
             let sectionId;
             switch(section) {
                 case 'inicio':
@@ -1423,21 +1599,14 @@
                     sectionId = 'inicioSection';
             }
             
-            console.log(`🔍 Buscando sección: ${sectionId}`);
-            
-            // Mostrar sección seleccionada
             const targetSection = document.getElementById(sectionId);
             if (targetSection) {
                 targetSection.style.display = 'block';
                 console.log(`✅ Sección ${sectionId} mostrada`);
                 
-                // Actualizar título de página
                 updatePageTitle(section);
-                
-                // Scroll al inicio de la sección
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 
-                // Recalcular puntajes si es necesario
                 if (section === 'irat-5') {
                     calcularIRAT();
                 } else if (section === 'tinetti') {
@@ -1448,8 +1617,6 @@
             } else {
                 console.error(`❌ No se encontró la sección: ${sectionId}`);
                 showNotification(`Error: No se pudo cargar la sección ${section}`, 'error');
-                
-                // Fallback a inicio
                 navigateTo('inicio');
             }
             
@@ -1482,31 +1649,20 @@
         }
 
         // ============================================
-        // AUTENTICACIÓN MEJORADA
+        // AUTENTICACIÓN
         // ============================================
         async function handleAuth() {
             const email = document.getElementById('authEmail').value.trim();
             const password = document.getElementById('authPassword').value;
             
-            if (!email) {
-                showNotification('Ingrese un correo electrónico', 'warning');
-                return;
-            }
-            
-            if (!password) {
-                showNotification('Ingrese una contraseña', 'warning');
-                return;
-            }
-            
-            if (password.length < 6) {
-                showNotification('La contraseña debe tener al menos 6 caracteres', 'warning');
+            if (!email || !password) {
+                showNotification('Ingrese correo y contraseña', 'warning');
                 return;
             }
             
             const button = document.getElementById('authButton');
             const originalHTML = button.innerHTML;
-            const originalText = button.querySelector('span').textContent;
-            button.innerHTML = '<div class="loader"></div> ' + originalText;
+            button.innerHTML = '<div class="loader"></div>';
             button.disabled = true;
             
             try {
@@ -1531,11 +1687,9 @@
                 'auth/wrong-password': 'Contraseña incorrecta',
                 'auth/email-already-in-use': 'El correo ya está registrado',
                 'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres',
-                'auth/invalid-email': 'Correo electrónico inválido',
-                'auth/network-request-failed': 'Error de conexión a internet',
-                'auth/too-many-requests': 'Demasiados intentos, intente más tarde'
+                'auth/invalid-email': 'Correo electrónico inválido'
             };
-            return errors[code] || 'Error de autenticación. Código: ' + code;
+            return errors[code] || 'Error de autenticación';
         }
 
         function toggleAuthMode() {
@@ -1563,131 +1717,167 @@
         }
 
         // ============================================
-        // CÁLCULOS COMPLETOS Y MEJORADOS
+        // CÁLCULOS DE LAS ESCALAS
         // ============================================
         function calcularIRAT() {
-            console.log("🔄 Calculando IRAT-5...");
-            
             const campos = ['equilibrio', 'amputacion', 'brazos', 'social', 'cooperacion'];
-            let total = 0;
+            let total = campos.reduce((sum, id) => {
+                const valor = parseInt(document.getElementById(id)?.value) || 0;
+                return sum + valor;
+            }, 0);
             
-            campos.forEach(id => {
-                const elemento = document.getElementById(id);
-                if (elemento) {
-                    const valor = parseInt(elemento.value) || 0;
-                    total += valor;
-                    console.log(`${id}: ${valor} puntos`);
-                }
-            });
-            
-            // Punto extra por riesgo de caídas en amputación ≥3
             const amputacion = parseInt(document.getElementById('amputacion')?.value) || 0;
-            if (amputacion >= 3) {
-                total += 1;
-                console.log("➕ Punto extra por riesgo de caídas (amputación ≥3)");
-            }
+            if (amputacion >= 3) total += 1;
             
-            console.log(`📊 Puntaje total IRAT-5: ${total}`);
-            
-            // Actualizar display
-            const displayElement = document.getElementById('puntajeIrat');
-            if (displayElement) {
-                displayElement.textContent = total;
-            }
-            
+            document.getElementById('puntajeIrat').textContent = total;
             return total;
         }
 
         function calcularTinetti() {
-            console.log("🔄 Calculando Tinetti...");
-            
             const selects = document.querySelectorAll('.tinetti-option');
-            let total = 0;
+            const total = Array.from(selects).reduce((sum, select) => {
+                return sum + (parseInt(select.value) || 0);
+            }, 0);
             
-            selects.forEach((select, index) => {
-                const valor = parseInt(select.value) || 0;
-                total += valor;
-                console.log(`Pregunta ${index + 1}: ${valor} puntos`);
-            });
-            
-            console.log(`📊 Puntaje total Tinetti: ${total}/28`);
-            
-            // Actualizar display
-            const displayElement = document.getElementById('puntajeTinetti');
-            if (displayElement) {
-                displayElement.textContent = total;
-            }
-            
+            document.getElementById('puntajeTinetti').textContent = total;
             return total;
         }
 
         function calcularNorton() {
-            console.log("🔄 Calculando Norton...");
-            
             const campos = ['nortonFisica', 'nortonMental', 'nortonActividad', 'nortonMovilidad', 'nortonIncontinencia'];
-            let total = 0;
+            const total = campos.reduce((sum, id) => {
+                return sum + (parseInt(document.getElementById(id)?.value) || 0);
+            }, 0);
             
-            campos.forEach(id => {
-                const elemento = document.getElementById(id);
-                if (elemento) {
-                    const valor = parseInt(elemento.value) || 0;
-                    total += valor;
-                    console.log(`${id}: ${valor} puntos`);
-                }
-            });
-            
-            console.log(`📊 Puntaje total Norton: ${total}/20`);
-            
-            // Actualizar display
-            const displayElement = document.getElementById('puntajeNorton');
-            if (displayElement) {
-                displayElement.textContent = total;
-            }
-            
+            document.getElementById('puntajeNorton').textContent = total;
             return total;
         }
 
         // ============================================
-        // GENERACIÓN DE RESULTADOS MEJORADA
+        // CÁLCULO DEL ÍNDICE DE AYUDA TÉCNICA (40-40-20)
+        // ============================================
+        function calcularIndiceAyudaTecnica(iratScore, tinettiScore, nortonScore) {
+            console.log("📊 Calculando Índice de Ayuda Técnica...");
+            
+            // Normalizar puntajes a escala 0-10
+            // IRAT: 0-18 -> 0-10 (mayor puntaje = mayor riesgo)
+            const iratNormalizado = (iratScore / 18) * 10;
+            
+            // Tinetti: 0-28 -> 0-10 (menor puntaje = mayor riesgo)
+            const tinettiNormalizado = ((28 - tinettiScore) / 28) * 10;
+            
+            // Norton: 4-20 -> 0-10 (menor puntaje = mayor riesgo)
+            const nortonNormalizado = ((20 - nortonScore) / 16) * 10; // Rango efectivo: 4-20
+            
+            // Aplicar ponderación: 40% IRAT + 40% Tinetti + 20% Norton
+            const indicePonderado = (iratNormalizado * 0.4) + (tinettiNormalizado * 0.4) + (nortonNormalizado * 0.2);
+            
+            // Redondear a 1 decimal
+            const indiceFinal = Math.round(indicePonderado * 10) / 10;
+            
+            console.log(`Cálculos intermedios:`);
+            console.log(`- IRAT (${iratScore}): ${iratNormalizado.toFixed(2)}`);
+            console.log(`- Tinetti (${tinettiScore}): ${tinettiNormalizado.toFixed(2)}`);
+            console.log(`- Norton (${nortonScore}): ${nortonNormalizado.toFixed(2)}`);
+            console.log(`- Índice final: ${indiceFinal}`);
+            
+            return indiceFinal;
+        }
+
+        function determinarAyudaTecnica(indice) {
+            let nivelRiesgo = '';
+            let ayudaTecnica = '';
+            let recomendaciones = [];
+            let color = '';
+            
+            if (indice <= 3) {
+                nivelRiesgo = 'BAJO';
+                color = 'success';
+                ayudaTecnica = 'Supervisión básica y bastón simple';
+                recomendaciones = [
+                    'Realizar ejercicios de equilibrio preventivos',
+                    'Evaluación semestral de marcha',
+                    'Modificaciones menores en el hogar (iluminación, alfombras)',
+                    'Uso de calzado adecuado con suela antideslizante'
+                ];
+            } else if (indice <= 6) {
+                nivelRiesgo = 'MODERADO';
+                color = 'warning';
+                ayudaTecnica = 'Bastón con base amplia o andador sin ruedas';
+                recomendaciones = [
+                    'Rehabilitación ambulatoria 2-3 veces por semana',
+                    'Evaluación por terapeuta ocupacional',
+                    'Adaptación domiciliaria: barras de apoyo, eliminación de umbrales',
+                    'Uso de dispositivo de alerta para caídas',
+                    'Programa de ejercicios domiciliarios supervisados'
+                ];
+            } else if (indice <= 9) {
+                nivelRiesgo = 'ALTO';
+                color = 'danger';
+                ayudaTecnica = 'Andador con ruedas o silla de ruedas para distancias largas';
+                recomendaciones = [
+                    'Rehabilitación intensiva (mínimo 3 veces por semana)',
+                    'Evaluación por equipo multidisciplinario',
+                    'Adaptaciones mayores en el hogar (rampas, elevadores)',
+                    'Considerar silla de ruedas para desplazamientos externos',
+                    'Asistencia domiciliaria parcial',
+                    'Supervisión durante la deambulación'
+                ];
+            } else {
+                nivelRiesgo = 'CRÍTICO';
+                color = 'danger';
+                ayudaTecnica = 'Silla de ruedas eléctrica y dispositivo de transferencia';
+                recomendaciones = [
+                    'Hospitalización o rehabilitación intensiva hospitalaria',
+                    'Asistencia permanente para movilización',
+                    'Adaptaciones completas del domicilio',
+                    'Equipo especializado: grúas de transferencia, camas articuladas',
+                    'Cuidado 24/7 por cuidador entrenado',
+                    'Evaluación de ingreso a residencia asistida'
+                ];
+            }
+            
+            return {
+                nivelRiesgo,
+                ayudaTecnica,
+                recomendaciones,
+                color
+            };
+        }
+
+        // ============================================
+        // GENERACIÓN DE RESULTADOS COMPLETA
         // ============================================
         function generarResultados() {
-            console.log("🚀 Generando resultados...");
-            
             // Validar campos obligatorios
             const requiredFields = ['nombre', 'fecha', 'evaluador'];
-            const missingFields = [];
-            
-            requiredFields.forEach(field => {
-                const elemento = document.getElementById(field);
-                if (elemento && !elemento.value.trim()) {
-                    missingFields.push(field);
-                }
+            const missingFields = requiredFields.filter(field => {
+                const value = document.getElementById(field).value.trim();
+                return !value;
             });
             
             if (missingFields.length > 0) {
                 showNotification('Complete los campos obligatorios (*) en Datos del Paciente', 'warning');
                 navigateTo('datos-paciente');
-                
-                // Resaltar campos faltantes
-                missingFields.forEach(field => {
-                    const elemento = document.getElementById(field);
-                    if (elemento) {
-                        elemento.style.borderColor = 'var(--danger)';
-                        elemento.focus();
-                    }
-                });
                 return;
             }
             
-            // Calcular puntajes
+            // Calcular puntajes individuales
             const iratScore = calcularIRAT();
             const tinettiScore = calcularTinetti();
             const nortonScore = calcularNorton();
             
-            console.log(`📈 Resultados calculados: IRAT=${iratScore}, Tinetti=${tinettiScore}, Norton=${nortonScore}`);
+            // Actualizar visualización de ponderación
+            document.getElementById('pondIrat').textContent = `${iratScore} pts`;
+            document.getElementById('pondTinetti').textContent = `${tinettiScore} pts`;
+            document.getElementById('pondNorton').textContent = `${nortonScore} pts`;
             
-            // Clasificar resultados
+            // Calcular clasificaciones individuales
             const classification = classifyResults(iratScore, tinettiScore, nortonScore);
+            
+            // Calcular Índice de Ayuda Técnica
+            const indiceAyuda = calcularIndiceAyudaTecnica(iratScore, tinettiScore, nortonScore);
+            const ayudaTecnica = determinarAyudaTecnica(indiceAyuda);
             
             // Guardar datos del reporte
             lastReportData = {
@@ -1707,13 +1897,18 @@
                     iratRiesgo: classification.iratRiesgo,
                     tinettiRiesgo: classification.tinettiRiesgo,
                     nortonRiesgo: classification.nortonRiesgo,
-                    riesgoGlobal: classification.riesgoGlobal
+                    riesgoGlobal: classification.riesgoGlobal,
+                    indiceAyudaTecnica: indiceAyuda,
+                    nivelAyudaTecnica: ayudaTecnica.nivelRiesgo,
+                    ayudaTecnicaRecomendada: ayudaTecnica.ayudaTecnica
                 },
-                recomendaciones: classification.recomendaciones
+                recomendaciones: classification.recomendaciones,
+                ayudaTecnica: ayudaTecnica
             };
             
-            // Mostrar resultados
+            // Mostrar todos los resultados
             displayResults(classification);
+            displayAyudaTecnica(indiceAyuda, ayudaTecnica);
             
             // Navegar a resultados
             navigateTo('resultados');
@@ -1722,69 +1917,33 @@
         }
 
         function classifyResults(irat, tinetti, norton) {
-            console.log("📊 Clasificando resultados...");
-            
             // Clasificación IRAT-5
             let iratRiesgo = '';
-            let iratColor = '';
-            
-            if (irat <= 6) {
-                iratRiesgo = 'BAJO';
-                iratColor = 'success';
-            } else if (irat <= 9) {
-                iratRiesgo = 'MODERADO';
-                iratColor = 'warning';
-            } else if (irat <= 12) {
-                iratRiesgo = 'ALTO';
-                iratColor = 'danger';
-            } else {
-                iratRiesgo = 'MUY ALTO';
-                iratColor = 'danger';
-            }
+            if (irat <= 6) iratRiesgo = 'BAJO';
+            else if (irat <= 9) iratRiesgo = 'MODERADO';
+            else if (irat <= 12) iratRiesgo = 'ALTO';
+            else iratRiesgo = 'MUY ALTO';
             
             // Clasificación Tinetti
             let tinettiRiesgo = '';
-            let tinettiColor = '';
-            
-            if (tinetti >= 25) {
-                tinettiRiesgo = 'BAJO';
-                tinettiColor = 'success';
-            } else if (tinetti >= 19) {
-                tinettiRiesgo = 'MODERADO';
-                tinettiColor = 'warning';
-            } else {
-                tinettiRiesgo = 'ALTO';
-                tinettiColor = 'danger';
-            }
+            if (tinetti >= 25) tinettiRiesgo = 'BAJO';
+            else if (tinetti >= 19) tinettiRiesgo = 'MODERADO';
+            else tinettiRiesgo = 'ALTO';
             
             // Clasificación Norton
             let nortonRiesgo = '';
-            let nortonColor = '';
-            
-            if (norton >= 16) {
-                nortonRiesgo = 'BAJO';
-                nortonColor = 'success';
-            } else if (norton >= 12) {
-                nortonRiesgo = 'MODERADO';
-                nortonColor = 'warning';
-            } else {
-                nortonRiesgo = 'ALTO';
-                nortonColor = 'danger';
-            }
+            if (norton >= 16) nortonRiesgo = 'BAJO';
+            else if (norton >= 12) nortonRiesgo = 'MODERADO';
+            else nortonRiesgo = 'ALTO';
             
             // Clasificación Global
             let riesgoGlobal = 'BAJO';
-            let riesgoGlobalColor = 'success';
-            
             if (iratRiesgo === 'MUY ALTO' || tinettiRiesgo === 'ALTO') {
                 riesgoGlobal = 'CRÍTICO';
-                riesgoGlobalColor = 'danger';
             } else if (iratRiesgo === 'ALTO' || nortonRiesgo === 'ALTO') {
                 riesgoGlobal = 'ALTO';
-                riesgoGlobalColor = 'danger';
             } else if (iratRiesgo === 'MODERADO' || tinettiRiesgo === 'MODERADO') {
                 riesgoGlobal = 'MODERADO';
-                riesgoGlobalColor = 'warning';
             }
             
             // Generar recomendaciones
@@ -1822,39 +1981,17 @@
                 });
             }
             
-            // Recomendación general si no hay otras
-            if (recomendaciones.length === 0) {
-                recomendaciones.push({
-                    titulo: '📋 Evaluación Completa',
-                    texto: 'Paciente evaluado en todas las escalas. Continuar con seguimiento según protocolo institucional.',
-                    tipo: 'success'
-                });
-            }
-            
-            console.log("✅ Clasificación completada");
-            
             return {
                 iratRiesgo,
-                iratColor,
                 tinettiRiesgo,
-                tinettiColor,
                 nortonRiesgo,
-                nortonColor,
                 riesgoGlobal,
-                riesgoGlobalColor,
                 recomendaciones
             };
         }
 
         function displayResults(classification) {
-            console.log("🎨 Mostrando resultados...");
-            
             const container = document.getElementById('resultsGrid');
-            if (!container) {
-                console.error("❌ No se encontró el contenedor de resultados");
-                return;
-            }
-            
             const paciente = lastReportData.paciente;
             const puntajes = lastReportData.puntajes;
             
@@ -1862,61 +1999,88 @@
                 <div class="result-card irat">
                     <h5><i class="fas fa-walking"></i> IRAT-5</h5>
                     <div class="result-value">${puntajes.irat}</div>
-                    <div class="badge badge-${classification.iratColor} mt-2">
+                    <div class="badge ${getRiskClass(classification.iratRiesgo)} mt-2">
                         ${classification.iratRiesgo}
                     </div>
-                    <p class="mt-2 small">Puntaje máximo: 18</p>
+                    <p class="mt-2 small">Ponderación: 40%</p>
                 </div>
                 
                 <div class="result-card tinetti">
                     <h5><i class="fas fa-person-walking"></i> Tinetti</h5>
                     <div class="result-value">${puntajes.tinetti}/28</div>
-                    <div class="badge badge-${classification.tinettiColor} mt-2">
+                    <div class="badge ${getRiskClass(classification.tinettiRiesgo)} mt-2">
                         ${classification.tinettiRiesgo}
                     </div>
-                    <p class="mt-2 small">16 items evaluados</p>
+                    <p class="mt-2 small">Ponderación: 40%</p>
                 </div>
                 
                 <div class="result-card norton">
                     <h5><i class="fas fa-bed"></i> Norton</h5>
                     <div class="result-value">${puntajes.norton}/20</div>
-                    <div class="badge badge-${classification.nortonColor} mt-2">
+                    <div class="badge ${getRiskClass(classification.nortonRiesgo)} mt-2">
                         ${classification.nortonRiesgo}
                     </div>
-                    <p class="mt-2 small">5 criterios evaluados</p>
-                </div>
-                
-                <div class="result-card" style="border-top-color: var(--${classification.riesgoGlobalColor});">
-                    <h5><i class="fas fa-chart-line"></i> Clasificación Global</h5>
-                    <div class="result-value text-${classification.riesgoGlobalColor}">
-                        ${classification.riesgoGlobal}
-                    </div>
-                    <div class="badge badge-${classification.riesgoGlobalColor} mt-2">
-                        RIESGO
-                    </div>
-                    <p class="mt-2 small">Evaluación integral</p>
+                    <p class="mt-2 small">Ponderación: 20%</p>
                 </div>
             `;
             
             // Mostrar recomendaciones
             const recomendacionesContainer = document.getElementById('recomendacionesContainer');
-            if (recomendacionesContainer) {
-                recomendacionesContainer.innerHTML = `
-                    <h5 class="mt-4 mb-3"><i class="fas fa-lightbulb"></i> Recomendaciones Clínicas</h5>
-                    ${classification.recomendaciones.map((rec, index) => `
-                        <div class="alert alert-${rec.tipo} mt-2">
-                            <strong>${index + 1}. ${rec.titulo}</strong><br>
-                            ${rec.texto}
-                        </div>
-                    `).join('')}
-                `;
-            }
+            recomendacionesContainer.innerHTML = `
+                <h5 class="mt-4 mb-3"><i class="fas fa-lightbulb"></i> Recomendaciones Clínicas</h5>
+                ${classification.recomendaciones.map((rec, index) => `
+                    <div class="alert alert-${rec.tipo} mt-2">
+                        <strong>${index + 1}. ${rec.titulo}</strong><br>
+                        ${rec.texto}
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function displayAyudaTecnica(indice, ayudaTecnica) {
+            // Actualizar tarjeta de ayuda técnica
+            document.getElementById('indiceAyuda').textContent = indice;
+            document.getElementById('recomendacionAyuda').textContent = ayudaTecnica.ayudaTecnica;
             
-            console.log("✅ Resultados mostrados correctamente");
+            // Aplicar color según nivel de riesgo
+            const card = document.getElementById('ayudaTecnicaCard');
+            card.style.background = getGradientByRisk(ayudaTecnica.color);
+            
+            // Mostrar detalles de la ayuda técnica
+            const detalleContainer = document.getElementById('detalleAyuda');
+            detalleContainer.innerHTML = `
+                <h5><i class="fas fa-info-circle"></i> Nivel de Riesgo: <span class="badge badge-${ayudaTecnica.color}">${ayudaTecnica.nivelRiesgo}</span></h5>
+                <div class="mt-3">
+                    <strong>Recomendaciones específicas:</strong>
+                    <ul class="mt-2">
+                        ${ayudaTecnica.recomendaciones.map(rec => `<li>${rec}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        function getRiskClass(riesgo) {
+            const map = {
+                'BAJO': 'badge-success',
+                'MODERADO': 'badge-warning',
+                'ALTO': 'badge-danger',
+                'MUY ALTO': 'badge-danger',
+                'CRÍTICO': 'badge-danger'
+            };
+            return map[riesgo] || 'badge-secondary';
+        }
+
+        function getGradientByRisk(color) {
+            const gradients = {
+                'success': 'linear-gradient(135deg, #4caf50 0%, #66bb6a 100%)',
+                'warning': 'linear-gradient(135deg, #ff9800 0%, #ffb74d 100%)',
+                'danger': 'linear-gradient(135deg, #f44336 0%, #ef5350 100%)'
+            };
+            return gradients[color] || 'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)';
         }
 
         // ============================================
-        // SISTEMA DE COMPARTIR MEJORADO
+        // FUNCIONES DE COMPARTIR Y PDF
         // ============================================
         function openShareModal() {
             if (!lastReportData) {
@@ -1927,28 +2091,29 @@
             const text = generateShareText();
             document.getElementById('shareText').textContent = text;
             document.getElementById('shareModal').style.display = 'flex';
-            
-            console.log("📤 Modal de compartir abierto");
         }
 
         function closeShareModal() {
             document.getElementById('shareModal').style.display = 'none';
-            console.log("📤 Modal de compartir cerrado");
         }
 
         function generateShareText() {
             const paciente = lastReportData.paciente;
             const puntajes = lastReportData.puntajes;
+            const ayuda = lastReportData.ayudaTecnica;
             
             return `📋 EVALUACIÓN CLÍNICA INTEGRAL\n\n` +
                    `👤 Paciente: ${paciente.nombre}\n` +
                    `📅 Fecha: ${paciente.fecha}\n` +
                    `👨‍⚕️ Evaluador: ${paciente.evaluador}\n\n` +
                    `📊 RESULTADOS:\n` +
-                   `• IRAT-5: ${puntajes.irat} puntos (${puntajes.iratRiesgo})\n` +
-                   `• Test de Tinetti: ${puntajes.tinetti}/28 (${puntajes.tinettiRiesgo})\n` +
-                   `• Escala Norton: ${puntajes.norton}/20 (${puntajes.nortonRiesgo})\n` +
+                   `• IRAT-5 (40%): ${puntajes.irat} pts (${puntajes.iratRiesgo})\n` +
+                   `• Tinetti (40%): ${puntajes.tinetti}/28 pts (${puntajes.tinettiRiesgo})\n` +
+                   `• Norton (20%): ${puntajes.norton}/20 pts (${puntajes.nortonRiesgo})\n` +
                    `• Riesgo Global: ${puntajes.riesgoGlobal}\n\n` +
+                   `🎯 ÍNDICE DE AYUDA TÉCNICA: ${puntajes.indiceAyudaTecnica}\n` +
+                   `• Nivel: ${puntajes.nivelAyudaTecnica}\n` +
+                   `• Ayuda recomendada: ${puntajes.ayudaTecnicaRecomendada}\n\n` +
                    `💡 Sistema Evaluador Clínico Integrado`;
         }
 
@@ -1978,7 +2143,6 @@
                     await navigator.clipboard.writeText(text);
                     showNotification('✅ Texto copiado al portapapeles', 'success');
                 } else {
-                    // Fallback para navegadores antiguos
                     const textarea = document.createElement('textarea');
                     textarea.value = text;
                     textarea.style.position = 'fixed';
@@ -1991,7 +2155,7 @@
                 }
             } catch (error) {
                 console.error('Error al copiar:', error);
-                showNotification('❌ Error al copiar al portapapeles', 'error');
+                showNotification('❌ Error al copiar', 'error');
             }
             
             closeShareModal();
@@ -2007,10 +2171,6 @@
                 showNotification('🔄 Generando PDF...', 'info');
                 
                 const { jsPDF } = window.jspdf;
-                if (!jsPDF) {
-                    throw new Error("jsPDF no está disponible");
-                }
-                
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const pageWidth = pdf.internal.pageSize.getWidth();
                 let y = 20;
@@ -2044,28 +2204,62 @@
                 pdf.text(`Institución: ${paciente.institucion || 'N/A'}`, 25, y);
                 y += 15;
                 
-                // Resultados
+                // Resultados con ponderación
                 pdf.setFontSize(14);
                 pdf.setTextColor(26, 35, 126);
-                pdf.text('RESULTADOS', 20, y);
+                pdf.text('RESULTADOS CON PONDERACIÓN 40-40-20', 20, y);
                 y += 10;
                 
                 pdf.setFontSize(10);
                 const puntajes = lastReportData.puntajes;
-                pdf.text(`• IRAT-5: ${puntajes.irat} puntos (${puntajes.iratRiesgo})`, 25, y);
+                pdf.text(`• IRAT-5 (40%): ${puntajes.irat} puntos (${puntajes.iratRiesgo})`, 25, y);
                 y += 7;
-                pdf.text(`• Test de Tinetti: ${puntajes.tinetti}/28 puntos (${puntajes.tinettiRiesgo})`, 25, y);
+                pdf.text(`• Test de Tinetti (40%): ${puntajes.tinetti}/28 puntos (${puntajes.tinettiRiesgo})`, 25, y);
                 y += 7;
-                pdf.text(`• Escala Norton: ${puntajes.norton}/20 puntos (${puntajes.nortonRiesgo})`, 25, y);
+                pdf.text(`• Escala Norton (20%): ${puntajes.norton}/20 puntos (${puntajes.nortonRiesgo})`, 25, y);
                 y += 7;
                 pdf.text(`• Riesgo Global: ${puntajes.riesgoGlobal}`, 25, y);
+                y += 10;
+                
+                // Índice de Ayuda Técnica
+                pdf.setFontSize(14);
+                pdf.setTextColor(106, 17, 203);
+                pdf.text('ÍNDICE DE AYUDA TÉCNICA', 20, y);
+                y += 10;
+                
+                pdf.setFontSize(12);
+                pdf.setTextColor(0, 0, 0);
+                pdf.text(`Valor: ${puntajes.indiceAyudaTecnica}`, 25, y);
+                y += 7;
+                pdf.text(`Nivel: ${puntajes.nivelAyudaTecnica}`, 25, y);
+                y += 7;
+                pdf.text(`Ayuda recomendada: ${puntajes.ayudaTecnicaRecomendada}`, 25, y);
                 y += 15;
                 
-                // Recomendaciones
-                if (lastReportData.recomendaciones && lastReportData.recomendaciones.length > 0) {
+                // Recomendaciones de ayuda técnica
+                if (lastReportData.ayudaTecnica && lastReportData.ayudaTecnica.recomendaciones) {
                     pdf.setFontSize(14);
                     pdf.setTextColor(26, 35, 126);
-                    pdf.text('RECOMENDACIONES', 20, y);
+                    pdf.text('RECOMENDACIONES DE AYUDA TÉCNICA', 20, y);
+                    y += 10;
+                    
+                    pdf.setFontSize(10);
+                    lastReportData.ayudaTecnica.recomendaciones.forEach((rec, index) => {
+                        if (y > 250) {
+                            pdf.addPage();
+                            y = 20;
+                        }
+                        pdf.text(`${index + 1}. ${rec}`, 25, y);
+                        y += 5;
+                    });
+                }
+                
+                // Recomendaciones generales
+                if (lastReportData.recomendaciones && lastReportData.recomendaciones.length > 0) {
+                    y += 10;
+                    pdf.setFontSize(14);
+                    pdf.setTextColor(26, 35, 126);
+                    pdf.text('RECOMENDACIONES GENERALES', 20, y);
                     y += 10;
                     
                     pdf.setFontSize(10);
@@ -2085,14 +2279,8 @@
                     });
                 }
                 
-                // Pie de página
-                pdf.setFontSize(8);
-                pdf.setTextColor(100, 100, 100);
-                pdf.text('Generado por Evaluador Clínico Integrado', pageWidth / 2, 290, { align: 'center' });
-                pdf.text(new Date().toLocaleString('es-ES'), pageWidth / 2, 295, { align: 'center' });
-                
                 // Guardar
-                const fileName = `Evaluacion_${paciente.nombre.replace(/\s/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+                const fileName = `Evaluacion_${paciente.nombre.replace(/\s/g, '_')}.pdf`;
                 pdf.save(fileName);
                 
                 showNotification('✅ PDF generado exitosamente', 'success');
@@ -2100,13 +2288,13 @@
                 
             } catch (error) {
                 console.error('Error generando PDF:', error);
-                showNotification('❌ Error al generar PDF. Verifique la consola.', 'error');
+                showNotification('❌ Error al generar PDF', 'error');
                 closeShareModal();
             }
         }
 
         // ============================================
-        // BASE DE DATOS - FUNCIONES MEJORADAS
+        // BASE DE DATOS
         // ============================================
         async function saveReport() {
             if (!currentUser) {
@@ -2119,11 +2307,6 @@
                 return;
             }
             
-            const button = document.querySelector('button[onclick="saveReport()"]');
-            const originalHTML = button.innerHTML;
-            button.innerHTML = '<div class="loader"></div> Guardando...';
-            button.disabled = true;
-            
             try {
                 const report = {
                     ...lastReportData,
@@ -2133,41 +2316,25 @@
                 };
                 
                 await db.collection('evaluaciones').add(report);
-                
-                button.innerHTML = originalHTML;
-                button.disabled = false;
-                
                 showNotification('✅ Evaluación guardada en la nube', 'success');
                 loadHistorial();
-                
             } catch (error) {
                 console.error('Error al guardar:', error);
-                button.innerHTML = originalHTML;
-                button.disabled = false;
-                
                 showNotification('❌ Error al guardar la evaluación', 'error');
             }
         }
 
         async function loadHistorial() {
-            if (!currentUser) {
-                console.log("No hay usuario autenticado, no se carga historial");
-                return;
-            }
+            if (!currentUser) return;
             
             const container = document.getElementById('historialList');
-            if (!container) {
-                console.error("No se encontró el contenedor del historial");
-                return;
-            }
-            
-            container.innerHTML = '<div class="text-center p-3"><div class="loader"></div><p class="mt-2">Cargando historial...</p></div>';
+            container.innerHTML = '<div class="text-center p-3">Cargando historial...</div>';
             
             try {
                 const snapshot = await db.collection('evaluaciones')
                     .where('userId', '==', currentUser.uid)
                     .orderBy('savedAt', 'desc')
-                    .limit(20)
+                    .limit(10)
                     .get();
                 
                 if (snapshot.empty) {
@@ -2179,7 +2346,6 @@
                 snapshot.docs.forEach(doc => {
                     const data = doc.data();
                     const fecha = new Date(data.paciente.fecha).toLocaleDateString('es-ES');
-                    const savedDate = new Date(data.savedAt).toLocaleDateString('es-ES');
                     
                     const item = document.createElement('div');
                     item.className = 'history-item';
@@ -2187,11 +2353,11 @@
                         <div>
                             <strong>${data.paciente.nombre}</strong><br>
                             <small class="text-muted">
-                                <i class="fas fa-calendar"></i> ${fecha} | 
-                                <i class="fas fa-save"></i> ${savedDate}<br>
-                                <span class="badge badge-primary">IRAT: ${data.puntajes.irat}</span>
-                                <span class="badge badge-warning">Tinetti: ${data.puntajes.tinetti}</span>
-                                <span class="badge badge-success">Norton: ${data.puntajes.norton}</span>
+                                ${fecha} | 
+                                IRAT: ${data.puntajes.irat} | 
+                                Tinetti: ${data.puntajes.tinetti} |
+                                Norton: ${data.puntajes.norton} |
+                                Índice: ${data.puntajes.indiceAyudaTecnica}
                             </small>
                         </div>
                         <div>
@@ -2202,9 +2368,6 @@
                     `;
                     container.appendChild(item);
                 });
-                
-                console.log(`✅ Historial cargado: ${snapshot.size} evaluaciones`);
-                
             } catch (error) {
                 console.error('Error cargando historial:', error);
                 container.innerHTML = '<p class="text-center text-danger p-3">Error al cargar el historial</p>';
@@ -2236,6 +2399,10 @@
                     };
                     
                     displayResults(classification);
+                    displayAyudaTecnica(
+                        lastReportData.puntajes.indiceAyudaTecnica,
+                        lastReportData.ayudaTecnica
+                    );
                     navigateTo('resultados');
                     
                     showNotification('✅ Evaluación cargada exitosamente', 'success');
@@ -2247,20 +2414,13 @@
         }
 
         // ============================================
-        // UTILIDADES MEJORADAS
+        // UTILIDADES
         // ============================================
         function showNotification(message, type = 'info', duration = 4000) {
             const notification = document.getElementById('notification');
-            if (!notification) {
-                console.error("No se encontró el elemento de notificación");
-                return;
-            }
-            
             notification.textContent = message;
             notification.className = `notification ${type}`;
             notification.style.display = 'block';
-            
-            console.log(`📢 Notificación: ${type} - ${message}`);
             
             setTimeout(() => {
                 notification.style.display = 'none';
@@ -2270,10 +2430,7 @@
         // ============================================
         // INICIALIZAR APLICACIÓN
         // ============================================
-        window.onload = function() {
-            console.log("🚀 Iniciando aplicación...");
-            initApp();
-        };
+        window.onload = initApp;
 
         // Cerrar modal al hacer clic fuera
         window.onclick = function(event) {
@@ -2289,17 +2446,6 @@
                 closeShareModal();
             }
         });
-
-        // Manejar envío de formularios con Enter
-        document.addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                if (currentSection === 'auth') {
-                    handleAuth();
-                }
-            }
-        });
-
-        console.log("✅ Script cargado correctamente");
     </script>
 </body>
 </html>
