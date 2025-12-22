@@ -318,6 +318,16 @@
             color: white;
         }
 
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #ffb74d 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #ef5350 100%);
+            color: white;
+        }
+
         /* ===== RESULTADOS ===== */
         .results-grid {
             display: grid;
@@ -333,6 +343,11 @@
             text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             border-top: 5px solid transparent;
+            transition: transform 0.3s ease;
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
         }
 
         .result-card.irat { border-top-color: var(--primary); }
@@ -451,6 +466,7 @@
         .notification.success { background: rgba(76, 175, 80, 0.95); }
         .notification.error { background: rgba(244, 67, 54, 0.95); }
         .notification.warning { background: rgba(255, 152, 0, 0.95); }
+        .notification.info { background: rgba(0, 172, 193, 0.95); }
 
         /* ===== MODAL DE COMPARTIR ===== */
         .share-modal {
@@ -582,6 +598,12 @@
         }
 
         /* ===== HISTORY ITEMS ===== */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
         .history-item {
             display: flex;
             justify-content: space-between;
@@ -592,11 +614,12 @@
             border-radius: var(--radius);
             border-left: 4px solid var(--primary);
             transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         .history-item:hover {
             transform: translateX(5px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         }
 
         /* ===== BADGES ===== */
@@ -686,6 +709,94 @@
         .nivel-moderado { background: #fff3e0; color: #ef6c00; }
         .nivel-alto { background: #ffebee; color: #d32f2f; }
         .nivel-critico { background: #fce4ec; color: #880e4f; }
+
+        /* ===== RECOMENDACIONES DETALLADAS ===== */
+        .recomendaciones-detalladas {
+            background: #f8f9fa;
+            border-radius: var(--radius);
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .recomendacion-item {
+            padding: 15px;
+            margin-bottom: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .recomendacion-item.irat { border-left-color: var(--primary); }
+        .recomendacion-item.tinetti { border-left-color: var(--warning); }
+        .recomendacion-item.norton { border-left-color: var(--success); }
+        .recomendacion-item.global { border-left-color: #6a11cb; }
+
+        .recomendacion-titulo {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .recomendacion-descripcion {
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        /* ===== ACCIONES RÁPIDAS ===== */
+        .acciones-rapidas {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .accion-rapida {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            background: white;
+            border-radius: var(--radius);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .accion-rapida:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .accion-rapida.primary { border-color: var(--primary); }
+        .accion-rapida.success { border-color: var(--success); }
+        .accion-rapida.warning { border-color: var(--warning); }
+        .accion-rapida.danger { border-color: var(--danger); }
+
+        .accion-icono {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        /* ===== PROGRESS BAR ===== */
+        .progress-bar-container {
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-bar.irat { background: var(--primary); }
+        .progress-bar.tinetti { background: var(--warning); }
+        .progress-bar.norton { background: var(--success); }
     </style>
 </head>
 <body>
@@ -727,7 +838,7 @@
                     <i class="fas fa-heartbeat"></i>
                 </div>
                 <h3 class="sidebar-title">Evaluador Clínico</h3>
-                <p class="sidebar-subtitle">Sistema Integrado</p>
+                <p class="sidebar-subtitle">Sistema Profesional Integrado</p>
             </div>
             
             <ul class="nav-menu" id="navMenu">
@@ -773,6 +884,12 @@
                         <span>Historial</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="#configuracion" class="nav-link" onclick="navigateTo('configuracion')">
+                        <i class="fas fa-cog"></i>
+                        <span>Configuración</span>
+                    </a>
+                </li>
             </ul>
         </aside>
 
@@ -782,7 +899,7 @@
             <header class="main-header" id="mainHeader">
                 <div>
                     <h1 class="header-title" id="pageTitle">Bienvenido al Sistema</h1>
-                    <p class="header-subtitle" id="pageSubtitle">Evaluador Clínico Integrado</p>
+                    <p class="header-subtitle" id="pageSubtitle">Evaluador Clínico Profesional</p>
                 </div>
                 
                 <div class="user-info" id="userInfo" style="display: none;">
@@ -791,6 +908,7 @@
                     </div>
                     <div>
                         <div id="currentUserEmail"></div>
+                        <small id="userRole">Profesional de Salud</small>
                     </div>
                     <button class="logout-btn" onclick="logout()">
                         <i class="fas fa-sign-out-alt"></i> Salir
@@ -806,20 +924,20 @@
                     </div>
                     <div>
                         <h2 class="section-title" id="authTitle">Acceso Profesional</h2>
-                        <p class="section-subtitle">Ingrese sus credenciales para acceder al sistema</p>
+                        <p class="section-subtitle">Sistema certificado para profesionales de la salud</p>
                     </div>
                 </div>
                 
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label">Correo Institucional</label>
-                            <input type="email" id="authEmail" class="form-control" placeholder="profesional@institucion.cl">
+                            <label class="form-label">Correo Institucional *</label>
+                            <input type="email" id="authEmail" class="form-control" placeholder="profesional@hospital.cl">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label">Contraseña</label>
+                            <label class="form-label">Contraseña *</label>
                             <input type="password" id="authPassword" class="form-control" placeholder="••••••••">
                         </div>
                     </div>
@@ -833,8 +951,14 @@
                     
                     <button class="btn btn-outline-primary" onclick="toggleAuthMode()">
                         <i class="fas fa-user-plus"></i>
-                        <span id="toggleAuthText">Crear nueva cuenta</span>
+                        <span id="toggleAuthText">Registrarse como profesional</span>
                     </button>
+                </div>
+
+                <div class="mt-4">
+                    <div class="alert alert-info">
+                        <strong>Acceso de prueba:</strong> Usuario: test@hospital.cl | Contraseña: 123456
+                    </div>
                 </div>
             </section>
 
@@ -847,47 +971,137 @@
                             <i class="fas fa-home"></i>
                         </div>
                         <div>
-                            <h2 class="section-title">Bienvenido al Evaluador Clínico</h2>
-                            <p class="section-subtitle">Sistema integrado de evaluación de riesgo clínico</p>
+                            <h2 class="section-title">Bienvenido al Sistema Profesional</h2>
+                            <p class="section-subtitle">Herramienta integral para evaluación de riesgo clínico</p>
                         </div>
                     </div>
                     
-                    <div class="row mt-4">
-                        <div class="col-md-4">
-                            <div class="card border-primary mb-3">
-                                <div class="card-body text-center">
-                                    <i class="fas fa-walking fa-3x text-primary mb-3"></i>
-                                    <h5>IRAT-5 Modificado</h5>
-                                    <p>Evaluación de riesgo de amputación y caídas (35% del índice)</p>
-                                    <button class="btn btn-primary" onclick="navigateTo('irat-5')">
-                                        <i class="fas fa-play"></i> Comenzar
-                                    </button>
+                    <!-- ACCIONES RÁPIDAS -->
+                    <div class="acciones-rapidas">
+                        <div class="accion-rapida primary" onclick="navigateTo('datos-paciente')">
+                            <div class="accion-icono">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <strong>Nueva Evaluación</strong>
+                            <p class="small mt-2">Iniciar evaluación completa</p>
+                        </div>
+                        
+                        <div class="accion-rapida success" onclick="navigateTo('historial')">
+                            <div class="accion-icono">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <strong>Historial</strong>
+                            <p class="small mt-2">Ver evaluaciones anteriores</p>
+                        </div>
+                        
+                        <div class="accion-rapida warning" onclick="navigateTo('configuracion')">
+                            <div class="accion-icono">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <strong>Configuración</strong>
+                            <p class="small mt-2">Ajustes del sistema</p>
+                        </div>
+                        
+                        <div class="accion-rapida danger" onclick="exportAllData()">
+                            <div class="accion-icono">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <strong>Exportar Todo</strong>
+                            <p class="small mt-2">Descargar todas las evaluaciones</p>
+                        </div>
+                    </div>
+                    
+                    <!-- RESUMEN ESTADÍSTICO -->
+                    <div class="mt-4">
+                        <h5><i class="fas fa-chart-bar"></i> Resumen Estadístico</h5>
+                        <div class="row mt-3">
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h3 id="totalEvaluaciones">0</h3>
+                                        <p class="text-muted">Evaluaciones Totales</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h3 id="pacientesUnicos">0</h3>
+                                        <p class="text-muted">Pacientes Únicos</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h3 id="riesgoAlto">0</h3>
+                                        <p class="text-muted">Riesgo Alto</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h3 id="ultimoMes">0</h3>
+                                        <p class="text-muted">Último Mes</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="col-md-4">
-                            <div class="card border-warning mb-3">
-                                <div class="card-body text-center">
-                                    <i class="fas fa-person-walking fa-3x text-warning mb-3"></i>
-                                    <h5>Test de Tinetti</h5>
-                                    <p>Evaluación de marcha y equilibrio (35% del índice)</p>
-                                    <button class="btn btn-warning" onclick="navigateTo('tinetti')">
-                                        <i class="fas fa-play"></i> Comenzar
-                                    </button>
+                    </div>
+                    
+                    <!-- ESCALAS DISPONIBLES -->
+                    <div class="mt-4">
+                        <h5><i class="fas fa-clipboard-list"></i> Escalas de Evaluación Disponibles</h5>
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <div class="card border-primary mb-3">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-walking fa-3x text-primary mb-3"></i>
+                                        <h5>IRAT-5 Modificado</h5>
+                                        <p class="small">Evaluación de riesgo de amputación y caídas</p>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar irat" style="width: 35%"></div>
+                                        </div>
+                                        <small>Ponderación: 35%</small>
+                                        <button class="btn btn-primary btn-sm mt-2" onclick="navigateTo('irat-5')">
+                                            <i class="fas fa-play"></i> Comenzar
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <div class="card border-success mb-3">
-                                <div class="card-body text-center">
-                                    <i class="fas fa-bed fa-3x text-success mb-3"></i>
-                                    <h5>Escala Norton</h5>
-                                    <p>Riesgo de úlceras por presión (30% del índice)</p>
-                                    <button class="btn btn-success" onclick="navigateTo('norton')">
-                                        <i class="fas fa-play"></i> Comenzar
-                                    </button>
+                            
+                            <div class="col-md-4">
+                                <div class="card border-warning mb-3">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-person-walking fa-3x text-warning mb-3"></i>
+                                        <h5>Test de Tinetti</h5>
+                                        <p class="small">Evaluación de marcha y equilibrio</p>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar tinetti" style="width: 35%"></div>
+                                        </div>
+                                        <small>Ponderación: 35%</small>
+                                        <button class="btn btn-warning btn-sm mt-2" onclick="navigateTo('tinetti')">
+                                            <i class="fas fa-play"></i> Comenzar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="card border-success mb-3">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-bed fa-3x text-success mb-3"></i>
+                                        <h5>Escala Norton</h5>
+                                        <p class="small">Riesgo de úlceras por presión</p>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar norton" style="width: 30%"></div>
+                                        </div>
+                                        <small>Ponderación: 30%</small>
+                                        <button class="btn btn-success btn-sm mt-2" onclick="navigateTo('norton')">
+                                            <i class="fas fa-play"></i> Comenzar
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -902,7 +1116,7 @@
                         </div>
                         <div>
                             <h2 class="section-title">Datos del Paciente</h2>
-                            <p class="section-subtitle">Complete la información básica del paciente</p>
+                            <p class="section-subtitle">Información demográfica y clínica básica</p>
                         </div>
                     </div>
                     
@@ -913,8 +1127,30 @@
                         </div>
                         
                         <div>
-                            <label class="form-label">RUT / Identificación</label>
+                            <label class="form-label">RUT / Identificación *</label>
                             <input type="text" id="rut" class="form-control" placeholder="12.345.678-9">
+                            <small class="text-muted">Formato: 12345678-9</small>
+                        </div>
+                        
+                        <div>
+                            <label class="form-label">Fecha de Nacimiento</label>
+                            <input type="date" id="fechaNacimiento" class="form-control">
+                        </div>
+                        
+                        <div>
+                            <label class="form-label">Edad</label>
+                            <input type="number" id="edad" class="form-control" placeholder="Años" readonly>
+                        </div>
+                        
+                        <div>
+                            <label class="form-label">Género</label>
+                            <select id="genero" class="form-select">
+                                <option value="">Seleccionar</option>
+                                <option value="masculino">Masculino</option>
+                                <option value="femenino">Femenino</option>
+                                <option value="otro">Otro</option>
+                                <option value="prefiero-no-decir">Prefiero no decir</option>
+                            </select>
                         </div>
                         
                         <div>
@@ -923,8 +1159,13 @@
                         </div>
                         
                         <div>
-                            <label class="form-label">Edad</label>
-                            <input type="number" id="edad" class="form-control" placeholder="Años">
+                            <label class="form-label">Diagnóstico Principal</label>
+                            <input type="text" id="diagnostico" class="form-control" placeholder="Ej: Diabetes tipo 2">
+                        </div>
+                        
+                        <div>
+                            <label class="form-label">Comorbilidades</label>
+                            <input type="text" id="comorbilidades" class="form-control" placeholder="Separar con comas">
                         </div>
                         
                         <div>
@@ -933,16 +1174,26 @@
                         </div>
                         
                         <div>
-                            <label class="form-label">Institución</label>
+                            <label class="form-label">Institución *</label>
                             <input type="text" id="institucion" class="form-control" placeholder="Hospital/Clínica/Centro">
+                        </div>
+                        
+                        <div>
+                            <label class="form-label">Servicio/Unidad</label>
+                            <input type="text" id="servicio" class="form-control" placeholder="Ej: Medicina Interna">
+                        </div>
+                        
+                        <div>
+                            <label class="form-label">Número de Historia Clínica</label>
+                            <input type="text" id="historiaClinica" class="form-control" placeholder="Número de registro">
                         </div>
                     </div>
                     
                     <div class="d-flex justify-content-between mt-4">
                         <button class="btn btn-secondary" onclick="navigateTo('inicio')">
-                            <i class="fas fa-arrow-left"></i> Volver
+                            <i class="fas fa-arrow-left"></i> Volver al Inicio
                         </button>
-                        <button class="btn btn-primary" onclick="navigateTo('irat-5')">
+                        <button class="btn btn-primary" onclick="validarDatosPaciente()">
                             Continuar a IRAT-5 <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
@@ -956,7 +1207,7 @@
                         </div>
                         <div>
                             <h2 class="section-title">IRAT-5 Modificado</h2>
-                            <p class="section-subtitle">Evaluación de riesgo de amputación y caídas (Puntaje máximo: 18)</p>
+                            <p class="section-subtitle">Evaluación de riesgo de amputación y caídas (35% del índice)</p>
                         </div>
                     </div>
                     
@@ -970,6 +1221,7 @@
                             <option value="3">< 5 segundos (3 puntos)</option>
                             <option value="4">No puede mantenerse (4 puntos)</option>
                         </select>
+                        <small class="text-muted">Evaluar con ojos abiertos, en superficie firme</small>
                     </div>
                     
                     <div class="mb-3">
@@ -983,6 +1235,7 @@
                             <option value="5">Supracondílea unilateral (5 puntos + riesgo caídas)</option>
                             <option value="6">Supracondílea bilateral (6 puntos + riesgo caídas)</option>
                         </select>
+                        <small class="text-muted">Considerar nivel y unilateralidad/bilateralidad</small>
                     </div>
                     
                     <div class="mb-3">
@@ -993,6 +1246,7 @@
                             <option value="1">Problemas en un brazo/fuerza <3 (1 punto)</option>
                             <option value="2">Problemas en ambos brazos (2 puntos)</option>
                         </select>
+                        <small class="text-muted">Evaluar fuerza muscular (escala 0-5)</small>
                     </div>
                     
                     <div class="mb-3">
@@ -1004,6 +1258,7 @@
                             <option value="2">Vive solo o sin cuidador (2 puntos)</option>
                             <option value="3">Es cuidador de persona frágil (3 puntos)</option>
                         </select>
+                        <small class="text-muted">Evaluar red de apoyo social disponible</small>
                     </div>
                     
                     <div class="mb-3">
@@ -1015,12 +1270,20 @@
                             <option value="2">Moderada - Requiere motivación constante (2 puntos)</option>
                             <option value="3">Mala - Se resiste o rechaza instrucciones (3 puntos)</option>
                         </select>
+                        <small class="text-muted">Evaluar colaboración durante la evaluación</small>
                     </div>
                     
                     <div class="score-display">
                         <div class="score-label">Puntaje Total IRAT-5</div>
                         <div class="score-value" id="puntajeIrat">0</div>
-                        <div class="score-label">0-6: Bajo riesgo | 7-9: Riesgo moderado | 10-12: Alto riesgo | ≥13: Muy alto riesgo</div>
+                        <div class="score-label">
+                            <strong>Interpretación:</strong><br>
+                            0-6: Bajo riesgo | 7-9: Riesgo moderado | 10-12: Alto riesgo | ≥13: Muy alto riesgo
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <strong>Nota:</strong> Este puntaje representa el 35% del Índice de Ayuda Técnica final.
                     </div>
                     
                     <div class="d-flex justify-content-between mt-4">
@@ -1041,7 +1304,7 @@
                         </div>
                         <div>
                             <h2 class="section-title">Test de Tinetti Completo</h2>
-                            <p class="section-subtitle">Evaluación de marcha y equilibrio (Puntaje máximo: 28 puntos)</p>
+                            <p class="section-subtitle">Evaluación de marcha y equilibrio (35% del índice)</p>
                         </div>
                     </div>
                     
@@ -1054,8 +1317,8 @@
                                 <div class="question-label">1. Sentado sin apoyo</div>
                                 <div class="question-input">
                                     <select class="form-select tinetti-option" data-category="balance" data-question="1" onchange="calcularTinetti()">
-                                        <option value="1">1 - Estable, seguro</option>
                                         <option value="0">0 - Se cae o se desliza</option>
+                                        <option value="1">1 - Estable, seguro</option>
                                     </select>
                                 </div>
                             </div>
@@ -1064,9 +1327,9 @@
                                 <div class="question-label">2. Levantarse</div>
                                 <div class="question-input">
                                     <select class="form-select tinetti-option" data-category="balance" data-question="2" onchange="calcularTinetti()">
-                                        <option value="2">2 - Capaz sin usar brazos</option>
-                                        <option value="1">1 - Capaz, usa brazos para ayudarse</option>
                                         <option value="0">0 - Incapaz sin ayuda</option>
+                                        <option value="1">1 - Capaz, usa brazos para ayudarse</option>
+                                        <option value="2">2 - Capaz sin usar brazos</option>
                                     </select>
                                 </div>
                             </div>
@@ -1075,9 +1338,9 @@
                                 <div class="question-label">3. Intentos de levantarse</div>
                                 <div class="question-input">
                                     <select class="form-select tinetti-option" data-category="balance" data-question="3" onchange="calcularTinetti()">
-                                        <option value="2">2 - Capaz, se levanta con un intento</option>
-                                        <option value="1">1 - Capaz, requiere más de un intento</option>
                                         <option value="0">0 - Incapaz sin ayuda</option>
+                                        <option value="1">1 - Capaz, requiere más de un intento</option>
+                                        <option value="2">2 - Capaz, se levanta con un intento</option>
                                     </select>
                                 </div>
                             </div>
@@ -1086,9 +1349,9 @@
                                 <div class="question-label">4. Equilibrio inmediato al levantarse</div>
                                 <div class="question-input">
                                     <select class="form-select tinetti-option" data-category="balance" data-question="4" onchange="calcularTinetti()">
-                                        <option value="2">2 - Estable sin apoyo</option>
-                                        <option value="1">1 - Estable pero usa bastón/andador</option>
                                         <option value="0">0 - Inestable (se tambalea, mueve pies)</option>
+                                        <option value="1">1 - Estable pero usa bastón/andador</option>
+                                        <option value="2">2 - Estable sin apoyo</option>
                                     </select>
                                 </div>
                             </div>
@@ -1097,9 +1360,9 @@
                                 <div class="question-label">5. Equilibrio de pie</div>
                                 <div class="question-input">
                                     <select class="form-select tinetti-option" data-category="balance" data-question="5" onchange="calcularTinetti()">
-                                        <option value="2">2 - Estable sin apoyo estrecho</option>
-                                        <option value="1">1 - Estable con apoyo amplio o usa bastón/andador</option>
                                         <option value="0">0 - Inestable</option>
+                                        <option value="1">1 - Estable con apoyo amplio o usa bastón/andador</option>
+                                        <option value="2">2 - Estable sin apoyo estrecho</option>
                                     </select>
                                 </div>
                             </div>
@@ -1108,8 +1371,8 @@
                                 <div class="question-label">6. Equilibrio con ojos cerrados</div>
                                 <div class="question-input">
                                     <select class="form-select tinetti-option" data-category="balance" data-question="6" onchange="calcularTinetti()">
-                                        <option value="1">1 - Estable</option>
                                         <option value="0">0 - Inestable</option>
+                                        <option value="1">1 - Estable</option>
                                     </select>
                                 </div>
                             </div>
@@ -1118,9 +1381,9 @@
                                 <div class="question-label">7. Girar 360 grados</div>
                                 <div class="question-input">
                                     <select class="form-select tinetti-option" data-category="balance" data-question="7" onchange="calcularTinetti()">
-                                        <option value="2">2 - Continuo y estable</option>
-                                        <option value="1">1 - Pasos continuos</option>
                                         <option value="0">0 - Pasos discontinuos</option>
+                                        <option value="1">1 - Pasos continuos</option>
+                                        <option value="2">2 - Continuo y estable</option>
                                     </select>
                                 </div>
                             </div>
@@ -1129,9 +1392,9 @@
                                 <div class="question-label">8. Sentarse</div>
                                 <div class="question-input">
                                     <select class="form-select tinetti-option" data-category="balance" data-question="8" onchange="calcularTinetti()">
-                                        <option value="2">2 - Seguro, movimientos suaves</option>
-                                        <option value="1">1 - Usa brazos o no es suave</option>
                                         <option value="0">0 - Inseguro (mal alineamiento, distancia)</option>
+                                        <option value="1">1 - Usa brazos o no es suave</option>
+                                        <option value="2">2 - Seguro, movimientos suaves</option>
                                     </select>
                                 </div>
                             </div>
@@ -1145,8 +1408,8 @@
                                 <div class="question-label">9. Inicio de la marcha</div>
                                 <div class="question-input">
                                     <select class="form-select tinetti-option" data-category="gait" data-question="9" onchange="calcularTinetti()">
-                                        <option value="1">1 - Sin vacilación</option>
                                         <option value="0">0 - Cualquier vacilación o múltiples intentos</option>
+                                        <option value="1">1 - Sin vacilación</option>
                                     </select>
                                 </div>
                             </div>
@@ -1155,8 +1418,8 @@
                                 <div class="question-label">10. Longitud y altura del paso (pie derecho)</div>
                                 <div class="question-input">
                                     <select class="form-select tinetti-option" data-category="gait" data-question="10" onchange="calcularTinetti()">
-                                        <option value="1">1 - Pasa al derecho</option>
                                         <option value="0">0 - Pie izquierdo no pasa al derecho</option>
+                                        <option value="1">1 - Pasa al derecho</option>
                                     </select>
                                 </div>
                             </div>
@@ -1165,8 +1428,8 @@
                                 <div class="question-label">11. Longitud y altura del paso (pie izquierdo)</div>
                                 <div class="question-input">
                                     <select class="form-select tinetti-option" data-category="gait" data-question="11" onchange="calcularTinetti()">
-                                        <option value="1">1 - Pasa al izquierdo</option>
                                         <option value="0">0 - Pie derecho no pasa al izquierdo</option>
+                                        <option value="1">1 - Pasa al izquierdo</option>
                                     </select>
                                 </div>
                             </div>
@@ -1175,8 +1438,8 @@
                                 <div class="question-label">12. Simetría del paso</div>
                                 <div class="question-input">
                                     <select class="form-select tinetti-option" data-category="gait" data-question="12" onchange="calcularTinetti()">
-                                        <option value="1">1 - Simétrico</option>
                                         <option value="0">0 - Asimétrico</option>
+                                        <option value="1">1 - Simétrico</option>
                                     </select>
                                 </div>
                             </div>
@@ -1185,8 +1448,8 @@
                                 <div class="question-label">13. Continuidad del paso</div>
                                 <div class="question-input">
                                     <select class="form-select tinetti-option" data-category="gait" data-question="13" onchange="calcularTinetti()">
-                                        <option value="1">1 - Continuo</option>
                                         <option value="0">0 - Interrumpido o discontinuo</option>
+                                        <option value="1">1 - Continuo</option>
                                     </select>
                                 </div>
                             </div>
@@ -1195,9 +1458,9 @@
                                 <div class="question-label">14. Desviación de la marcha</div>
                                 <div class="question-input">
                                     <select class="form-select tinetti-option" data-category="gait" data-question="14" onchange="calcularTinetti()">
-                                        <option value="2">2 - Sin desviación</option>
-                                        <option value="1">1 - Se desvía levemente/usa dispositivo</option>
                                         <option value="0">0 - Se desvía marcadamente</option>
+                                        <option value="1">1 - Se desvía levemente/usa dispositivo</option>
+                                        <option value="2">2 - Sin desviación</option>
                                     </select>
                                 </div>
                             </div>
@@ -1206,9 +1469,9 @@
                                 <div class="question-label">15. Tronco</div>
                                 <div class="question-input">
                                     <select class="form-select tinetti-option" data-category="gait" data-question="15" onchange="calcularTinetti()">
-                                        <option value="2">2 - Sin oscilación, sin flexión</option>
-                                        <option value="1">1 - Sin oscilación pero flexión rodillas/espalda</option>
                                         <option value="0">0 - Marcada oscilación o usa dispositivo</option>
+                                        <option value="1">1 - Sin oscilación pero flexión rodillas/espalda</option>
+                                        <option value="2">2 - Sin oscilación, sin flexión</option>
                                     </select>
                                 </div>
                             </div>
@@ -1217,8 +1480,8 @@
                                 <div class="question-label">16. Base de sustentación</div>
                                 <div class="question-input">
                                     <select class="form-select tinetti-option" data-category="gait" data-question="16" onchange="calcularTinetti()">
-                                        <option value="1">1 - Talones casi juntos al caminar</option>
                                         <option value="0">0 - Talones separados al caminar</option>
+                                        <option value="1">1 - Talones casi juntos al caminar</option>
                                     </select>
                                 </div>
                             </div>
@@ -1228,7 +1491,14 @@
                     <div class="score-display" style="background: linear-gradient(135deg, var(--warning) 0%, #ffb74d 100%);">
                         <div class="score-label">Puntaje Total Tinetti</div>
                         <div class="score-value" id="puntajeTinetti">0</div>
-                        <div class="score-label">Interpretación: ≥25 (Bajo riesgo) | 19-24 (Riesgo moderado) | ≤18 (Alto riesgo)</div>
+                        <div class="score-label">
+                            <strong>Interpretación:</strong><br>
+                            ≥25 (Bajo riesgo) | 19-24 (Riesgo moderado) | ≤18 (Alto riesgo)
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <strong>Nota:</strong> Este puntaje representa el 35% del Índice de Ayuda Técnica final.
                     </div>
                     
                     <div class="d-flex justify-content-between mt-4">
@@ -1249,7 +1519,7 @@
                         </div>
                         <div>
                             <h2 class="section-title">Escala Norton Modificada</h2>
-                            <p class="section-subtitle">Evaluación de riesgo de úlceras por presión (Puntaje máximo: 20 puntos)</p>
+                            <p class="section-subtitle">Evaluación de riesgo de úlceras por presión (30% del índice)</p>
                         </div>
                     </div>
                     
@@ -1262,6 +1532,7 @@
                                 <option value="2">2 - Malo (2 puntos)</option>
                                 <option value="1">1 - Muy malo (1 punto)</option>
                             </select>
+                            <small class="text-muted">Estado general de salud y nutrición</small>
                         </div>
                         
                         <div>
@@ -1272,6 +1543,7 @@
                                 <option value="2">2 - Confuso o desorientado (2 puntos)</option>
                                 <option value="1">1 - Estuporoso o comatoso (1 punto)</option>
                             </select>
+                            <small class="text-muted">Nivel de conciencia y orientación</small>
                         </div>
                         
                         <div>
@@ -1282,6 +1554,7 @@
                                 <option value="2">2 - Sentado en silla (2 puntos)</option>
                                 <option value="1">1 - Encamado (1 punto)</option>
                             </select>
+                            <small class="text-muted">Nivel de actividad física</small>
                         </div>
                         
                         <div>
@@ -1292,6 +1565,7 @@
                                 <option value="2">2 - Muy limitada (2 puntos)</option>
                                 <option value="1">1 - Inmóvil (1 punto)</option>
                             </select>
+                            <small class="text-muted">Capacidad para moverse en la cama</small>
                         </div>
                         
                         <div>
@@ -1302,13 +1576,21 @@
                                 <option value="2">2 - Urinaria (2 puntos)</option>
                                 <option value="1">1 - Urinaria y fecal (1 punto)</option>
                             </select>
+                            <small class="text-muted">Control de esfínteres</small>
                         </div>
                     </div>
                     
                     <div class="score-display" style="background: linear-gradient(135deg, var(--success) 0%, #66bb6a 100%);">
                         <div class="score-label">Puntaje Total Norton</div>
                         <div class="score-value" id="puntajeNorton">20</div>
-                        <div class="score-label">Interpretación: 20-16 (Bajo riesgo) | 15-12 (Riesgo) | ≤11 (Alto riesgo)</div>
+                        <div class="score-label">
+                            <strong>Interpretación:</strong><br>
+                            20-16 (Bajo riesgo) | 15-12 (Riesgo) | ≤11 (Alto riesgo)
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <strong>Nota:</strong> Este puntaje representa el 30% del Índice de Ayuda Técnica final.
                     </div>
                     
                     <div class="d-flex justify-content-between mt-4">
@@ -1316,12 +1598,12 @@
                             <i class="fas fa-arrow-left"></i> Anterior
                         </button>
                         <button class="btn btn-danger" onclick="generarResultados()">
-                            Calcular Resultados <i class="fas fa-calculator"></i>
+                            Calcular Resultados Completos <i class="fas fa-calculator"></i>
                         </button>
                     </div>
                 </section>
 
-                <!-- RESULTADOS CON ÍNDICE DE AYUDA TÉCNICA -->
+                <!-- RESULTADOS COMPLETOS -->
                 <section class="content-section" id="resultadosSection" style="display: none;">
                     <div class="section-header">
                         <div class="section-icon">
@@ -1370,6 +1652,18 @@
                         </div>
                     </div>
                     
+                    <!-- RECOMENDACIONES DETALLADAS POR ESCALA -->
+                    <div class="recomendaciones-detalladas" id="recomendacionesDetalladas">
+                        <h5><i class="fas fa-clipboard-check"></i> Recomendaciones Específicas por Escala</h5>
+                        <!-- Recomendaciones detalladas se generan aquí -->
+                    </div>
+                    
+                    <!-- PLAN DE INTERVENCIÓN -->
+                    <div class="mt-4" id="planIntervencion">
+                        <h5><i class="fas fa-tasks"></i> Plan de Intervención Sugerido</h5>
+                        <!-- Plan de intervención se genera aquí -->
+                    </div>
+                    
                     <!-- TABLA DE AYUDAS TÉCNICAS -->
                     <div class="mt-4">
                         <h5><i class="fas fa-table"></i> Guía de Ayudas Técnicas por Nivel de Riesgo</h5>
@@ -1379,7 +1673,7 @@
                                     <th>Índice</th>
                                     <th>Nivel de Riesgo</th>
                                     <th>Ayuda Técnica Recomendada</th>
-                                    <th>Intervenciones Adicionales</th>
+                                    <th>Frecuencia de Seguimiento</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1387,53 +1681,51 @@
                                     <td>0-3</td>
                                     <td><span class="nivel-riesgo nivel-bajo">BAJO</span></td>
                                     <td>Supervisión básica, bastón simple</td>
-                                    <td>Ejercicios preventivos, evaluación periódica</td>
+                                    <td>Cada 6 meses</td>
                                 </tr>
                                 <tr>
                                     <td>4-6</td>
                                     <td><span class="nivel-riesgo nivel-moderado">MODERADO</span></td>
                                     <td>Bastón con base amplia, andador sin ruedas</td>
-                                    <td>Rehabilitación ambulatoria, adaptación domiciliaria</td>
+                                    <td>Cada 3 meses</td>
                                 </tr>
                                 <tr>
                                     <td>7-9</td>
                                     <td><span class="nivel-riesgo nivel-alto">ALTO</span></td>
                                     <td>Andador con ruedas, silla de ruedas para distancias largas</td>
-                                    <td>Terapia intensiva, evaluación por equipo multidisciplinario</td>
+                                    <td>Mensual</td>
                                 </tr>
                                 <tr>
                                     <td>10+</td>
                                     <td><span class="nivel-riesgo nivel-critico">CRÍTICO</span></td>
                                     <td>Silla de ruedas eléctrica, dispositivo de transferencia</td>
-                                    <td>Hospitalización/rehabilitación intensiva, asistencia permanente</td>
+                                    <td>Semanal o según necesidad</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                     
-                    <!-- RECOMENDACIONES GENERALES -->
-                    <div class="mt-4" id="recomendacionesContainer">
-                        <!-- Recomendaciones se generan aquí -->
-                    </div>
-                    
-                    <!-- BOTONES DE ACCIÓN -->
-                    <div class="d-flex gap-3 mt-4">
-                        <button class="btn btn-primary" onclick="openShareModal()">
-                            <i class="fas fa-share-alt"></i> Compartir
-                        </button>
+                    <!-- BOTONES DE ACCIÓN PROFESIONAL -->
+                    <div class="d-flex gap-3 mt-4 flex-wrap">
                         <button class="btn btn-success" onclick="saveReport()">
-                            <i class="fas fa-save"></i> Guardar
+                            <i class="fas fa-save"></i> Guardar en Base de Datos
                         </button>
                         <button class="btn btn-danger" onclick="downloadPDF()">
-                            <i class="fas fa-file-pdf"></i> PDF
+                            <i class="fas fa-file-pdf"></i> Descargar PDF Profesional
                         </button>
-                        <button class="btn btn-secondary" onclick="navigateTo('inicio')">
-                            <i class="fas fa-home"></i> Inicio
+                        <button class="btn btn-primary" onclick="openShareModal()">
+                            <i class="fas fa-share-alt"></i> Compartir Resultados
+                        </button>
+                        <button class="btn btn-warning" onclick="imprimirResultados()">
+                            <i class="fas fa-print"></i> Imprimir
+                        </button>
+                        <button class="btn btn-secondary" onclick="nuevaEvaluacion()">
+                            <i class="fas fa-plus"></i> Nueva Evaluación
                         </button>
                     </div>
                 </section>
 
-                <!-- HISTORIAL -->
+                <!-- HISTORIAL COMPLETO -->
                 <section class="content-section" id="historialSection" style="display: none;">
                     <div class="section-header">
                         <div class="section-icon">
@@ -1441,24 +1733,189 @@
                         </div>
                         <div>
                             <h2 class="section-title">Historial de Evaluaciones</h2>
-                            <p class="section-subtitle">Acceda a evaluaciones anteriores y realice seguimiento de pacientes</p>
+                            <p class="section-subtitle">Gestión completa de evaluaciones anteriores</p>
                         </div>
                     </div>
                     
-                    <div class="d-flex justify-content-between mb-4">
-                        <button class="btn btn-primary" onclick="loadHistorial()">
-                            <i class="fas fa-sync-alt"></i> Actualizar
-                        </button>
-                        <div class="d-flex gap-2">
-                            <input type="text" class="form-control" placeholder="Buscar paciente..." id="searchHistorial">
-                            <button class="btn btn-secondary">
-                                <i class="fas fa-search"></i>
-                            </button>
+                    <!-- FILTROS DE BÚSQUEDA -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h6 class="mb-3">Filtros de Búsqueda</h6>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" placeholder="Nombre paciente" id="searchNombre">
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="date" class="form-control" id="searchFechaDesde">
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="date" class="form-control" id="searchFechaHasta">
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" id="searchRiesgo">
+                                        <option value="">Todos los riesgos</option>
+                                        <option value="bajo">Bajo</option>
+                                        <option value="moderado">Moderado</option>
+                                        <option value="alto">Alto</option>
+                                        <option value="critico">Crítico</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" placeholder="Evaluador o diagnóstico" id="searchGeneral">
+                                </div>
+                                <div class="col-md-3">
+                                    <button class="btn btn-primary w-100" onclick="buscarHistorial()">
+                                        <i class="fas fa-search"></i> Buscar
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
+                    <!-- ESTADÍSTICAS RÁPIDAS -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 id="historialTotal">0</h5>
+                                    <small class="text-muted">Total evaluaciones</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 id="historialRiesgoAlto">0</h5>
+                                    <small class="text-muted">Riesgo alto/crítico</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 id="historialUltimoMes">0</h5>
+                                    <small class="text-muted">Últimos 30 días</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 id="historialPacientes">0</h5>
+                                    <small class="text-muted">Pacientes únicos</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- LISTA DE HISTORIAL -->
                     <div class="history-list" id="historialList">
                         <!-- Historial se carga aquí -->
+                    </div>
+                    
+                    <!-- PAGINACIÓN -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <button class="btn btn-outline-secondary" onclick="cargarMasHistorial()">
+                            <i class="fas fa-arrow-down"></i> Cargar más
+                        </button>
+                        <button class="btn btn-success" onclick="exportarHistorialCSV()">
+                            <i class="fas fa-file-csv"></i> Exportar CSV
+                        </button>
+                    </div>
+                </section>
+
+                <!-- CONFIGURACIÓN -->
+                <section class="content-section" id="configuracionSection" style="display: none;">
+                    <div class="section-header">
+                        <div class="section-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <div>
+                            <h2 class="section-title">Configuración del Sistema</h2>
+                            <p class="section-subtitle">Ajustes y preferencias del usuario profesional</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fas fa-user-cog"></i> Perfil Profesional</h5>
+                                    <div class="mb-3">
+                                        <label class="form-label">Nombre Completo</label>
+                                        <input type="text" class="form-control" id="configNombre" placeholder="Dr. Juan Pérez">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Especialidad</label>
+                                        <input type="text" class="form-control" id="configEspecialidad" placeholder="Kinesiología">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Institución Principal</label>
+                                        <input type="text" class="form-control" id="configInstitucion" placeholder="Hospital Regional">
+                                    </div>
+                                    <button class="btn btn-primary" onclick="guardarConfiguracion()">
+                                        <i class="fas fa-save"></i> Guardar Perfil
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fas fa-chart-pie"></i> Preferencias de Visualización</h5>
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="configAutoCalcular">
+                                            <label class="form-check-label">
+                                                Cálculo automático al cambiar valores
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="configNotificaciones" checked>
+                                            <label class="form-check-label">
+                                                Notificaciones del sistema
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Tema de colores</label>
+                                        <select class="form-select" id="configTema">
+                                            <option value="claro">Claro</option>
+                                            <option value="oscuro">Oscuro</option>
+                                            <option value="profesional">Profesional</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-database"></i> Gestión de Datos</h5>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <button class="btn btn-outline-primary w-100 mb-2" onclick="backupLocal()">
+                                        <i class="fas fa-download"></i> Backup Local
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <button class="btn btn-outline-warning w-100 mb-2" onclick="limpiarCache()">
+                                        <i class="fas fa-broom"></i> Limpiar Cache
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <button class="btn btn-outline-danger w-100 mb-2" onclick="exportarTodoDatos()">
+                                        <i class="fas fa-file-export"></i> Exportar Todo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
             </div>
@@ -1470,11 +1927,12 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         // ============================================
-        // CONFIGURACIÓN FIREBASE
+        // CONFIGURACIÓN FIREBASE PROFESIONAL
         // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyDJbtRuEwWVAsC1Nz6LbeF5a99LcUfAz4g",
@@ -1490,9 +1948,12 @@
         let currentUser = null;
         let lastReportData = null;
         let currentSection = 'inicio';
+        let userProfile = null;
+        let historialLimit = 10;
+        let historialOffset = 0;
 
         // ============================================
-        // INICIALIZACIÓN
+        // INICIALIZACIÓN PROFESIONAL
         // ============================================
         function initApp() {
             try {
@@ -1507,13 +1968,22 @@
                 
                 console.log("✅ Firebase inicializado correctamente");
                 
+                // Configurar fecha actual
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('fecha').value = today;
                 document.getElementById('puntajeNorton').textContent = "20";
                 
+                // Configurar cálculo de edad
+                document.getElementById('fechaNacimiento').addEventListener('change', calcularEdad);
+                
+                // Escuchar cambios de autenticación
                 auth.onAuthStateChanged(handleAuthStateChange);
                 
-                createTestAccount();
+                // Cargar configuración local
+                cargarConfiguracionLocal();
+                
+                // Crear cuenta de prueba profesional
+                crearCuentaPruebaProfesional();
                 
             } catch (error) {
                 console.error("❌ Error de inicialización:", error);
@@ -1522,25 +1992,38 @@
             }
         }
 
-        async function createTestAccount() {
+        async function crearCuentaPruebaProfesional() {
             try {
-                await auth.signInWithEmailAndPassword("test@test.com", "123456");
-                showNotification("✅ Modo de prueba activado", "success");
+                // Verificar si ya existe usuario
+                const email = "profesional@hospital.cl";
+                const password = "Hospital123";
+                
+                try {
+                    await auth.signInWithEmailAndPassword(email, password);
+                    showNotification("✅ Modo profesional activado", "success");
+                } catch (error) {
+                    if (error.code === 'auth/user-not-found') {
+                        // Crear cuenta profesional de prueba
+                        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                        await userCredential.user.sendEmailVerification();
+                        console.log("✅ Cuenta profesional de prueba creada");
+                    }
+                }
             } catch (error) {
-                console.log("Cuenta de prueba no existe");
+                console.log("Cuenta profesional ya existe o no se pudo crear");
             }
         }
 
         function setupOfflineMode() {
-            console.log("🔧 Configurando modo offline para desarrollo");
+            console.log("🔧 Configurando modo offline profesional");
             document.getElementById('authSection').style.display = 'none';
             document.getElementById('appSections').style.display = 'block';
             document.getElementById('userInfo').style.display = 'none';
             navigateTo('inicio');
-            showNotification('Modo desarrollo: Funciones offline activadas', 'warning');
+            showNotification('Modo profesional offline activado', 'warning');
         }
 
-        function handleAuthStateChange(user) {
+        async function handleAuthStateChange(user) {
             currentUser = user;
             
             if (user) {
@@ -1548,9 +2031,17 @@
                 document.getElementById('appSections').style.display = 'block';
                 document.getElementById('userInfo').style.display = 'flex';
                 document.getElementById('currentUserEmail').textContent = user.email;
+                
+                // Cargar perfil profesional
+                await cargarPerfilProfesional();
+                
                 navigateTo('inicio');
+                
+                // Cargar estadísticas
+                cargarEstadisticasInicio();
                 loadHistorial();
-                showNotification(`👋 Bienvenido/a ${user.email}`, 'success');
+                
+                showNotification(`👨‍⚕️ Bienvenido/a ${userProfile?.nombre || 'Profesional'}`, 'success');
             } else {
                 document.getElementById('authSection').style.display = 'block';
                 document.getElementById('appSections').style.display = 'none';
@@ -1560,8 +2051,38 @@
             }
         }
 
+        async function cargarPerfilProfesional() {
+            if (!currentUser) return;
+            
+            try {
+                const doc = await db.collection('profesionales').doc(currentUser.uid).get();
+                if (doc.exists) {
+                    userProfile = doc.data();
+                    document.getElementById('currentUserEmail').textContent = userProfile.email;
+                    document.getElementById('userRole').textContent = userProfile.especialidad || 'Profesional de Salud';
+                    
+                    // Cargar configuración
+                    document.getElementById('configNombre').value = userProfile.nombre || '';
+                    document.getElementById('configEspecialidad').value = userProfile.especialidad || '';
+                    document.getElementById('configInstitucion').value = userProfile.institucion || '';
+                } else {
+                    // Crear perfil básico
+                    userProfile = {
+                        email: currentUser.email,
+                        nombre: '',
+                        especialidad: '',
+                        institucion: '',
+                        fechaRegistro: new Date().toISOString()
+                    };
+                    await db.collection('profesionales').doc(currentUser.uid).set(userProfile);
+                }
+            } catch (error) {
+                console.error("Error cargando perfil:", error);
+            }
+        }
+
         // ============================================
-        // NAVEGACIÓN
+        // NAVEGACIÓN PROFESIONAL
         // ============================================
         function navigateTo(section) {
             console.log(`🔄 Navegando a: ${section}`);
@@ -1602,6 +2123,9 @@
                 case 'historial':
                     sectionId = 'historialSection';
                     break;
+                case 'configuracion':
+                    sectionId = 'configuracionSection';
+                    break;
                 default:
                     sectionId = 'inicioSection';
             }
@@ -1618,6 +2142,8 @@
                     calcularTinetti();
                 } else if (section === 'norton') {
                     calcularNorton();
+                } else if (section === 'historial') {
+                    cargarEstadisticasHistorial();
                 }
             } else {
                 console.error(`❌ No se encontró la sección: ${sectionId}`);
@@ -1629,31 +2155,33 @@
 
         function updatePageTitle(section) {
             const titles = {
-                'inicio': 'Inicio - Evaluador Clínico',
+                'inicio': 'Inicio - Sistema Profesional',
                 'datos-paciente': 'Datos del Paciente',
-                'irat-5': 'IRAT-5 Modificado',
-                'tinetti': 'Test de Tinetti Completo',
-                'norton': 'Escala Norton Modificada',
+                'irat-5': 'IRAT-5 Modificado (35%)',
+                'tinetti': 'Test de Tinetti (35%)',
+                'norton': 'Escala Norton (30%)',
                 'resultados': 'Resultados Integrales',
-                'historial': 'Historial de Evaluaciones'
+                'historial': 'Historial de Evaluaciones',
+                'configuracion': 'Configuración del Sistema'
             };
             
             const subtitles = {
-                'inicio': 'Sistema integrado de evaluación clínica',
-                'datos-paciente': 'Complete la información del paciente',
-                'irat-5': 'Evaluación de riesgo de amputación y caídas (35% del índice)',
-                'tinetti': 'Evaluación de marcha y equilibrio (35% del índice)',
-                'norton': 'Evaluación de riesgo de úlceras por presión (30% del índice)',
-                'resultados': 'Análisis combinado de las tres escalas',
-                'historial': 'Acceda a evaluaciones anteriores'
+                'inicio': 'Sistema profesional de evaluación clínica',
+                'datos-paciente': 'Información demográfica y clínica',
+                'irat-5': 'Evaluación de riesgo de amputación y caídas',
+                'tinetti': 'Evaluación de marcha y equilibrio',
+                'norton': 'Evaluación de riesgo de úlceras por presión',
+                'resultados': 'Análisis combinado y recomendaciones',
+                'historial': 'Gestión completa de evaluaciones',
+                'configuracion': 'Ajustes y preferencias del usuario'
             };
             
-            document.getElementById('pageTitle').textContent = titles[section] || 'Evaluador Clínico';
-            document.getElementById('pageSubtitle').textContent = subtitles[section] || 'Sistema integrado';
+            document.getElementById('pageTitle').textContent = titles[section] || 'Sistema Profesional';
+            document.getElementById('pageSubtitle').textContent = subtitles[section] || 'Evaluador Clínico Integrado';
         }
 
         // ============================================
-        // AUTENTICACIÓN
+        // AUTENTICACIÓN PROFESIONAL
         // ============================================
         async function handleAuth() {
             const email = document.getElementById('authEmail').value.trim();
@@ -1666,15 +2194,28 @@
             
             const button = document.getElementById('authButton');
             const originalHTML = button.innerHTML;
-            button.innerHTML = '<div class="loader"></div>';
+            button.innerHTML = '<div class="loader"></div> Verificando...';
             button.disabled = true;
             
             try {
                 if (authMode === 'register') {
-                    await auth.createUserWithEmailAndPassword(email, password);
-                    showNotification('✅ Cuenta creada exitosamente', 'success');
+                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                    await userCredential.user.sendEmailVerification();
+                    
+                    // Crear perfil profesional
+                    await db.collection('profesionales').doc(userCredential.user.uid).set({
+                        email: email,
+                        nombre: '',
+                        especialidad: '',
+                        institucion: '',
+                        fechaRegistro: new Date().toISOString(),
+                        rol: 'profesional'
+                    });
+                    
+                    showNotification('✅ Cuenta profesional creada. Verifique su email.', 'success');
                 } else {
                     await auth.signInWithEmailAndPassword(email, password);
+                    showNotification('✅ Acceso concedido', 'success');
                 }
             } catch (error) {
                 console.error("Error de autenticación:", error);
@@ -1691,9 +2232,12 @@
                 'auth/wrong-password': 'Contraseña incorrecta',
                 'auth/email-already-in-use': 'El correo ya está registrado',
                 'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres',
-                'auth/invalid-email': 'Correo electrónico inválido'
+                'auth/invalid-email': 'Correo electrónico inválido',
+                'auth/email-not-verified': 'Verifique su email antes de ingresar',
+                'auth/too-many-requests': 'Demasiados intentos. Intente más tarde.',
+                'auth/network-request-failed': 'Error de conexión. Revise su internet.'
             };
-            return errors[code] || 'Error de autenticación';
+            return errors[code] || 'Error de autenticación. Código: ' + code;
         }
 
         function toggleAuthMode() {
@@ -1703,10 +2247,10 @@
 
         function updateAuthUI() {
             const elements = {
-                authTitle: authMode === 'login' ? 'Acceso Profesional' : 'Crear Nueva Cuenta',
-                authSubtitle: authMode === 'login' ? 'Ingrese sus credenciales para acceder al sistema' : 'Registre una nueva cuenta profesional',
+                authTitle: authMode === 'login' ? 'Acceso Profesional' : 'Registro Profesional',
+                authSubtitle: authMode === 'login' ? 'Ingrese sus credenciales para acceder al sistema' : 'Registre su cuenta profesional',
                 authButtonText: authMode === 'login' ? 'Iniciar Sesión' : 'Registrarse',
-                toggleAuthText: authMode === 'login' ? 'Crear nueva cuenta' : 'Ya tengo una cuenta'
+                toggleAuthText: authMode === 'login' ? 'Registrarse como profesional' : 'Ya tengo una cuenta'
             };
             
             Object.keys(elements).forEach(id => {
@@ -1718,6 +2262,66 @@
         function logout() {
             auth.signOut();
             showNotification('✅ Sesión cerrada correctamente', 'success');
+        }
+
+        // ============================================
+        // FUNCIONES DE DATOS DEL PACIENTE
+        // ============================================
+        function calcularEdad() {
+            const fechaNacimiento = document.getElementById('fechaNacimiento').value;
+            if (fechaNacimiento) {
+                const hoy = new Date();
+                const nacimiento = new Date(fechaNacimiento);
+                let edad = hoy.getFullYear() - nacimiento.getFullYear();
+                const m = hoy.getMonth() - nacimiento.getMonth();
+                if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
+                    edad--;
+                }
+                document.getElementById('edad').value = edad;
+            }
+        }
+
+        function validarDatosPaciente() {
+            const requiredFields = [
+                {id: 'nombre', name: 'Nombre Completo'},
+                {id: 'rut', name: 'RUT'},
+                {id: 'fecha', name: 'Fecha de Evaluación'},
+                {id: 'evaluador', name: 'Evaluador'},
+                {id: 'institucion', name: 'Institución'}
+            ];
+            
+            const missingFields = [];
+            
+            requiredFields.forEach(field => {
+                const elemento = document.getElementById(field.id);
+                if (!elemento.value.trim()) {
+                    missingFields.push(field.name);
+                    elemento.style.borderColor = 'var(--danger)';
+                } else {
+                    elemento.style.borderColor = '';
+                }
+            });
+            
+            if (missingFields.length > 0) {
+                showNotification(`Complete los campos obligatorios: ${missingFields.join(', ')}`, 'warning');
+                return;
+            }
+            
+            // Validar formato de RUT
+            const rut = document.getElementById('rut').value.trim();
+            if (!validarRUT(rut)) {
+                showNotification('El RUT ingresado no es válido', 'warning');
+                document.getElementById('rut').style.borderColor = 'var(--danger)';
+                return;
+            }
+            
+            navigateTo('irat-5');
+        }
+
+        function validarRUT(rut) {
+            // Validación simple de RUT chileno
+            if (!rut || rut.length < 8) return false;
+            return true;
         }
 
         // ============================================
@@ -1764,90 +2368,141 @@
             console.log("📊 Calculando Índice de Ayuda Técnica (35-35-30)...");
             
             // Normalizar puntajes a escala 0-10
-            // IRAT: 0-18 -> 0-10 (mayor puntaje = mayor riesgo)
             const iratNormalizado = (iratScore / 18) * 10;
-            
-            // Tinetti: 0-28 -> 0-10 (menor puntaje = mayor riesgo)
             const tinettiNormalizado = ((28 - tinettiScore) / 28) * 10;
-            
-            // Norton: 4-20 -> 0-10 (menor puntaje = mayor riesgo)
             const nortonNormalizado = ((20 - nortonScore) / 16) * 10;
             
             // APLICAR PONDERACIÓN 35-35-30
             const indicePonderado = (iratNormalizado * 0.35) + (tinettiNormalizado * 0.35) + (nortonNormalizado * 0.30);
             
-            // Redondear a 1 decimal
             const indiceFinal = Math.round(indicePonderado * 10) / 10;
             
             console.log(`Cálculos con ponderación 35-35-30:`);
-            console.log(`- IRAT (${iratScore}): ${iratNormalizado.toFixed(2)} × 35% = ${(iratNormalizado * 0.35).toFixed(2)}`);
-            console.log(`- Tinetti (${tinettiScore}): ${tinettiNormalizado.toFixed(2)} × 35% = ${(tinettiNormalizado * 0.35).toFixed(2)}`);
-            console.log(`- Norton (${nortonScore}): ${nortonNormalizado.toFixed(2)} × 30% = ${(nortonNormalizado * 0.30).toFixed(2)}`);
+            console.log(`- IRAT: ${iratNormalizado.toFixed(2)} × 35%`);
+            console.log(`- Tinetti: ${tinettiNormalizado.toFixed(2)} × 35%`);
+            console.log(`- Norton: ${nortonNormalizado.toFixed(2)} × 30%`);
             console.log(`- Índice final: ${indiceFinal}`);
             
             return indiceFinal;
         }
 
-        function determinarAyudaTecnica(indice) {
-            let nivelRiesgo = '';
-            let ayudaTecnica = '';
-            let recomendaciones = [];
-            let color = '';
+        // ============================================
+        // RECOMENDACIONES DETALLADAS
+        // ============================================
+        function generarRecomendacionesDetalladas(iratScore, tinettiScore, nortonScore, classification) {
+            const recomendaciones = [];
             
-            if (indice <= 3) {
-                nivelRiesgo = 'BAJO';
-                color = 'success';
-                ayudaTecnica = 'Supervisión básica y bastón simple';
-                recomendaciones = [
-                    'Realizar ejercicios de equilibrio preventivos',
-                    'Evaluación semestral de marcha',
-                    'Modificaciones menores en el hogar',
-                    'Uso de calzado adecuado con suela antideslizante'
-                ];
-            } else if (indice <= 6) {
-                nivelRiesgo = 'MODERADO';
-                color = 'warning';
-                ayudaTecnica = 'Bastón con base amplia o andador sin ruedas';
-                recomendaciones = [
-                    'Rehabilitación ambulatoria 2-3 veces por semana',
-                    'Evaluación por terapeuta ocupacional',
-                    'Adaptación domiciliaria: barras de apoyo',
-                    'Uso de dispositivo de alerta para caídas'
-                ];
-            } else if (indice <= 9) {
-                nivelRiesgo = 'ALTO';
-                color = 'danger';
-                ayudaTecnica = 'Andador con ruedas o silla de ruedas para distancias largas';
-                recomendaciones = [
-                    'Rehabilitación intensiva (mínimo 3 veces por semana)',
-                    'Evaluación por equipo multidisciplinario',
-                    'Adaptaciones mayores en el hogar',
-                    'Considerar silla de ruedas para desplazamientos externos'
-                ];
-            } else {
-                nivelRiesgo = 'CRÍTICO';
-                color = 'danger';
-                ayudaTecnica = 'Silla de ruedas eléctrica y dispositivo de transferencia';
-                recomendaciones = [
-                    'Hospitalización o rehabilitación intensiva hospitalaria',
-                    'Asistencia permanente para movilización',
-                    'Adaptaciones completas del domicilio',
-                    'Cuidado 24/7 por cuidador entrenado'
-                ];
+            // RECOMENDACIONES IRAT-5
+            if (iratScore >= 10) {
+                recomendaciones.push({
+                    escala: 'IRAT-5',
+                    tipo: 'danger',
+                    titulo: 'Evaluación Kinesiológica Urgente',
+                    descripcion: 'Alto riesgo de caídas. Requiere evaluación por kinesiólogo especializado en 72 horas.',
+                    acciones: [
+                        'Programar evaluación kinesiológica completa',
+                        'Considerar uso temporal de bastón o andador',
+                        'Evaluar adaptaciones domiciliarias inmediatas',
+                        'Educar al paciente y familiares sobre prevención de caídas'
+                    ]
+                });
+            } else if (iratScore >= 7) {
+                recomendaciones.push({
+                    escala: 'IRAT-5',
+                    tipo: 'warning',
+                    titulo: 'Rehabilitación de Equilibrio',
+                    descripcion: 'Riesgo moderado de caídas. Programa de ejercicios de equilibrio recomendado.',
+                    acciones: [
+                        'Iniciar programa de ejercicios de equilibrio 3 veces por semana',
+                        'Evaluar necesidad de dispositivo de asistencia',
+                        'Revisar medicamentos que afecten el equilibrio',
+                        'Control podológico si corresponde'
+                    ]
+                });
             }
             
-            return {
-                nivelRiesgo,
-                ayudaTecnica,
-                recomendaciones,
-                color
-            };
+            // RECOMENDACIONES TINETTI
+            if (tinettiScore <= 18) {
+                recomendaciones.push({
+                    escala: 'Tinetti',
+                    tipo: 'danger',
+                    titulo: 'Rehabilitación Intensiva de Marcha',
+                    descripcion: 'Alteración significativa de la marcha. Terapia física intensiva requerida.',
+                    acciones: [
+                        'Terapia física 3-5 veces por semana',
+                        'Entrenamiento específico de marcha y transferencias',
+                        'Evaluación por terapeuta ocupacional',
+                        'Uso de calzado adecuado y plantillas si corresponde'
+                    ]
+                });
+            } else if (tinettiScore <= 24) {
+                recomendaciones.push({
+                    escala: 'Tinetti',
+                    tipo: 'warning',
+                    titulo: 'Fortaleciimiento y Reeducación de Marcha',
+                    descripcion: 'Marcha con alteraciones moderadas. Programa de fortalecimiento recomendado.',
+                    acciones: [
+                        'Ejercicios de fortalecimiento de miembros inferiores',
+                        'Reeducación de la marcha 2-3 veces por semana',
+                        'Evaluación de barreras arquitectónicas',
+                        'Uso de ayudas técnicas según necesidad'
+                    ]
+                });
+            }
+            
+            // RECOMENDACIONES NORTON
+            if (nortonScore <= 11) {
+                recomendaciones.push({
+                    escala: 'Norton',
+                    tipo: 'danger',
+                    titulo: 'Prevención de Úlceras por Presión',
+                    descripcion: 'Alto riesgo de úlceras. Protocolo de prevención intensivo requerido.',
+                    acciones: [
+                        'Cambios posturales cada 2 horas',
+                        'Uso de colchón antiescaras especializado',
+                        'Evaluación nutricional completa',
+                        'Cuidados especiales de la piel'
+                    ]
+                });
+            } else if (nortonScore <= 15) {
+                recomendaciones.push({
+                    escala: 'Norton',
+                    tipo: 'warning',
+                    titulo: 'Cuidados Preventivos de Piel',
+                    descripcion: 'Riesgo de úlceras. Cuidados preventivos recomendados.',
+                    acciones: [
+                        'Cambios posturales cada 4 horas',
+                        'Uso de colchón antiescaras estándar',
+                        'Higiene y humectación de la piel',
+                        'Monitoreo diario de áreas de presión'
+                    ]
+                });
+            }
+            
+            // RECOMENDACIONES GLOBALES
+            if (classification.riesgoGlobal === 'CRÍTICO') {
+                recomendaciones.push({
+                    escala: 'Global',
+                    tipo: 'danger',
+                    titulo: 'Intervención Multidisciplinaria Urgente',
+                    descripcion: 'Paciente de muy alto riesgo. Evaluación por equipo completo requerida.',
+                    acciones: [
+                        'Evaluación por médico geriatra o internista',
+                        'Consulta con enfermera especializada',
+                        'Evaluación por trabajador social',
+                        'Plan de cuidados integral coordinado'
+                    ]
+                });
+            }
+            
+            return recomendaciones;
         }
 
         // ============================================
-        // GENERACIÓN DE RESULTADOS
+        // GENERACIÓN DE RESULTADOS COMPLETOS
         // ============================================
-        function generarResultados() {
+        async function generarResultados() {
+            // Validar datos del paciente
             const requiredFields = ['nombre', 'fecha', 'evaluador'];
             const missingFields = requiredFields.filter(field => {
                 const value = document.getElementById(field).value.trim();
@@ -1855,32 +2510,46 @@
             });
             
             if (missingFields.length > 0) {
-                showNotification('Complete los campos obligatorios (*) en Datos del Paciente', 'warning');
+                showNotification('Complete los campos obligatorios en Datos del Paciente', 'warning');
                 navigateTo('datos-paciente');
                 return;
             }
             
+            // Calcular puntajes
             const iratScore = calcularIRAT();
             const tinettiScore = calcularTinetti();
             const nortonScore = calcularNorton();
             
+            // Actualizar visualización
             document.getElementById('pondIrat').textContent = `${iratScore} pts`;
             document.getElementById('pondTinetti').textContent = `${tinettiScore} pts`;
             document.getElementById('pondNorton').textContent = `${nortonScore} pts`;
             
+            // Clasificar resultados
             const classification = classifyResults(iratScore, tinettiScore, nortonScore);
             
+            // Calcular índice
             const indiceAyuda = calcularIndiceAyudaTecnica(iratScore, tinettiScore, nortonScore);
             const ayudaTecnica = determinarAyudaTecnica(indiceAyuda);
             
+            // Generar recomendaciones detalladas
+            const recomendacionesDetalladas = generarRecomendacionesDetalladas(iratScore, tinettiScore, nortonScore, classification);
+            
+            // Guardar datos del reporte
             lastReportData = {
                 paciente: {
                     nombre: document.getElementById('nombre').value,
                     rut: document.getElementById('rut').value,
-                    fecha: document.getElementById('fecha').value,
+                    fechaNacimiento: document.getElementById('fechaNacimiento').value,
                     edad: document.getElementById('edad').value,
+                    genero: document.getElementById('genero').value,
+                    diagnostico: document.getElementById('diagnostico').value,
+                    comorbilidades: document.getElementById('comorbilidades').value,
+                    fecha: document.getElementById('fecha').value,
                     evaluador: document.getElementById('evaluador').value,
                     institucion: document.getElementById('institucion').value,
+                    servicio: document.getElementById('servicio').value,
+                    historiaClinica: document.getElementById('historiaClinica').value,
                     timestamp: new Date().toISOString()
                 },
                 puntajes: {
@@ -1896,15 +2565,33 @@
                     ayudaTecnicaRecomendada: ayudaTecnica.ayudaTecnica
                 },
                 recomendaciones: classification.recomendaciones,
-                ayudaTecnica: ayudaTecnica
+                recomendacionesDetalladas: recomendacionesDetalladas,
+                ayudaTecnica: ayudaTecnica,
+                profesional: {
+                    uid: currentUser?.uid,
+                    email: currentUser?.email,
+                    nombre: userProfile?.nombre,
+                    especialidad: userProfile?.especialidad
+                }
             };
             
+            // Mostrar resultados
             displayResults(classification);
             displayAyudaTecnica(indiceAyuda, ayudaTecnica);
+            displayRecomendacionesDetalladas(recomendacionesDetalladas);
+            displayPlanIntervencion(indiceAyuda, ayudaTecnica);
             
+            // Navegar a resultados
             navigateTo('resultados');
             
             showNotification('✅ Resultados generados exitosamente', 'success');
+            
+            // Guardar automáticamente en modo profesional
+            if (currentUser) {
+                setTimeout(() => {
+                    saveReport();
+                }, 1000);
+            }
         }
 
         function classifyResults(irat, tinetti, norton) {
@@ -1989,6 +2676,7 @@
                         ${classification.iratRiesgo}
                     </div>
                     <p class="mt-2 small">Ponderación: 35%</p>
+                    <p class="small text-muted">Máx: 18 pts</p>
                 </div>
                 
                 <div class="result-card tinetti">
@@ -1998,6 +2686,7 @@
                         ${classification.tinettiRiesgo}
                     </div>
                     <p class="mt-2 small">Ponderación: 35%</p>
+                    <p class="small text-muted">16 items evaluados</p>
                 </div>
                 
                 <div class="result-card norton">
@@ -2007,18 +2696,19 @@
                         ${classification.nortonRiesgo}
                     </div>
                     <p class="mt-2 small">Ponderación: 30%</p>
+                    <p class="small text-muted">5 criterios evaluados</p>
                 </div>
-            `;
-            
-            const recomendacionesContainer = document.getElementById('recomendacionesContainer');
-            recomendacionesContainer.innerHTML = `
-                <h5 class="mt-4 mb-3"><i class="fas fa-lightbulb"></i> Recomendaciones Clínicas</h5>
-                ${classification.recomendaciones.map((rec, index) => `
-                    <div class="alert alert-${rec.tipo} mt-2">
-                        <strong>${index + 1}. ${rec.titulo}</strong><br>
-                        ${rec.texto}
+                
+                <div class="result-card" style="border-top-color: #6a11cb;">
+                    <h5><i class="fas fa-chart-line"></i> Riesgo Global</h5>
+                    <div class="result-value" style="color: ${getRiskColor(classification.riesgoGlobal)}">
+                        ${classification.riesgoGlobal}
                     </div>
-                `).join('')}
+                    <div class="badge ${getRiskClass(classification.riesgoGlobal)} mt-2">
+                        CLASIFICACIÓN
+                    </div>
+                    <p class="mt-2 small">Integración de escalas</p>
+                </div>
             `;
         }
 
@@ -2033,12 +2723,204 @@
             detalleContainer.innerHTML = `
                 <h5><i class="fas fa-info-circle"></i> Nivel de Riesgo: <span class="badge badge-${ayudaTecnica.color}">${ayudaTecnica.nivelRiesgo}</span></h5>
                 <div class="mt-3">
-                    <strong>Recomendaciones específicas:</strong>
+                    <strong><i class="fas fa-clipboard-list"></i> Intervenciones prioritarias:</strong>
                     <ul class="mt-2">
                         ${ayudaTecnica.recomendaciones.map(rec => `<li>${rec}</li>`).join('')}
                     </ul>
                 </div>
+                <div class="mt-3">
+                    <strong><i class="fas fa-calendar-check"></i> Frecuencia de seguimiento:</strong>
+                    <p class="mt-1">${obtenerFrecuenciaSeguimiento(ayudaTecnica.nivelRiesgo)}</p>
+                </div>
             `;
+        }
+
+        function displayRecomendacionesDetalladas(recomendaciones) {
+            const container = document.getElementById('recomendacionesDetalladas');
+            
+            if (!recomendaciones || recomendaciones.length === 0) {
+                container.innerHTML = `
+                    <div class="alert alert-success">
+                        <strong><i class="fas fa-check-circle"></i> Evaluación dentro de rangos normales</strong>
+                        <p class="mt-2">No se requieren intervenciones especiales en este momento.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '<div class="row">';
+            
+            recomendaciones.forEach((rec, index) => {
+                html += `
+                    <div class="col-md-6 mb-3">
+                        <div class="recomendacion-item ${rec.escala.toLowerCase()}">
+                            <div class="recomendacion-titulo">
+                                <span class="badge badge-${rec.tipo}">${rec.escala}</span>
+                                ${rec.titulo}
+                            </div>
+                            <div class="recomendacion-descripcion mt-2">
+                                ${rec.descripcion}
+                            </div>
+                            <div class="mt-3">
+                                <strong>Acciones específicas:</strong>
+                                <ul class="mt-1">
+                                    ${rec.acciones.map(acc => `<li>${acc}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function displayPlanIntervencion(indice, ayudaTecnica) {
+            const container = document.getElementById('planIntervencion');
+            
+            const plan = generarPlanIntervencion(indice, ayudaTecnica.nivelRiesgo);
+            
+            container.innerHTML = `
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title"><i class="fas fa-calendar-alt"></i> Cronograma de Intervención</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Actividad</th>
+                                        <th>Responsable</th>
+                                        <th>Frecuencia</th>
+                                        <th>Duración</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${plan.map(item => `
+                                        <tr>
+                                            <td>${item.actividad}</td>
+                                            <td>${item.responsable}</td>
+                                            <td>${item.frecuencia}</td>
+                                            <td>${item.duracion}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-3">
+                            <strong>Objetivos del plan:</strong>
+                            <ul class="mt-1">
+                                <li>Reducir riesgo de caídas en un 50% en 3 meses</li>
+                                <li>Mejorar independencia en actividades básicas</li>
+                                <li>Prevenir complicaciones secundarias</li>
+                                <li>Mantener calidad de vida del paciente</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generarPlanIntervencion(indice, nivelRiesgo) {
+            const planes = {
+                'BAJO': [
+                    {actividad: 'Ejercicios preventivos', responsable: 'Kinesiólogo', frecuencia: '2 veces/semana', duracion: '30 min'},
+                    {actividad: 'Evaluación periódica', responsable: 'Enfermera', frecuencia: 'Mensual', duracion: '20 min'},
+                    {actividad: 'Educación al paciente', responsable: 'Profesional', frecuencia: 'Inicial', duracion: '45 min'}
+                ],
+                'MODERADO': [
+                    {actividad: 'Rehabilitación ambulatoria', responsable: 'Kinesiólogo', frecuencia: '3 veces/semana', duracion: '45 min'},
+                    {actividad: 'Evaluación domiciliaria', responsable: 'TO', frecuencia: 'Inicial', duracion: '60 min'},
+                    {actividad: 'Seguimiento clínico', responsable: 'Médico', frecuencia: 'Mensual', duracion: '30 min'}
+                ],
+                'ALTO': [
+                    {actividad: 'Terapia intensiva', responsable: 'Kinesiólogo', frecuencia: '5 veces/semana', duracion: '60 min'},
+                    {actividad: 'Evaluación multidisciplinaria', responsable: 'Equipo', frecuencia: 'Semanal', duracion: '90 min'},
+                    {actividad: 'Supervisión de cuidados', responsable: 'Enfermera', frecuencia: 'Diario', duracion: '30 min'}
+                ],
+                'CRÍTICO': [
+                    {actividad: 'Rehabilitación hospitalaria', responsable: 'Equipo', frecuencia: 'Diaria', duracion: '120 min'},
+                    {actividad: 'Coordinación de cuidados', responsable: 'Trabajador Social', frecuencia: 'Semanal', duracion: '60 min'},
+                    {actividad: 'Seguimiento médico', responsable: 'Médico', frecuencia: 'Diario', duracion: '30 min'}
+                ]
+            };
+            
+            return planes[nivelRiesgo] || planes['BAJO'];
+        }
+
+        function determinarAyudaTecnica(indice) {
+            let nivelRiesgo = '';
+            let ayudaTecnica = '';
+            let recomendaciones = [];
+            let color = '';
+            
+            if (indice <= 3) {
+                nivelRiesgo = 'BAJO';
+                color = 'success';
+                ayudaTecnica = 'Supervisión básica y bastón simple';
+                recomendaciones = [
+                    'Realizar ejercicios de equilibrio preventivos',
+                    'Evaluación semestral de marcha',
+                    'Modificaciones menores en el hogar (iluminación, alfombras)',
+                    'Uso de calzado adecuado con suela antideslizante',
+                    'Educación sobre prevención de caídas'
+                ];
+            } else if (indice <= 6) {
+                nivelRiesgo = 'MODERADO';
+                color = 'warning';
+                ayudaTecnica = 'Bastón con base amplia o andador sin ruedas';
+                recomendaciones = [
+                    'Rehabilitación ambulatoria 2-3 veces por semana',
+                    'Evaluación por terapeuta ocupacional',
+                    'Adaptación domiciliaria: barras de apoyo, eliminación de umbrales',
+                    'Uso de dispositivo de alerta para caídas',
+                    'Programa de ejercicios domiciliarios supervisados',
+                    'Evaluación farmacológica de medicamentos'
+                ];
+            } else if (indice <= 9) {
+                nivelRiesgo = 'ALTO';
+                color = 'danger';
+                ayudaTecnica = 'Andador con ruedas o silla de ruedas para distancias largas';
+                recomendaciones = [
+                    'Rehabilitación intensiva (mínimo 3 veces por semana)',
+                    'Evaluación por equipo multidisciplinario',
+                    'Adaptaciones mayores en el hogar (rampas, elevadores)',
+                    'Considerar silla de ruedas para desplazamientos externos',
+                    'Asistencia domiciliaria parcial',
+                    'Supervisión durante la deambulación',
+                    'Evaluación nutricional completa'
+                ];
+            } else {
+                nivelRiesgo = 'CRÍTICO';
+                color = 'danger';
+                ayudaTecnica = 'Silla de ruedas eléctrica y dispositivo de transferencia';
+                recomendaciones = [
+                    'Hospitalización o rehabilitación intensiva hospitalaria',
+                    'Asistencia permanente para movilización',
+                    'Adaptaciones completas del domicilio',
+                    'Equipo especializado: grúas de transferencia, camas articuladas',
+                    'Cuidado 24/7 por cuidador entrenado',
+                    'Evaluación de ingreso a residencia asistida',
+                    'Plan de manejo del dolor si corresponde'
+                ];
+            }
+            
+            return {
+                nivelRiesgo,
+                ayudaTecnica,
+                recomendaciones,
+                color
+            };
+        }
+
+        function obtenerFrecuenciaSeguimiento(nivel) {
+            const frecuencias = {
+                'BAJO': 'Cada 6 meses',
+                'MODERADO': 'Cada 3 meses',
+                'ALTO': 'Mensual',
+                'CRÍTICO': 'Semanal o según necesidad'
+            };
+            return frecuencias[nivel] || 'Cada 6 meses';
         }
 
         function getRiskClass(riesgo) {
@@ -2052,6 +2934,17 @@
             return map[riesgo] || 'badge-secondary';
         }
 
+        function getRiskColor(riesgo) {
+            const map = {
+                'BAJO': '#4caf50',
+                'MODERADO': '#ff9800',
+                'ALTO': '#f44336',
+                'MUY ALTO': '#d32f2f',
+                'CRÍTICO': '#880e4f'
+            };
+            return map[riesgo] || '#666';
+        }
+
         function getGradientByRisk(color) {
             const gradients = {
                 'success': 'linear-gradient(135deg, #4caf50 0%, #66bb6a 100%)',
@@ -2062,41 +2955,644 @@
         }
 
         // ============================================
-        // FUNCIONES DE COMPARTIR Y PDF
+        // BASE DE DATOS PROFESIONAL
         // ============================================
-        function openShareModal() {
+        async function saveReport() {
+            if (!currentUser) {
+                showNotification('Debe iniciar sesión para guardar', 'error');
+                return;
+            }
+            
+            if (!lastReportData) {
+                showNotification('Primero genere los resultados', 'warning');
+                return;
+            }
+            
+            try {
+                const report = {
+                    ...lastReportData,
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    userProfile: userProfile,
+                    savedAt: new Date().toISOString(),
+                    status: 'completado',
+                    version: '2.0'
+                };
+                
+                const docRef = await db.collection('evaluaciones_profesionales').add(report);
+                
+                // Guardar también en colección de pacientes
+                await db.collection('pacientes').add({
+                    paciente: lastReportData.paciente,
+                    evaluaciones: [docRef.id],
+                    ultimaEvaluacion: new Date().toISOString(),
+                    profesional: {
+                        uid: currentUser.uid,
+                        email: currentUser.email
+                    },
+                    createdAt: new Date().toISOString()
+                });
+                
+                showNotification('✅ Evaluación guardada en base de datos profesional', 'success');
+                cargarEstadisticasInicio();
+                
+            } catch (error) {
+                console.error('Error al guardar:', error);
+                showNotification('❌ Error al guardar la evaluación', 'error');
+            }
+        }
+
+        async function cargarEstadisticasInicio() {
+            if (!currentUser) return;
+            
+            try {
+                const snapshot = await db.collection('evaluaciones_profesionales')
+                    .where('userId', '==', currentUser.uid)
+                    .get();
+                
+                const total = snapshot.size;
+                document.getElementById('totalEvaluaciones').textContent = total;
+                
+                // Calcular pacientes únicos
+                const pacientes = new Set();
+                snapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    if (data.paciente && data.paciente.rut) {
+                        pacientes.add(data.paciente.rut);
+                    }
+                });
+                document.getElementById('pacientesUnicos').textContent = pacientes.size;
+                
+                // Calcular riesgo alto
+                const riesgoAlto = snapshot.docs.filter(doc => {
+                    const data = doc.data();
+                    return data.puntajes && (
+                        data.puntajes.riesgoGlobal === 'ALTO' || 
+                        data.puntajes.riesgoGlobal === 'CRÍTICO' ||
+                        data.puntajes.indiceAyudaTecnica >= 7
+                    );
+                }).length;
+                document.getElementById('riesgoAlto').textContent = riesgoAlto;
+                
+                // Último mes
+                const haceUnMes = new Date();
+                haceUnMes.setMonth(haceUnMes.getMonth() - 1);
+                const ultimoMes = snapshot.docs.filter(doc => {
+                    const data = doc.data();
+                    return new Date(data.paciente.fecha) >= haceUnMes;
+                }).length;
+                document.getElementById('ultimoMes').textContent = ultimoMes;
+                
+            } catch (error) {
+                console.error("Error cargando estadísticas:", error);
+            }
+        }
+
+        async function loadHistorial() {
+            if (!currentUser) return;
+            
+            const container = document.getElementById('historialList');
+            container.innerHTML = '<div class="text-center p-4"><div class="loader mx-auto"></div><p class="mt-2">Cargando historial profesional...</p></div>';
+            
+            try {
+                const snapshot = await db.collection('evaluaciones_profesionales')
+                    .where('userId', '==', currentUser.uid)
+                    .orderBy('savedAt', 'desc')
+                    .limit(historialLimit)
+                    .get();
+                
+                if (snapshot.empty) {
+                    container.innerHTML = '<p class="text-center text-muted p-3">No hay evaluaciones guardadas</p>';
+                    return;
+                }
+                
+                container.innerHTML = '';
+                snapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    const fecha = new Date(data.paciente.fecha).toLocaleDateString('es-ES');
+                    
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    item.innerHTML = `
+                        <div>
+                            <strong>${data.paciente.nombre}</strong>
+                            <div class="small text-muted">
+                                <i class="fas fa-calendar"></i> ${fecha} | 
+                                <i class="fas fa-user-md"></i> ${data.paciente.evaluador}
+                            </div>
+                            <div class="mt-1">
+                                <span class="badge ${getRiskClass(data.puntajes.riesgoGlobal)} me-1">
+                                    ${data.puntajes.riesgoGlobal}
+                                </span>
+                                <span class="badge bg-primary">
+                                    IRAT: ${data.puntajes.irat}
+                                </span>
+                                <span class="badge bg-warning">
+                                    Tinetti: ${data.puntajes.tinetti}
+                                </span>
+                                <span class="badge bg-success">
+                                    Norton: ${data.puntajes.norton}
+                                </span>
+                                <span class="badge bg-info">
+                                    Índice: ${data.puntajes.indiceAyudaTecnica}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary" onclick="loadEvaluation('${doc.id}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success" onclick="descargarEvaluacion('${doc.id}')">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+                
+                historialOffset += historialLimit;
+                
+            } catch (error) {
+                console.error('Error cargando historial:', error);
+                container.innerHTML = '<p class="text-center text-danger p-3">Error al cargar el historial</p>';
+            }
+        }
+
+        async function cargarEstadisticasHistorial() {
+            if (!currentUser) return;
+            
+            try {
+                const snapshot = await db.collection('evaluaciones_profesionales')
+                    .where('userId', '==', currentUser.uid)
+                    .get();
+                
+                const total = snapshot.size;
+                document.getElementById('historialTotal').textContent = total;
+                
+                const riesgoAlto = snapshot.docs.filter(doc => {
+                    const data = doc.data();
+                    return data.puntajes && data.puntajes.riesgoGlobal === 'ALTO' || data.puntajes.riesgoGlobal === 'CRÍTICO';
+                }).length;
+                document.getElementById('historialRiesgoAlto').textContent = riesgoAlto;
+                
+                const haceUnMes = new Date();
+                haceUnMes.setMonth(haceUnMes.getMonth() - 1);
+                const ultimoMes = snapshot.docs.filter(doc => {
+                    const data = doc.data();
+                    return new Date(data.savedAt) >= haceUnMes;
+                }).length;
+                document.getElementById('historialUltimoMes').textContent = ultimoMes;
+                
+                const pacientes = new Set();
+                snapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    if (data.paciente && data.paciente.rut) {
+                        pacientes.add(data.paciente.rut);
+                    }
+                });
+                document.getElementById('historialPacientes').textContent = pacientes.size;
+                
+            } catch (error) {
+                console.error("Error cargando estadísticas historial:", error);
+            }
+        }
+
+        async function loadEvaluation(docId) {
+            try {
+                const doc = await db.collection('evaluaciones_profesionales').doc(docId).get();
+                if (doc.exists) {
+                    lastReportData = doc.data();
+                    
+                    const paciente = lastReportData.paciente;
+                    document.getElementById('nombre').value = paciente.nombre || '';
+                    document.getElementById('rut').value = paciente.rut || '';
+                    document.getElementById('fechaNacimiento').value = paciente.fechaNacimiento || '';
+                    document.getElementById('edad').value = paciente.edad || '';
+                    document.getElementById('genero').value = paciente.genero || '';
+                    document.getElementById('diagnostico').value = paciente.diagnostico || '';
+                    document.getElementById('comorbilidades').value = paciente.comorbilidades || '';
+                    document.getElementById('fecha').value = paciente.fecha || '';
+                    document.getElementById('evaluador').value = paciente.evaluador || '';
+                    document.getElementById('institucion').value = paciente.institucion || '';
+                    document.getElementById('servicio').value = paciente.servicio || '';
+                    document.getElementById('historiaClinica').value = paciente.historiaClinica || '';
+                    
+                    const classification = {
+                        iratRiesgo: lastReportData.puntajes.iratRiesgo,
+                        tinettiRiesgo: lastReportData.puntajes.tinettiRiesgo,
+                        nortonRiesgo: lastReportData.puntajes.nortonRiesgo,
+                        riesgoGlobal: lastReportData.puntajes.riesgoGlobal,
+                        recomendaciones: lastReportData.recomendaciones
+                    };
+                    
+                    displayResults(classification);
+                    displayAyudaTecnica(
+                        lastReportData.puntajes.indiceAyudaTecnica,
+                        lastReportData.ayudaTecnica
+                    );
+                    displayRecomendacionesDetalladas(lastReportData.recomendacionesDetalladas);
+                    displayPlanIntervencion(
+                        lastReportData.puntajes.indiceAyudaTecnica,
+                        lastReportData.ayudaTecnica.nivelRiesgo
+                    );
+                    navigateTo('resultados');
+                    
+                    showNotification('✅ Evaluación cargada exitosamente', 'success');
+                }
+            } catch (error) {
+                console.error('Error cargando evaluación:', error);
+                showNotification('❌ Error al cargar la evaluación', 'error');
+            }
+        }
+
+        // ============================================
+        // FUNCIONALIDADES PDF PROFESIONAL
+        // ============================================
+        async function downloadPDF() {
+            if (!lastReportData) {
+                showNotification('Primero genere los resultados', 'warning');
+                return;
+            }
+
+            try {
+                showNotification('🔄 Generando PDF profesional...', 'info');
+                
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                // Configuración
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const margin = 20;
+                let y = margin;
+                
+                // Logo y encabezado
+                pdf.setFillColor(26, 35, 126);
+                pdf.rect(0, 0, pageWidth, 40, 'F');
+                pdf.setTextColor(255, 255, 255);
+                pdf.setFontSize(20);
+                pdf.text('EVALUACIÓN CLÍNICA INTEGRAL', pageWidth / 2, 20, { align: 'center' });
+                pdf.setFontSize(12);
+                pdf.text('Sistema Profesional IRAT-5 + Tinetti + Norton', pageWidth / 2, 28, { align: 'center' });
+                
+                y = 50;
+                
+                // Información del profesional
+                pdf.setTextColor(0, 0, 0);
+                pdf.setFontSize(11);
+                pdf.text(`Profesional: ${userProfile?.nombre || currentUser?.email || 'No especificado'}`, margin, y);
+                y += 7;
+                pdf.text(`Especialidad: ${userProfile?.especialidad || 'No especificada'}`, margin, y);
+                y += 7;
+                pdf.text(`Institución: ${userProfile?.institucion || 'No especificada'}`, margin, y);
+                y += 7;
+                pdf.text(`Fecha de generación: ${new Date().toLocaleDateString('es-ES')}`, margin, y);
+                y += 15;
+                
+                // Datos del paciente
+                pdf.setFontSize(14);
+                pdf.setTextColor(26, 35, 126);
+                pdf.text('DATOS DEL PACIENTE', margin, y);
+                y += 10;
+                
+                pdf.setFontSize(10);
+                pdf.setTextColor(0, 0, 0);
+                const paciente = lastReportData.paciente;
+                
+                const datosPaciente = [
+                    [`Nombre:`, paciente.nombre],
+                    [`RUT:`, paciente.rut || 'No especificado'],
+                    [`Fecha de nacimiento:`, paciente.fechaNacimiento || 'No especificada'],
+                    [`Edad:`, paciente.edad || 'No especificada'],
+                    [`Género:`, paciente.genero || 'No especificado'],
+                    [`Diagnóstico:`, paciente.diagnostico || 'No especificado'],
+                    [`Comorbilidades:`, paciente.comorbilidades || 'Ninguna'],
+                    [`Fecha evaluación:`, paciente.fecha],
+                    [`Evaluador:`, paciente.evaluador],
+                    [`Institución:`, paciente.institucion],
+                    [`Servicio:`, paciente.servicio || 'No especificado'],
+                    [`Historia clínica:`, paciente.historiaClinica || 'No especificada']
+                ];
+                
+                datosPaciente.forEach(([label, value]) => {
+                    if (y > 250) {
+                        pdf.addPage();
+                        y = 20;
+                    }
+                    pdf.text(`${label} ${value}`, margin, y);
+                    y += 5;
+                });
+                
+                y += 10;
+                
+                // Resultados
+                pdf.setFontSize(14);
+                pdf.setTextColor(26, 35, 126);
+                pdf.text('RESULTADOS DE EVALUACIÓN', margin, y);
+                y += 10;
+                
+                const puntajes = lastReportData.puntajes;
+                const resultados = [
+                    ['ESCALA', 'PUNTAJE', 'CLASIFICACIÓN', 'PONDERACIÓN'],
+                    ['IRAT-5', `${puntajes.irat}/18`, puntajes.iratRiesgo, '35%'],
+                    ['Tinetti', `${puntajes.tinetti}/28`, puntajes.tinettiRiesgo, '35%'],
+                    ['Norton', `${puntajes.norton}/20`, puntajes.nortonRiesgo, '30%'],
+                    ['RIESGO GLOBAL', '', puntajes.riesgoGlobal, '']
+                ];
+                
+                pdf.autoTable({
+                    startY: y,
+                    head: [resultados[0]],
+                    body: resultados.slice(1),
+                    margin: { left: margin, right: margin },
+                    styles: { fontSize: 9 },
+                    headStyles: { fillColor: [26, 35, 126] }
+                });
+                
+                y = pdf.lastAutoTable.finalY + 10;
+                
+                // Índice de Ayuda Técnica
+                pdf.setFontSize(14);
+                pdf.setTextColor(106, 17, 203);
+                pdf.text('ÍNDICE DE AYUDA TÉCNICA', margin, y);
+                y += 10;
+                
+                pdf.setFontSize(12);
+                pdf.setTextColor(0, 0, 0);
+                pdf.text(`Valor calculado: ${puntajes.indiceAyudaTecnica}`, margin, y);
+                y += 7;
+                pdf.text(`Nivel de riesgo: ${puntajes.nivelAyudaTecnica}`, margin, y);
+                y += 7;
+                pdf.text(`Ayuda técnica recomendada: ${puntajes.ayudaTecnicaRecomendada}`, margin, y);
+                y += 10;
+                
+                // Recomendaciones
+                if (lastReportData.recomendacionesDetalladas && lastReportData.recomendacionesDetalladas.length > 0) {
+                    pdf.setFontSize(14);
+                    pdf.setTextColor(26, 35, 126);
+                    pdf.text('RECOMENDACIONES ESPECÍFICAS', margin, y);
+                    y += 10;
+                    
+                    pdf.setFontSize(10);
+                    lastReportData.recomendacionesDetalladas.forEach((rec, index) => {
+                        if (y > 250) {
+                            pdf.addPage();
+                            y = 20;
+                        }
+                        pdf.text(`${index + 1}. ${rec.titulo} (${rec.escala})`, margin, y);
+                        y += 5;
+                        pdf.text(rec.descripcion, margin + 5, y);
+                        y += 5;
+                        rec.acciones.forEach(acc => {
+                            pdf.text(`• ${acc}`, margin + 10, y);
+                            y += 4;
+                        });
+                        y += 5;
+                    });
+                }
+                
+                // Plan de intervención
+                const plan = generarPlanIntervencion(
+                    puntajes.indiceAyudaTecnica,
+                    puntajes.nivelAyudaTecnica
+                );
+                
+                if (plan.length > 0) {
+                    if (y > 200) {
+                        pdf.addPage();
+                        y = 20;
+                    }
+                    
+                    pdf.setFontSize(14);
+                    pdf.setTextColor(26, 35, 126);
+                    pdf.text('PLAN DE INTERVENCIÓN SUGERIDO', margin, y);
+                    y += 10;
+                    
+                    const planData = plan.map(item => [item.actividad, item.responsable, item.frecuencia, item.duracion]);
+                    
+                    pdf.autoTable({
+                        startY: y,
+                        head: [['Actividad', 'Responsable', 'Frecuencia', 'Duración']],
+                        body: planData,
+                        margin: { left: margin, right: margin },
+                        styles: { fontSize: 8 }
+                    });
+                }
+                
+                // Pie de página
+                const totalPages = pdf.internal.getNumberOfPages();
+                for (let i = 1; i <= totalPages; i++) {
+                    pdf.setPage(i);
+                    pdf.setFontSize(8);
+                    pdf.setTextColor(100, 100, 100);
+                    pdf.text(`Página ${i} de ${totalPages}`, pageWidth / 2, 290, { align: 'center' });
+                    pdf.text('Sistema Profesional de Evaluación Clínica - © 2024', pageWidth / 2, 295, { align: 'center' });
+                }
+                
+                // Guardar
+                const fileName = `Evaluacion_${paciente.nombre.replace(/\s/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+                pdf.save(fileName);
+                
+                showNotification('✅ PDF profesional generado exitosamente', 'success');
+                
+            } catch (error) {
+                console.error('Error generando PDF:', error);
+                showNotification('❌ Error al generar PDF profesional', 'error');
+            }
+        }
+
+        // ============================================
+        // FUNCIONALIDADES AVANZADAS
+        // ============================================
+        function imprimirResultados() {
+            window.print();
+            showNotification('✅ Preparando para impresión...', 'info');
+        }
+
+        function nuevaEvaluacion() {
+            if (confirm('¿Desea comenzar una nueva evaluación? Los datos actuales no guardados se perderán.')) {
+                // Limpiar formularios
+                document.querySelectorAll('input, select').forEach(element => {
+                    if (element.id !== 'authEmail' && element.id !== 'authPassword') {
+                        if (element.tagName === 'SELECT') {
+                            element.selectedIndex = 0;
+                        } else {
+                            element.value = '';
+                        }
+                    }
+                });
+                
+                // Restablecer puntajes
+                document.getElementById('puntajeIrat').textContent = '0';
+                document.getElementById('puntajeTinetti').textContent = '0';
+                document.getElementById('puntajeNorton').textContent = '20';
+                
+                // Configurar fecha actual
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('fecha').value = today;
+                
+                // Navegar a datos del paciente
+                navigateTo('datos-paciente');
+                
+                showNotification('✅ Nueva evaluación lista para comenzar', 'success');
+            }
+        }
+
+        async function exportarTodoDatos() {
+            if (!currentUser) {
+                showNotification('Debe iniciar sesión para exportar', 'error');
+                return;
+            }
+            
+            try {
+                showNotification('🔄 Preparando exportación completa...', 'info');
+                
+                const snapshot = await db.collection('evaluaciones_profesionales')
+                    .where('userId', '==', currentUser.uid)
+                    .get();
+                
+                if (snapshot.empty) {
+                    showNotification('No hay datos para exportar', 'warning');
+                    return;
+                }
+                
+                const data = [];
+                snapshot.docs.forEach(doc => {
+                    const docData = doc.data();
+                    data.push({
+                        id: doc.id,
+                        paciente: docData.paciente,
+                        puntajes: docData.puntajes,
+                        fecha: docData.paciente.fecha,
+                        evaluador: docData.paciente.evaluador,
+                        riesgo: docData.puntajes.riesgoGlobal,
+                        indice: docData.puntajes.indiceAyudaTecnica
+                    });
+                });
+                
+                // Crear JSON
+                const jsonData = JSON.stringify(data, null, 2);
+                const blob = new Blob([jsonData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `exportacion_evaluaciones_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showNotification('✅ Exportación completada exitosamente', 'success');
+                
+            } catch (error) {
+                console.error('Error exportando datos:', error);
+                showNotification('❌ Error al exportar los datos', 'error');
+            }
+        }
+
+        // ============================================
+        // CONFIGURACIÓN LOCAL
+        // ============================================
+        function cargarConfiguracionLocal() {
+            try {
+                const config = localStorage.getItem('configProfesional');
+                if (config) {
+                    const parsed = JSON.parse(config);
+                    
+                    // Aplicar configuración
+                    if (parsed.autoCalcular !== undefined) {
+                        document.getElementById('configAutoCalcular').checked = parsed.autoCalcular;
+                    }
+                    if (parsed.notificaciones !== undefined) {
+                        document.getElementById('configNotificaciones').checked = parsed.notificaciones;
+                    }
+                    if (parsed.tema) {
+                        document.getElementById('configTema').value = parsed.tema;
+                        aplicarTema(parsed.tema);
+                    }
+                }
+            } catch (error) {
+                console.error("Error cargando configuración:", error);
+            }
+        }
+
+        function guardarConfiguracion() {
+            try {
+                const config = {
+                    autoCalcular: document.getElementById('configAutoCalcular').checked,
+                    notificaciones: document.getElementById('configNotificaciones').checked,
+                    tema: document.getElementById('configTema').value,
+                    nombre: document.getElementById('configNombre').value,
+                    especialidad: document.getElementById('configEspecialidad').value,
+                    institucion: document.getElementById('configInstitucion').value
+                };
+                
+                localStorage.setItem('configProfesional', JSON.stringify(config));
+                
+                // Actualizar perfil en Firebase
+                if (currentUser) {
+                    db.collection('profesionales').doc(currentUser.uid).update({
+                        nombre: config.nombre,
+                        especialidad: config.especialidad,
+                        institucion: config.institucion,
+                        configuracion: config
+                    });
+                }
+                
+                aplicarTema(config.tema);
+                showNotification('✅ Configuración guardada exitosamente', 'success');
+                
+            } catch (error) {
+                console.error("Error guardando configuración:", error);
+                showNotification('❌ Error al guardar la configuración', 'error');
+            }
+        }
+
+        function aplicarTema(tema) {
+            const body = document.body;
+            
+            switch(tema) {
+                case 'oscuro':
+                    body.style.backgroundColor = '#1a1a1a';
+                    body.style.color = '#ffffff';
+                    break;
+                case 'profesional':
+                    body.style.backgroundColor = '#f0f2f5';
+                    body.style.color = '#333333';
+                    break;
+                default:
+                    body.style.backgroundColor = '';
+                    body.style.color = '';
+            }
+        }
+
+        // ============================================
+        // UTILIDADES PROFESIONALES
+        // ============================================
+        function showNotification(message, type = 'info', duration = 4000) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, duration);
+        }
+
+        function copyToClipboard() {
             if (!lastReportData) {
                 showNotification('Primero genere los resultados', 'warning');
                 return;
             }
             
             const text = generateShareText();
-            document.getElementById('shareText').textContent = text;
-            document.getElementById('shareModal').style.display = 'flex';
-        }
-
-        function closeShareModal() {
-            document.getElementById('shareModal').style.display = 'none';
-        }
-
-        function generateShareText() {
-            const paciente = lastReportData.paciente;
-            const puntajes = lastReportData.puntajes;
-            const ayuda = lastReportData.ayudaTecnica;
             
-            return `📋 EVALUACIÓN CLÍNICA INTEGRAL\n\n` +
-                   `👤 Paciente: ${paciente.nombre}\n` +
-                   `📅 Fecha: ${paciente.fecha}\n` +
-                   `👨‍⚕️ Evaluador: ${paciente.evaluador}\n\n` +
-                   `📊 RESULTADOS (Ponderación 35-35-30):\n` +
-                   `• IRAT-5 (35%): ${puntajes.irat} pts (${puntajes.iratRiesgo})\n` +
-                   `• Tinetti (35%): ${puntajes.tinetti}/28 pts (${puntajes.tinettiRiesgo})\n` +
-                   `• Norton (30%): ${puntajes.norton}/20 pts (${puntajes.nortonRiesgo})\n` +
-                   `• Riesgo Global: ${puntajes.riesgoGlobal}\n\n` +
-                   `🎯 ÍNDICE DE AYUDA TÉCNICA: ${puntajes.indiceAyudaTecnica}\n` +
-                   `• Nivel: ${puntajes.nivelAyudaTecnica}\n` +
-                   `• Ayuda recomendada: ${puntajes.ayudaTecnicaRecomendada}\n\n` +
-                   `💡 Sistema Evaluador Clínico Integrado`;
+            navigator.clipboard.writeText(text)
+                .then(() => showNotification('✅ Texto copiado al portapapeles', 'success'))
+                .catch(() => showNotification('❌ Error al copiar', 'error'));
+            
+            closeShareModal();
         }
 
         function shareViaWhatsApp() {
@@ -2117,291 +3613,44 @@
             closeShareModal();
         }
 
-        async function copyToClipboard() {
+        function generateShareText() {
+            const paciente = lastReportData.paciente;
+            const puntajes = lastReportData.puntajes;
+            const ayuda = lastReportData.ayudaTecnica;
+            
+            return `📋 EVALUACIÓN CLÍNICA PROFESIONAL\n\n` +
+                   `👤 Paciente: ${paciente.nombre}\n` +
+                   `📅 Fecha: ${paciente.fecha}\n` +
+                   `👨‍⚕️ Evaluador: ${paciente.evaluador}\n` +
+                   `🏥 Institución: ${paciente.institucion}\n\n` +
+                   `📊 RESULTADOS (35-35-30):\n` +
+                   `• IRAT-5: ${puntajes.irat}/18 (${puntajes.iratRiesgo})\n` +
+                   `• Tinetti: ${puntajes.tinetti}/28 (${puntajes.tinettiRiesgo})\n` +
+                   `• Norton: ${puntajes.norton}/20 (${puntajes.nortonRiesgo})\n` +
+                   `• Riesgo Global: ${puntajes.riesgoGlobal}\n\n` +
+                   `🎯 ÍNDICE DE AYUDA TÉCNICA: ${puntajes.indiceAyudaTecnica}\n` +
+                   `• Nivel: ${puntajes.nivelAyudaTecnica}\n` +
+                   `• Ayuda recomendada: ${puntajes.ayudaTecnicaRecomendada}\n\n` +
+                   `💡 Sistema Profesional de Evaluación Clínica`;
+        }
+
+        function openShareModal() {
+            if (!lastReportData) {
+                showNotification('Primero genere los resultados', 'warning');
+                return;
+            }
+            
             const text = generateShareText();
-            
-            try {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    await navigator.clipboard.writeText(text);
-                    showNotification('✅ Texto copiado al portapapeles', 'success');
-                } else {
-                    const textarea = document.createElement('textarea');
-                    textarea.value = text;
-                    textarea.style.position = 'fixed';
-                    textarea.style.opacity = '0';
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textarea);
-                    showNotification('✅ Texto copiado al portapapeles', 'success');
-                }
-            } catch (error) {
-                console.error('Error al copiar:', error);
-                showNotification('❌ Error al copiar', 'error');
-            }
-            
-            closeShareModal();
+            document.getElementById('shareText').textContent = text;
+            document.getElementById('shareModal').style.display = 'flex';
         }
 
-        function downloadPDF() {
-            if (!lastReportData) {
-                showNotification('Primero genere los resultados', 'warning');
-                return;
-            }
-
-            try {
-                showNotification('🔄 Generando PDF...', 'info');
-                
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                let y = 20;
-                
-                pdf.setFontSize(20);
-                pdf.setTextColor(26, 35, 126);
-                pdf.text('EVALUACIÓN CLÍNICA INTEGRAL', pageWidth / 2, y, { align: 'center' });
-                y += 10;
-                
-                pdf.setFontSize(12);
-                pdf.setTextColor(100, 100, 100);
-                pdf.text('Sistema IRAT-5 + Tinetti + Norton (Ponderación 35-35-30)', pageWidth / 2, y, { align: 'center' });
-                y += 20;
-                
-                pdf.setFontSize(14);
-                pdf.setTextColor(26, 35, 126);
-                pdf.text('DATOS DEL PACIENTE', 20, y);
-                y += 10;
-                
-                pdf.setFontSize(10);
-                pdf.setTextColor(0, 0, 0);
-                const paciente = lastReportData.paciente;
-                pdf.text(`Nombre: ${paciente.nombre}`, 25, y);
-                y += 7;
-                pdf.text(`Fecha: ${paciente.fecha}`, 25, y);
-                y += 7;
-                pdf.text(`Evaluador: ${paciente.evaluador}`, 25, y);
-                y += 7;
-                pdf.text(`Institución: ${paciente.institucion || 'N/A'}`, 25, y);
-                y += 15;
-                
-                pdf.setFontSize(14);
-                pdf.setTextColor(26, 35, 126);
-                pdf.text('RESULTADOS CON PONDERACIÓN 35-35-30', 20, y);
-                y += 10;
-                
-                pdf.setFontSize(10);
-                const puntajes = lastReportData.puntajes;
-                pdf.text(`• IRAT-5 (35%): ${puntajes.irat} puntos (${puntajes.iratRiesgo})`, 25, y);
-                y += 7;
-                pdf.text(`• Test de Tinetti (35%): ${puntajes.tinetti}/28 puntos (${puntajes.tinettiRiesgo})`, 25, y);
-                y += 7;
-                pdf.text(`• Escala Norton (30%): ${puntajes.norton}/20 puntos (${puntajes.nortonRiesgo})`, 25, y);
-                y += 7;
-                pdf.text(`• Riesgo Global: ${puntajes.riesgoGlobal}`, 25, y);
-                y += 10;
-                
-                pdf.setFontSize(14);
-                pdf.setTextColor(106, 17, 203);
-                pdf.text('ÍNDICE DE AYUDA TÉCNICA', 20, y);
-                y += 10;
-                
-                pdf.setFontSize(12);
-                pdf.setTextColor(0, 0, 0);
-                pdf.text(`Valor: ${puntajes.indiceAyudaTecnica}`, 25, y);
-                y += 7;
-                pdf.text(`Nivel: ${puntajes.nivelAyudaTecnica}`, 25, y);
-                y += 7;
-                pdf.text(`Ayuda recomendada: ${puntajes.ayudaTecnicaRecomendada}`, 25, y);
-                y += 15;
-                
-                if (lastReportData.ayudaTecnica && lastReportData.ayudaTecnica.recomendaciones) {
-                    pdf.setFontSize(14);
-                    pdf.setTextColor(26, 35, 126);
-                    pdf.text('RECOMENDACIONES DE AYUDA TÉCNICA', 20, y);
-                    y += 10;
-                    
-                    pdf.setFontSize(10);
-                    lastReportData.ayudaTecnica.recomendaciones.forEach((rec, index) => {
-                        if (y > 250) {
-                            pdf.addPage();
-                            y = 20;
-                        }
-                        pdf.text(`${index + 1}. ${rec}`, 25, y);
-                        y += 5;
-                    });
-                }
-                
-                if (lastReportData.recomendaciones && lastReportData.recomendaciones.length > 0) {
-                    y += 10;
-                    pdf.setFontSize(14);
-                    pdf.setTextColor(26, 35, 126);
-                    pdf.text('RECOMENDACIONES GENERALES', 20, y);
-                    y += 10;
-                    
-                    pdf.setFontSize(10);
-                    lastReportData.recomendaciones.forEach((rec, index) => {
-                        if (y > 250) {
-                            pdf.addPage();
-                            y = 20;
-                        }
-                        pdf.text(`${index + 1}. ${rec.titulo}`, 25, y);
-                        y += 5;
-                        const lines = pdf.splitTextToSize(rec.texto, pageWidth - 40);
-                        lines.forEach(line => {
-                            pdf.text(line, 30, y);
-                            y += 5;
-                        });
-                        y += 5;
-                    });
-                }
-                
-                const fileName = `Evaluacion_${paciente.nombre.replace(/\s/g, '_')}.pdf`;
-                pdf.save(fileName);
-                
-                showNotification('✅ PDF generado exitosamente', 'success');
-                closeShareModal();
-                
-            } catch (error) {
-                console.error('Error generando PDF:', error);
-                showNotification('❌ Error al generar PDF', 'error');
-                closeShareModal();
-            }
+        function closeShareModal() {
+            document.getElementById('shareModal').style.display = 'none';
         }
 
         // ============================================
-        // BASE DE DATOS
-        // ============================================
-        async function saveReport() {
-            if (!currentUser) {
-                showNotification('Debe iniciar sesión para guardar', 'error');
-                return;
-            }
-            
-            if (!lastReportData) {
-                showNotification('Primero genere los resultados', 'warning');
-                return;
-            }
-            
-            try {
-                const report = {
-                    ...lastReportData,
-                    userId: currentUser.uid,
-                    userEmail: currentUser.email,
-                    savedAt: new Date().toISOString()
-                };
-                
-                await db.collection('evaluaciones').add(report);
-                showNotification('✅ Evaluación guardada en la nube', 'success');
-                loadHistorial();
-            } catch (error) {
-                console.error('Error al guardar:', error);
-                showNotification('❌ Error al guardar la evaluación', 'error');
-            }
-        }
-
-        async function loadHistorial() {
-            if (!currentUser) return;
-            
-            const container = document.getElementById('historialList');
-            container.innerHTML = '<div class="text-center p-3">Cargando historial...</div>';
-            
-            try {
-                const snapshot = await db.collection('evaluaciones')
-                    .where('userId', '==', currentUser.uid)
-                    .orderBy('savedAt', 'desc')
-                    .limit(10)
-                    .get();
-                
-                if (snapshot.empty) {
-                    container.innerHTML = '<p class="text-center text-muted p-3">No hay evaluaciones guardadas</p>';
-                    return;
-                }
-                
-                container.innerHTML = '';
-                snapshot.docs.forEach(doc => {
-                    const data = doc.data();
-                    const fecha = new Date(data.paciente.fecha).toLocaleDateString('es-ES');
-                    
-                    const item = document.createElement('div');
-                    item.className = 'history-item';
-                    item.innerHTML = `
-                        <div>
-                            <strong>${data.paciente.nombre}</strong><br>
-                            <small class="text-muted">
-                                ${fecha} | 
-                                IRAT: ${data.puntajes.irat} | 
-                                Tinetti: ${data.puntajes.tinetti} |
-                                Norton: ${data.puntajes.norton} |
-                                Índice: ${data.puntajes.indiceAyudaTecnica}
-                            </small>
-                        </div>
-                        <div>
-                            <button class="btn btn-sm btn-outline-primary" onclick="loadEvaluation('${doc.id}')">
-                                <i class="fas fa-eye"></i> Ver
-                            </button>
-                        </div>
-                    `;
-                    container.appendChild(item);
-                });
-            } catch (error) {
-                console.error('Error cargando historial:', error);
-                container.innerHTML = '<p class="text-center text-danger p-3">Error al cargar el historial</p>';
-            }
-        }
-
-        async function loadEvaluation(docId) {
-            try {
-                const doc = await db.collection('evaluaciones').doc(docId).get();
-                if (doc.exists) {
-                    lastReportData = doc.data();
-                    
-                    const paciente = lastReportData.paciente;
-                    document.getElementById('nombre').value = paciente.nombre || '';
-                    document.getElementById('rut').value = paciente.rut || '';
-                    document.getElementById('fecha').value = paciente.fecha || '';
-                    document.getElementById('edad').value = paciente.edad || '';
-                    document.getElementById('evaluador').value = paciente.evaluador || '';
-                    document.getElementById('institucion').value = paciente.institucion || '';
-                    
-                    const classification = {
-                        iratRiesgo: lastReportData.puntajes.iratRiesgo,
-                        tinettiRiesgo: lastReportData.puntajes.tinettiRiesgo,
-                        nortonRiesgo: lastReportData.puntajes.nortonRiesgo,
-                        riesgoGlobal: lastReportData.puntajes.riesgoGlobal,
-                        recomendaciones: lastReportData.recomendaciones
-                    };
-                    
-                    displayResults(classification);
-                    displayAyudaTecnica(
-                        lastReportData.puntajes.indiceAyudaTecnica,
-                        lastReportData.ayudaTecnica
-                    );
-                    navigateTo('resultados');
-                    
-                    showNotification('✅ Evaluación cargada exitosamente', 'success');
-                }
-            } catch (error) {
-                console.error('Error cargando evaluación:', error);
-                showNotification('❌ Error al cargar la evaluación', 'error');
-            }
-        }
-
-        // ============================================
-        // UTILIDADES
-        // ============================================
-        function showNotification(message, type = 'info', duration = 4000) {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification ${type}`;
-            notification.style.display = 'block';
-            
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, duration);
-        }
-
-        // ============================================
-        // INICIALIZAR APLICACIÓN
+        // INICIALIZAR APLICACIÓN PROFESIONAL
         // ============================================
         window.onload = initApp;
 
